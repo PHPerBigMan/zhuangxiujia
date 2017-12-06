@@ -1,0 +1,63 @@
+{extend name="template/layout" /}
+
+{block name="content"}
+
+{php}
+$nav = [
+["url"=>"/", "name"=>"个人中心"],
+["url"=>"/", "name"=>"个人信息"]
+]
+{/php}
+{include file="../application/index/view/template/crumbs-nav.html" nav="$nav" /}
+
+<div class="p-wrap m-user">
+    <div class="user-left-box">
+        <div class="user-tab-item active" onclick="href(1,this)">个人信息</div>
+        <div class="user-tab-item" onclick="href(2,this)">我的装修</div>
+        <div class="user-tab-item" onclick="href(3,this)">我的发布</div>
+    </div>
+
+    <div class="user-right-box">
+        <div class="user-info-left">
+            <div class="float-wrap">
+                <img src="{$data.user_pic}" class="user-avatar"></img>
+                <a href="/user/edit" class="user-edit-btn p-button">修改资料</a>
+            </div>
+        </div>
+
+        <div class="user-info-right">
+            <div class="info-row">
+                <label>昵称：</label>
+                <span>{$data.user_name}</span>
+            </div>
+
+            <div class="info-row">
+                <label>手机：</label>
+                <span>{$data.user_phone}</span>
+            </div>
+
+            <div class="info-row">
+                <label>性别：</label>
+                <span>
+                    {if condition="$data.user_sex == 1"}
+                    男
+                    {else/}
+                    女
+                    {/if}
+                </span>
+            </div>
+
+            <div class="info-row">
+                <label>职业：</label>
+                <span>{$data.user_job}</span>
+            </div>
+
+            <div class="info-row">
+                <label>地区：</label>
+                <span>{$data.user_area}{$data.user_city}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{/block}

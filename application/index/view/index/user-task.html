@@ -1,0 +1,69 @@
+{extend name="template/layout" /}
+
+{block name="content"}
+
+{php}
+$nav = [
+["url"=>"/", "name"=>"个人中心"],
+["url"=>"/", "name"=>"个人信息"]
+]
+{/php}
+{include file="../application/index/view/template/crumbs-nav.html" nav="$nav" /}
+
+<div class="p-wrap m-user">
+    <div class="user-left-box">
+        <div class="user-tab-item " onclick="href(1,this)">个人信息</div>
+        <div class="user-tab-item {php}if($active == 1){echo 'active';}{/php}" onclick="href(2,this)">我的装修</div>
+        <div class="user-tab-item {php}if($active == 2){echo 'active';}{/php}"" onclick="href(3,this)">我的发布</div>
+    </div>
+
+    <div class="user-right-box">
+        <div class="task-container">
+            {foreach $data as $item}
+
+
+            <div class="task-item">
+                <div class="task-detail">
+                    <input type="hidden" name="id" value="{$item.id}">
+                    <div class="task-detail-row">
+                        <label>房屋类型：</label>{$item.room_type}
+                    </div>
+
+                    <div class="task-detail-row">
+                        <label>建筑面积：</label>{$item.room_mj}㎡
+                    </div>
+
+                    <div class="task-detail-row">
+                        <label>装修预算：</label>{$item.room_ys}万
+                    </div>
+
+                    <div class="task-detail-row">
+                        <label>装修工期：</label>{$item.room_time}
+                    </div>
+
+                    <div class="task-detail-row">
+                        <label>联系电话：</label>{$item.phone}
+                    </div>
+
+                    <div class="task-detail-row">
+                        <div><label>备注：</label></div>
+                        <div class="p-single-line-text">
+                            {$item.remark}
+                        </div>
+                    </div>
+
+                    <div class="task-detail-row">
+                       <!--<button class="p-button">删除</button>-->
+                        <a class="p-button" href="{:url('User/del',['id'=>$item.id])}">删除</a>
+                    </div>
+                </div>
+
+                <div class="task-time">{$item.create_time | date="Y-m-d H:i",###}</div>
+            </div>
+            {/foreach}
+        </div>
+    </div>
+</div>
+
+{/block}
+

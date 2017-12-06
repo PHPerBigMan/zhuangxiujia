@@ -1,0 +1,108 @@
+{include file="layout/head"}
+<body>
+<div class="page-container">
+	<form   class="form form-horizontal layui-form"  id="anli" enctype="multipart/form-data">
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2">标题：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="{$data.title}" placeholder="" id="" name="title">
+			</div>
+		</div>
+
+
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2">发布时间：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="{$data.create_time}" placeholder="" id="" name="create_time" disabled>
+			</div>
+		</div>
+
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2">平台介绍：</label>
+			<div class="formControls col-xs-8 col-sm-9" >
+				<script id="editor" type="text/plain" class="" name="content" style="height: 500px" >
+					{$data.content}
+				</script>
+			</div>
+		</div>
+
+		<div class="row cl" >
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+				<input type="hidden" name="id" value="{$data.id}">
+				<button onClick="add();" class="btn btn-primary radius" type="button" style="margin-top: 10px"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+				<button onClick="layer_close();" class="btn btn-default radius" type="button" style="margin-top: 10px">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+
+{include file="layout/foot"}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="/lib/webuploader/0.1.5/webuploader.min.js"></script>
+<script type="text/javascript" src="/lib/ueditor/1.4.3/ueditor.config.js"></script>
+<script type="text/javascript" src="/lib/ueditor/1.4.3/ueditor.all.min.js"> </script>
+<script type="text/javascript" src="/lib/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script>
+<script type="text/javascript">
+    var ue = UE.getEditor('editor');
+    var ue = UE.getEditor('pic');
+
+	function add(){
+		$.post("{:url('Intro/add')}",$('#anli').serialize(),function(data){
+			if(data == 200){
+				layer.msg("操作成功",{icon:1,time:2000});
+			}else{
+				layer.msg("数据暂未修改",{icon:2,time:2000});
+			}
+		})
+	}
+</script>
+
+<script>
+	layui.use(['form', 'layedit', 'laydate'], function(){
+		var form = layui.form()
+				,layer = layui.layer
+				,layedit = layui.layedit
+				,laydate = layui.laydate;
+
+		//创建一个编辑器
+		var editIndex = layedit.build('LAY_demo_editor');
+
+		//自定义验证规则
+		form.verify({
+			title: function(value){
+				if(value.length < 5){
+					return '标题至少得5个字符啊';
+				}
+			}
+			,pass: [/(.+){6,12}$/, '密码必须6到12位']
+			,content: function(value){
+				layedit.sync(editIndex);
+			}
+		});
+
+		//监听指定开关
+		form.on('switch(switchTest)', function(data){
+			layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+				offset: '6px'
+			});
+			layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+		});
+
+		//监听提交
+		form.on('submit(demo1)', function(data){
+			layer.alert(JSON.stringify(data.field), {
+				title: '最终的提交信息'
+			})
+			return false;
+		});
+
+
+	});
+</script>
+</body>
+</html>

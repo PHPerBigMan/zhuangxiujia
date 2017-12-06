@@ -1,0 +1,35 @@
+{extend name="template/layout" /}
+
+{block name="content"}
+
+
+{include file="../application/index/view/template/crumbs-nav.html" /}
+
+<div class="p-wrap m-list" id="list">
+    <ul class="list-container">
+        <li class="list-item" v-for="datas in data">
+            <div class="item-title" v-text="datas.title" @click="news(datas.url)"></div>
+            <div class="item-time" v-text="datas.create_time"></div>
+        </li>
+    </ul>
+
+    <div class="pagelist">
+        {$page}
+    </div>
+
+
+</div>
+<script type="application/javascript">
+    var list = new Vue({
+        el:'#list',
+        data:{
+            data:{$data}
+        },
+        methods:{
+            news:function (url) {
+                location.href = url;
+            }
+        }
+    });
+</script>
+{/block}

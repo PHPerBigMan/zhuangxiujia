@@ -1,0 +1,56 @@
+{extend name="template/layout" /}
+
+{block name="content"}
+
+
+{include file="../application/index/view/template/crumbs-nav.html" nav={$nav}
+
+<div class="p-wrap m-decorate-case">
+    <div class="m-sort-label">
+        <form id="anli">
+            {foreach name="data" item="v1"}
+            <div class="label-row">
+                <label>{$v1.cat_name}</label>
+                <div class="sort-container">
+
+                    <span  <?php if(empty($v1['active'])){echo "class='active'";}?> onclick="cat('all-{$v1.id}',this)" id="all-{$v1.id}">全部</span>
+                    {foreach name="v1.sec" item="v2"}
+                    <span onclick="cat({$v2.id},this)" <?php if($v2['active'] == 1){echo "class='active'";}?> a="{$v2.id}">{$v2.cat_name}</span>
+                    {/foreach}
+
+
+                </div>
+            </div>
+            {/foreach}
+        </form>
+    </div>
+
+    <ul class="decorate-case-container">
+        {if condition="$anli != ''"}
+            {foreach name="anli" item="v1"}
+        <a href="/detail/5/{$v1.id}">
+            <li class='decorate-case-item'>
+                <div class='img-container'>
+                    <img src="{$v1.pic[0]}" class='img-big'>
+                    <div class='img-small-container'>
+                    {foreach name="v1.pic" item="v2"}
+
+                       <img src="{$v2}" class="img-small">
+
+                    {/foreach}
+                    </div>
+                </div>
+                <div class='title-container'>
+                <h3 class='item-title'>{$v1.title}</h3>
+                <h3 class='item-img-count'>{$v1.count}</h3>
+                </div>
+            </li>
+        </a>
+            {/foreach}
+        {/if}
+    </ul>
+    <input type="hidden" id="count" value="{$count}">
+    {include file="../application/index/view/template/pagination.html" /}
+</div>
+{/block}
+

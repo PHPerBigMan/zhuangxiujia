@@ -1,0 +1,25 @@
+{extend name="template/layout" /}
+
+{block name="content"}
+
+{php}
+$nav = [
+["url"=>"/", "name"=>"个人中心"],
+["url"=>"/", "name"=>"个人信息"]
+]
+{/php}
+{include file="../application/index/view/template/crumbs-nav.html" nav="$nav" /}
+
+<div class="p-wrap m-user">
+    <div class="user-left-box">
+        <div class="user-tab-item active">个人信息</div>
+        <div class="user-tab-item">我的装修</div>
+        <div class="user-tab-item">我的发布</div>
+    </div>
+
+    <div class="user-right-box">
+        <img src="$static/img/avatar.jpg" class="user-avatar"></img>
+    </div>
+</div>
+
+{/block}

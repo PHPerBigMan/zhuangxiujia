@@ -1,0 +1,74 @@
+﻿{include file="layout/head"}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 任务管理 <span class="c-gray en">&gt;</span> 任务列表 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+		<span class="r">共有数据：<strong>{$count}</strong> 条</span> </div>
+
+
+	<div class="mt-20">
+		<table id="Renwu" class="table table-border table-bordered table-bg table-hover table-sort">
+
+		</table>
+	</div>
+
+</div>
+{include file="layout/foot"}
+<!--请在下方写此页面业务相关的脚本-->
+<!--<script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>-->
+<!--<script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>-->
+<!--<script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script>-->
+<script type="text/javascript">
+
+
+    $(function () {
+        $('#Renwu').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "processing": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "ajax": "{:url('Tixian/tixian_ajax')}",
+            "columns": [
+                {"title": "ID", "data": "id"},
+                {"title": "申请用户", "data": "user_name"},
+                {"title": "提现金额", "data": "money"},
+                {"title": "提现状态", "data": "status"},
+                {"title": "审核状态", "data": "shenghe"},
+                {"title": "申请时间", "data": "create_time"},
+                {"title": "提现成功时间", "data": "end_time"},
+                {"title": "操作", "data": "caozuo"},
+            ]
+
+        });
+    });
+
+
+
+	/*审核*/
+	function shenghe(obj,id) {
+		layer.confirm("确认您的操作吗？",function () {
+			$.post("{:url('Tixian/shenghe')}",{id:id},function (code) {
+				if(code == 200){
+					layer.msg('操作成功',{icon:1,time:1000});
+					setTimeout(function () {
+						location.reload()
+					},1000);
+				}else{
+				    layer.msg('您没有权限')
+				}
+			})
+		});
+	}
+
+	function dakuan(obj,id,money) {
+	    layer.confirm("打款金额为"+money+"元",function () {
+			$.post("{:url('Tixian/dakuan')}",{id:id,money:money},function (code) {
+				
+            })
+        })
+	}
+</script> 
+</body>
+</html>

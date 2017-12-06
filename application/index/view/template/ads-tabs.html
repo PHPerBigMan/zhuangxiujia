@@ -1,0 +1,39 @@
+<div class="m-ads-tabs" id="app">
+    <ul class="nav nav-tabs m-tabs-custom" role="tablist">
+        <input type="hidden" id="type" value="<?php echo empty($type) ? '' : $type;?>">
+        <li v-for="(datas,index) in data" :class="datas.class">
+            <a :href="datas.href" role="tab"
+               data-toggle="tab">
+                <span v-text="datas.title"></span>
+            </a>
+        </li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" :class="datas.img_class"  v-for="datas in data" :id="datas.img_id">
+            <img :src="datas.img" alt="">
+        </div>
+    </div>
+</div>
+<script type="application/javascript">
+    var app1 = new Vue(
+        {
+            el:'#app',
+            data:{
+                data:[],
+            },
+            mounted:function () {
+                type = $('#type').val();
+                $.ajax({
+                    type:"GET",
+                    url:"/index/web/free/"+type,
+                    dataType:"json",
+                    success: function(result) {
+                        console.log(result);
+                        app1.data = $.parseJSON(result);
+                    }
+                })
+            }
+        }
+    );
+</script>

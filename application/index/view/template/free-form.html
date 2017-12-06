@@ -1,0 +1,41 @@
+<!--todo 表单提交地址-->
+<form id="free_data" class="m-free-form">
+    <div class="form-row">
+        <input type="text" placeholder="请输入您的姓名" id="free_name">
+    </div>
+    <div class="form-row">
+        <input type="text" placeholder="请输入您的手机号码" id="free_phone">
+    </div>
+    <div class="form-row">
+        <label>面积：</label>
+        <input type="text" name="" class="small-input" id="room_mj">
+
+        <label>风格：</label>
+        <input type="text" name="" class="small-input" id="free_fg">
+    </div>
+    <div class="form-row">
+        <label>地址：</label>
+        <select id="province" onchange="pro(1)">
+
+        </select>
+
+        <select id="city" onchange="city_a(1)">
+
+        </select>
+
+        <select id="area">
+
+        </select>
+    </div>
+    <div class="form-row">
+        <input type="text" name="" placeholder="详细地址" id="free_address">
+    </div>
+    <div class="form-row">
+        <div class="p-button" onclick="shenqing(this)">免费申请</div>
+    </div>
+</form>
+
+<script src="/static/js/decorate-mall.js">
+
+</script>
+<script src="http://pv.sohu.com/cityjson?ie=utf-8"></script>

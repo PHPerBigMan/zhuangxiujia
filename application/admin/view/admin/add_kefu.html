@@ -1,0 +1,60 @@
+{include file="layout/head"}
+<body>
+<article class="page-container">
+    <form id="form-change-password" class="form form-horizontal">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>客服电话：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" autocomplete="off" placeholder="" name="tel" id="tel" value="{$data}">
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;保存&nbsp;&nbsp;">
+                <input type="hidden" id="tel_id" value="{$id}">
+            </div>
+        </div>
+    </form>
+</article>
+
+{include file="layout/foot"}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $("#form-change-password").validate({
+            rules:{
+                tel:{
+                    required:true,
+                },
+            },
+            onkeyup:false,
+            focusCleanup:true,
+            success:"valid",
+            submitHandler:function(){
+                var tel    = $('#tel').val();
+                var id     = $('#tel_id').val();
+                $.post("{:url('Admin/kefu_edit')}",{id:id,tel:tel},function (data) {
+                    if(data.code == 200){
+                        layer.msg(data.msg);
+                        setTimeout(function () {
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.$('.btn-refresh').click();
+                            parent.layer.close(index);
+
+                        },1500);
+                    }else{
+                        layer.msg(data.msg);
+
+                    }
+                });
+            },
+        });
+    });
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

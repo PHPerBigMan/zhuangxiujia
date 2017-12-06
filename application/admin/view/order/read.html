@@ -1,0 +1,154 @@
+﻿{include file="layout/head"}
+<body>
+
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 订单管理 <span class="c-gray en">&gt;</span> 订单详情 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+	<form class="layui-form" id="form">
+		<div class="layui-form-item">
+			<label class="layui-form-label">订单ID</label>
+			<div class="layui-input-block">
+				<input type="text" name="orderId" lay-verify="title" autocomplete="off" placeholder="订单ID" class="layui-input" value="{$data.orderId}" disabled>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">用户名称</label>
+			<div class="layui-input-block">
+				<input type="text" name="user_name" lay-verify="required"  autocomplete="off" class="layui-input" value="{$data.user_name}" disabled>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">任务名称</label>
+			<div class="layui-input-block">
+				<input type="text" name="rw_title" lay-verify="required"  autocomplete="off" class="layui-input" value="{$data.rw_title}" disabled>
+			</div>
+		</div>
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">订单状态</label>
+			<div class="layui-input-block" style="padding-top: 10px">
+				{$data.status}
+			</div>
+		</div>
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">任务定金</label>
+			<div class="layui-input-block" style="padding-top: 10px">
+				<input type="text" name="rw_ding" lay-verify="required"  autocomplete="off" class="layui-input" value="{$data.rw_ding}">
+			</div>
+		</div>
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">任务佣金</label>
+			<div class="layui-input-block" style="padding-top: 10px">
+				<input type="text" name="rw_yj" lay-verify="required"  autocomplete="off" class="layui-input" value="{$data.rw_yj}">
+			</div>
+		</div>
+
+		{eq name="data.order_status" value="2"}
+			<div class="layui-form-item">
+				<label class="layui-form-label">审核是否通过</label>
+				<div class="layui-input-block">
+					<input type="radio" name="order_status_pass" value="4" title="是" <?php if($data['order_status'] == 4){echo "checked=checked";}?>>
+					<input type="radio" name="order_status_pass" value="0" title="否" <?php if($data['order_status'] == 0){echo "checked=checked";}?>>
+					<input type="radio" name="order_status_pass" value="2" title="暂未审核" <?php if($data['order_status'] ==2 ){echo "checked=checked";}?>>
+				</div>
+			</div>
+
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label">未通过理由</label>
+				<div class="layui-input-block">
+					<textarea placeholder="审核不通过填写" class="layui-textarea" id="order_remark" name="order_remark"></textarea>
+				</div>
+			</div>
+		{/eq}
+
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">接单时间</label>
+			<div class="layui-input-block" style="padding-top: 10px">
+				{$data.create_time}
+			</div>
+		</div>
+
+		<input type="hidden" value="{$data.id}" name="id">
+	</form>
+	{eq name="data.order_status" value="2"}
+	<button class="layui-btn"  style="margin-left: 800px" id="button">提交</button>
+	{/eq}
+</div>
+{include file="layout/foot"}
+
+
+</body>
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form()
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,laydate = layui.laydate;
+
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+        //自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length < 5){
+                    return '标题至少得5个字符啊';
+                }
+            }
+            ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+            ,content: function(value){
+                layedit.sync(editIndex);
+            }
+        });
+
+        //监听指定开关
+        form.on('switch(switchTest)', function(data){
+            layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+                offset: '6px'
+            });
+            layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+        });
+    });
+
+
+    $('#button').click(function () {
+		var value = $('input[name="order_status_pass"]:checked').val();
+		var order_remrark = $('#order_remark').val();
+		
+		if(value == 0){
+		    if(order_remrark == ""){
+		        layer.msg("请填写 审核不通过的原因");
+			}else{
+                $.post("{:url('Order/order_edit')}",$('#form').serialize(),function (code) {
+                    if(code == 200){
+                        layer.msg("订单修改成功",{icon:1,time:1000});
+                        setTimeout(function () {
+							location.reload();
+                        },1000);
+					}else{
+                        layer.msg("订单修改失败",{icon:2,time:1000});
+					}
+                })
+            }
+		}else if(value == 4){
+		    layer.confirm("审核通过后 定金将退还至用户账户!",['是','否'],function () {
+                $.post("{:url('Order/order_edit')}",$('#form').serialize(),function (code) {
+                    if(code == 200){
+                        layer.msg("订单修改成功",{icon:1,time:1000});
+                        setTimeout(function () {
+                            location.reload();
+                        },1000);
+                    }else{
+                        layer.msg("订单修改失败",{icon:2,time:1000});
+                    }
+                })	
+            },function () {
+
+            });
+           
+		}
+    })
+</script>
+</html>

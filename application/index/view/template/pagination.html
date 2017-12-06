@@ -1,0 +1,63 @@
+<!--
+   分页组件
+   参数- $total 总页数 $page 当前页面
+-->
+<link rel="stylesheet" href="/pagination/style/pagination.css">
+<link rel="stylesheet" href="/pagination/style/common.css">
+<script src="/pagination/script/lib/jquery.min.js"></script>
+<script src="/pagination/script/jquery.pagination.js"></script>
+<script src="/static/js/decorate.js"></script>
+<div class="M-box4 anli_page" id="M-box4"></div>
+
+<script>
+    function page(pageCount) {
+        var PageCount = pageCount == 0 ? 1 :pageCount;
+        $('#M-box4').pagination({
+            //获取  class = active的 属性值
+            pageCount: PageCount ,
+
+            callback:function(api){
+                var anli = "";
+                $('.m-sort-label .label-row span.active').each(function(key,value){
+                    array[key] = $(this).attr('a');
+                });
+                var data = {
+                    page: api.getCurrent(),
+                    name: 'mss',
+                    say: 'oh',
+                    houseTypes:array[0],
+                    acreageTypes:array[1],
+                    decorativeStyles:array[2],
+                    priceRanges:array[3]
+                };
+                $.post('/index/web/anli_data',data,function(json){
+                    var array = $.parseJSON(json);
+
+                    for(var i=0;i<array['anli'].length;i++){
+                        anli += "<a href='/detail/5/"+array['anli'][i].id+"'>"
+                        anli += "<li class='decorate-case-item'>";
+                        anli += "<div class='img-container'>";
+                        anli += " <img src='"+array['anli'][i].pic[0]+"' class='img-big'>";
+                        anli += "  <div class='img-small-container'>";
+                        if(array['anli'][i].pic != ''){
+                            for(var j=0;j<array['anli'][i].pic.length;j++){
+                                anli += "<img src='"+array['anli'][i].pic[j]+"' class='img-small'>";
+                            }
+                        }
+                        anli += "</div>";
+                        anli += "</div>";
+                        anli += "<div class='title-container'>";
+                        anli += "<h3 class='item-title'>"+array['anli'][i].title+"</h3>";
+                        anli += "<h3 class='item-img-count'>"+array['anli'][i].count+"</h3>";
+                        anli += "</div>";
+                        anli += "</li>";
+                        anli += "</a>";
+                    }
+
+                    $('.decorate-case-container').html('');
+                    $('.decorate-case-container').append(anli);
+                });
+            }
+        });
+    }
+</script>

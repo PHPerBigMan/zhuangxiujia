@@ -1,0 +1,90 @@
+﻿{include file="layout/head"}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 免费申请 <span class="c-gray en">&gt;</span> 首页申请类型 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+
+<div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"> <a class="btn btn-primary radius" data-title="添加分类"  onclick="edit(this,0)" href="javascript:;"><i class="Hui-iconfont">&#xe600;</i> 添加分类</a></span>
+
+<div class="page-container">
+	<div class="mt-20">
+		<table id="Product" class="table table-border table-bordered table-bg table-hover table-sort">
+
+		</table>
+	</div>
+
+</div>
+{include file="layout/foot"}
+<!--请在下方写此页面业务相关的脚本-->
+<!--<script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>-->
+<!--<script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>-->
+<!--<script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script>-->
+<script type="text/javascript">
+
+    $(function () {
+        $('#Product').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "processing": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "ajax": "{:url('Apply/cat_ajax')}?type=1",
+            "columns": [
+                {"title": "ID", "data": "id"},
+                {"title": "分类名称", "data": "title"},
+                {"title": "分类简介", "data": "content"},
+                {"title": "创建时间", "data": "create_time"},
+                {"title": "操作", "data": "caozuo"},
+            ]
+
+        });
+    });
+
+	/*编辑*/
+    function edit(id) {
+        layer.open({
+            type: 2,
+            title: '商品编辑',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['1080px', '880px'],
+            content: "{:url('Apply/iedit')}?id="+id ,//iframe的url
+			end:function () {
+
+				location.reload();
+            }
+        });
+    }
+    /*删除*/
+    function del(obj,id) {
+		layer.confirm("确定删除吗？",function () {
+			$.post("{:url('Apply/del')}",{id:id,type:2},function (code) {
+			    if(code == 200){
+			        layer.msg("操作成功",{icon:1,time:1000});
+			        setTimeout(function () {
+			            location.reload();
+                    },1000);
+				}else{
+			        layer.msg("您没有权限")
+				}
+            })
+        })
+    }
+
+    function is_show(obj,id) {
+        layer.confirm("确认操作？",function () {
+            $.post("{:url('Shop/is_show')}",{id:id},function (code) {
+                if(code == 200){
+                    layer.msg("操作成功",{icon:1,time:1000});
+                    setTimeout(function () {
+                        location.reload();
+                    },1000);
+                }else{
+                    layer.msg("您没有权限");
+				}
+            })
+        })
+    }
+</script> 
+</body>
+</html>

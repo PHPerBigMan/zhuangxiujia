@@ -1,0 +1,68 @@
+{include file="layout/head"}
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> PC网站管理 <span class="c-gray en">&gt;</span> 热装小区 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <div class="mt-20">
+        <div class="mt-20">
+            <table id="user" class="display table table-border table-bordered table-bg table-hover table-sort">
+
+            </table>
+        </div>
+    </div>
+</div>
+{include file="layout/foot"}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+<script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script>
+</body>
+</html>
+<script>
+
+    function hot(obj,id) {
+        layer.confirm('推荐为经典案例？', {
+                btn: ['推荐','不推荐','取消'],
+                shade: false,
+                closeBtn: 0
+            },
+            function(){
+                $.post("{:url('Charging/handel')}",{id:id,is_hot:1},function (data) {
+                    layer.msg(data.msg, {time:1000});
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                })
+            },
+            function(){
+                $.post("{:url('Charging/handel')}",{id:id,is_hot:0},function (data) {
+                    layer.msg(data.msg, {time:1000});
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                })
+            });
+    }
+    $(function () {
+        $('#user').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "processing": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "ajax": "{:url('Charging/GetList')}",
+            "columns": [
+                {"title": "ID", "data": "id"},
+                {"title": "案例标题", "data": "title"},
+                {"title": "案例缩略图", "data": "suolve"},
+                {"title": "案例二维码", "data": "qrcode"},
+                {"title": "是否推荐为热门展示", "data": "is_hot"},
+                {"title": "操作", "data": "caozuo"},
+            ]
+
+        });
+    });
+
+
+</script>

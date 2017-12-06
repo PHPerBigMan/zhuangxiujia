@@ -1,0 +1,67 @@
+﻿{include file="layout/head"}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 用户管理 <span class="c-gray en">&gt;</span> 用户详情 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+
+
+	<div class="mt-20">
+		<table class="table table-border table-bordered table-bg table-hover table-sort" >
+			<tr>
+				<td>用户名</td>
+				<td id="order_id">{$data.user_name}</td>
+			</tr>
+			<tr>
+				<td>用户联系方式</td>
+				<td>{$data.user_phone}</td>
+			</tr>
+
+			<tr>
+				<td>用户性别</td>
+				<td>
+					{$data.user_sex}
+				</td>
+			</tr>
+			<tr>
+				<td>用户钱包余额</td>
+				<td style="color: red">{$data.user_money}</td>
+			</tr>
+			<tr>
+				<td>用户地区</td>
+				<td >{$data.user_area}</td>
+			</tr>
+			<tr>
+				<td>用户头像</td>
+				<td>
+					{eq name="data.user_pic" value=""}
+
+					{else/}
+					<img src="{$data.user_pic}" alt="" style="width: 100px;height: 100px;">
+					{/eq}
+				</td>
+			</tr>
+		</table>
+		<input type="hidden" name="id" id="id" value="{$data.id}">
+	</div>
+</div>
+{include file="layout/foot"}
+<!--请在下方写此页面业务相关的脚本-->
+<!--<script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>-->
+<!--<script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>-->
+
+</body>
+<script>
+	function submit() {
+        var is_pass = $('input:radio:checked').val();
+        var id = $('#id').val();
+        if(id == 0){
+            layer.msg("该用户暂未填写企业信息,无法进行操作")
+		}else{
+            $.post("{:url('user/user_change')}",{is_pass:is_pass,id:id},function (data) {
+                layer.msg(data.msg)
+            });
+
+        }
+
+    }
+</script>
+</html>

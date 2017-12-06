@@ -1,0 +1,36 @@
+{extend name="template/layout" /}
+
+{block name="content"}
+
+{include file="../application/index/view/template/crumbs-nav.html" nav={$nav}}
+
+<div class="p-wrap m-decorate-train" id="app">
+    <ul class="decorate-train-container">
+
+        <li class="decorate-train-item" v-for="item in train" >
+            <img :src="item.zl_pic" v-on:click="read(item.id)">
+            <div class="title-container">
+                <h3 class="item-title">{{item.zl_title}}</h3>
+                <h3 class="item-time">{{item.create_time}}</h3>
+            </div>
+        </li>
+    </ul>
+    <div class="pagelist">
+        {$page}
+    </div>
+
+</div>
+<script type="application/javascript">
+    var app = new Vue({
+        el:"#app",
+        data:{
+            train:{$data}
+        },
+        methods:{
+            read:function (id) {
+                location.href = "/detail/4/"+id;
+            }
+        }
+    });
+</script>
+{/block}

@@ -1,0 +1,150 @@
+<div class="m-header">
+    <div class="header-top">
+        <div class="p-wrap">
+            <div class="header-top-left">
+                <i class="p-icon icon-mobile"></i>
+                <div>手机版</div>
+                <div id="now_area">杭州</div>
+                <div onclick="change()">点击切换</div>
+                <div class="change_area">
+                    <select id="cprovince" onchange="pro(2)">
+                    </select>
+                    <select id="ccity" onchange="city_a(2)">
+                    </select>
+                    <select id="carea" onchange="carea()">
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="header-top-right" id="app2">
+                <div @click="user()">个人中心</div>
+                <div id="user_name" v-if="isLogin == 0">{{user_name}}</div>
+                <div id="" v-if="isLogin == 0" v-on:click="login()">切换账号</div>
+                <div id="" v-if="isLogin == 0" v-on:click="loginout()">退出</div>
+                <div id="login" v-if="isLogin ==1" v-on:click="login()">登陆</div>
+                <div id="register" v-if="isLogin ==1" v-on:click="register()">注册</div>
+
+
+                <div onclick="kefu()">联系客服</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-middle">
+        <div class="p-wrap">
+            <div class="header-logo">
+                <a href="/"><img src="/static/img/1-logo.png" alt=""></a>
+            </div>
+
+            <div class="header-search">
+                <select name="" class="search-select" id="search">
+
+                    <option value="zxgl">装修管理</option>
+                    <option value="zxal">装修案例</option>
+                    <!--<option value="zxsc">装修商城</option>-->
+                </select>
+                <input type="text" class="search-input" id="keyword">
+                <div class="search-button" onclick="search()">搜索</div>
+            </div>
+
+            <div class="header-ad">
+                <img src="/static/img/1-pic-guanggao.png" alt="">
+            </div>
+        </div>
+    </div>
+
+    <div class="header-nav">
+        <div class="p-wrap">
+            <div class="nav-bar">
+                {php}
+                $title_arr = [
+                '首页'
+                ];
+                {/php}
+                <div class="nav-item-container {php}echo in_array($title,$title_arr)?'active':'';{/php}">
+                    <a href="/" target="_blank">
+                        <div class="nav-item">首页</div>
+                    </a>
+                </div>
+                {php}
+                $title_arr = [
+                '公司介绍',
+                ];
+                {/php}
+                <div class="nav-item-container {php}echo in_array($title,$title_arr)?'active':'';{/php}">
+
+                    <div class="nav-item">公司介绍<i class=" p-icon icon-arrow-down"></i>
+                    </div>
+
+
+                    <div class="nav-hidden">
+                        <a href="/detail/6" target="_blank">
+                            <div class="nav-item">公司简介</div>
+                        </a>
+                        <a href="/list/4" target="_blank">
+                            <div class="nav-item">公司新闻</div>
+                        </a>
+                    </div>
+                </div>
+
+                {php}
+                $title_arr = [
+                '我要装修',
+                ];
+                {/php}
+                <div class="nav-item-container {php}echo in_array($title,$title_arr)?'active':'';{/php}">
+                    <a href="/want-decorate" target="_blank">
+                        <div class="nav-item">我要装修</div>
+                    </a>
+                </div>
+                {php}
+                $title_arr = [
+                '装修管理',
+                ];
+                {/php}
+                <div class="nav-item-container {php}echo in_array($title,$title_arr)?'active':'';{/php}">
+
+                    <div class="nav-item">
+                        装修管理<i class=" p-icon icon-arrow-down"></i>
+                    </div>
+
+
+                    <div class="nav-hidden" id="zl">
+
+                    </div>
+                </div>
+                {php}
+                $title_arr = [
+                '装修案例',
+                ];
+                {/php}
+                <div class="nav-item-container {php}echo in_array($title,$title_arr)?'active':'';{/php}">
+                    <a href="/decorate-case/0" target="_blank">
+                        <div class="nav-item">装修案例</div>
+                    </a>
+                </div>
+                {php}
+                $title_arr = [
+                '装修商城',
+                ];
+                {/php}
+                <div class="nav-item-container {php}echo in_array($title,$title_arr)?'active':'';{/php}">
+                    <a href="/decorate-mall" target="_blank">
+                        <div class="nav-item">装修商城</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="//cdn.bootcss.com/jquery/2.2.2/jquery.js"></script>
+<!--首页js-->
+<script src="/static/js/index.js"></script>
+<script type="application/javascript">
+    function kefu() {
+        location.href = "http://wpa.qq.com/msgrd?v=3&uin=792528966&site=qq&menu=yes";
+    }
+</script>
+
+<script src="/static/js/web.js"></script>

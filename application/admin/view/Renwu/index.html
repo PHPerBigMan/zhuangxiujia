@@ -1,0 +1,109 @@
+﻿{include file="layout/head"}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 任务管理 <span class="c-gray en">&gt;</span> 任务列表 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"> <a class="btn btn-primary radius" data-title="添加任务" data-href="{:url('renwu/add_rw')}" onclick="Hui_admin_tab(this)" href="javascript:;"><i class="Hui-iconfont">&#xe600;</i> 添加任务</a></span>
+
+<div class="page-container">
+		<span class="r">共有数据：<strong>{$count}</strong> 条</span> </div>
+	<div class="mt-20">
+		<table id="Renwu" class="table table-border table-bordered table-bg table-hover table-sort">
+
+		</table>
+	</div>
+
+</div>
+{include file="layout/foot"}
+<!--请在下方写此页面业务相关的脚本-->
+<!--<script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>-->
+<!--<script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>-->
+<!--<script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script>-->
+<script type="text/javascript">
+	function rw_rm(obj,id) {
+        layer.confirm('是否推荐为热门任务？', {
+                btn: ['是','否','取消'],
+                shade: false,
+                closeBtn: 0
+            },
+            function(){
+                $.post("{:url('Renwu/remen')}",{id:id,is_hot:1},function (data) {
+                    layer.msg(data.msg, {icon:6,time:1000});
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                })
+            },
+            function(){
+                $.post("{:url('Renwu/remen')}",{id:id,is_hot:0},function (data) {
+                    layer.msg("取消热门任务成功", {icon:5,time:1000});
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                })
+            });
+    }
+
+    $(function () {
+        $('#Renwu').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "processing": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "ajax": "{:url('Renwu/renwu_ajax')}",
+            "columns": [
+                {"title": "ID", "data": "id"},
+                {"title": "任务标题", "data": "rw_title"},
+                {"title": "任务佣金", "data": "rw_yj"},
+                {"title": "任务定金", "data": "rw_ding"},
+                {"title": "任务封面图", "data": "rw_cover"},
+                {"title": "任务属性", "data": "rw_cat"},
+                {"title": "任务状态", "data": "rw_status"},
+                {"title": "是否热门任务", "data": "rw_hot"},
+                {"title": "是否发布", "data": "is_show"},
+                {"title": "添加时间", "data": "create_time"},
+                {"title": "操作", "data": "caozuo"},
+            ]
+
+        });
+    });
+
+
+
+	/*删除*/
+	function rw_del(obj,id){
+		layer.confirm('确认要删除吗？',function(index){
+			$.post("{:url('Renwu/rw_del')}",{id:id},function (data) {
+					if(data== 200){
+						layer.msg("删除成功");
+						layer.close(index);
+						setTimeout(function () {
+							window.location.reload()
+						},800)
+					}else{
+						layer.msg("您没有权限")
+					}
+	
+			})
+		});
+	}
+	
+	
+	function rw_fb(obj,id) {
+		layer.confirm("确认您的操作吗?",function () {
+			$.post("{:url('Renwu/fabu')}",{id:id},function (code) {
+				if(code == 200){
+				    layer.msg("操作成功",{icon:1,time:1000});
+				    setTimeout(function () {
+						location.reload();
+                    },1000)
+				}else{
+                    layer.msg("您没有权限")
+                }
+            })
+        })
+	}
+</script> 
+</body>
+</html>

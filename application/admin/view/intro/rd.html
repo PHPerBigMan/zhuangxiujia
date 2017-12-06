@@ -1,0 +1,102 @@
+﻿{include file="layout/head"}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 平台管理 <span class="c-gray en">&gt;</span> 热点列表 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"> <a class="btn btn-primary radius" data-title="添加热点"  onclick="edit(0,3)"><i class="Hui-iconfont">&#xe600;</i> 添加热点</a></span>
+
+<div class="page-container">
+	<div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"> </span>
+
+	<div class="mt-20">
+		<table id="table_id_example" class="display table table-border table-bordered table-bg table-hover table-sort">
+
+		</table>
+	</div>
+
+</div>
+{include file="layout/foot"}
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+<script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script>
+<script type="text/javascript">
+
+    $(function () {
+        $('#table_id_example').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "processing": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "ajax": "{:url('Intro/rd_ajax')}",
+            "columns": [
+                {"title": "ID", "data": "id"},
+                {"title": "标题", "data": "title"},
+                {"title": "操作", "data": "caozuo"},
+            ]
+
+        });
+    });
+
+    $.extend($.fn.dataTable.defaults, {
+        language: {
+            "sProcessing": "处理中...",
+            "sLengthMenu": "显示 _MENU_ 项结果",
+            "sZeroRecords": "没有匹配结果",
+            "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+            "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+            "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+            "sInfoPostFix": "",
+            "sSearch": "搜索:",
+            "sUrl": "",
+            "sEmptyTable": "表中数据为空",
+            "sLoadingRecords": "载入中...",
+            "sInfoThousands": ",",
+            "oPaginate": {
+                "sFirst": "首页",
+                "sPrevious": "上页",
+                "sNext": "下页",
+                "sLast": "末页"
+            },
+            "oAria": {
+                "sSortAscending": ": 以升序排列此列",
+                "sSortDescending": ": 以降序排列此列"
+            }
+        },
+        buttons: true
+    });
+
+    function del(id,type) {
+        layer.confirm('确认要删除吗？',function(index){
+            $.post("{:url('Intro/del')}",{id:id,type:type},function (data) {
+                if(data== 200){
+                    layer.msg("删除成功");
+                    layer.close(index);
+                    setTimeout(function () {
+                        window.location.reload()
+                    },800)
+                }else{
+                    layer.msg("您没有权限")
+                }
+
+            })
+        });
+    }
+
+    function edit(id,type) {
+        layer.open({
+            type: 2,
+            title: '公告编辑',
+            shadeClose: true,
+            shade: 0.4,
+            area: ['1080px', '880px'],
+            content: "{:url('intro/edit')}?id="+id+"&type="+type ,//iframe的url
+            end:function () {
+                location.reload()
+            }
+        });
+    }
+</script>
+</body>
+</html>

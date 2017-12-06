@@ -1,0 +1,100 @@
+{extend name="template/layout" /}
+
+{block name="content"}
+
+{php}
+$nav = [
+["url"=>"/decorate-mall", "name"=>"装修商城"]
+]
+{/php}
+{include file="../application/index/view/template/crumbs-nav.html" nav="$nav" /}
+
+<div class="p-wrap m-decorate-mall" id="mall">
+    <div class="decorate-mall-nav">
+        <ul class="mall-nav-bar" @mouseleave="hideChildNavBar">
+            <li class="mall-nav-item"
+                :class="{active: activeIndex == k}"
+                v-for="(item, k) in cats"
+                @mouseenter="hoverNavItem(k)"
+            ><span v-text="item.title"></span>
+                <span v-text="item.cat_name" onclick="change(1)"></span>
+                <ul class="child-nav-bar">
+                    <li class="child-nav-item" v-for="(items, k) in item.sec">
+                        <!--<a href="/goods-list/0">{{ items.cat_name }} </a>-->
+                        <a @click="second(items.id)"><span v-text="items.cat_name"></span> </a>
+
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+        <div class="img-container">
+            <img src="{$pic[0]}" class="img-big">
+
+            <div class="img-small-container">
+                <img src="{$pic[1]}" class="img-small">
+                <img src="{$pic[2]}" class="img-small">
+                <img src="{$pic[3]}" class="img-small">
+
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="decorate-mall-section" v-for="datas in data">
+        <div class="section-header">
+            <div class="section-title">
+                <span v-text="datas.cat_name"></span>
+
+            </div>
+            <div class="section-see-more"><a @click="more(datas.cat_id)">查看更多</a></div>
+
+        </div>
+
+        <div class="m-mall-goods-content">
+            <div class="mall-goods-item" v-for="product in datas.pro" v-on:click="pro(product.pro_url)">
+                <img :src="product.pro_img" alt="" class="item-img">
+                <div class="item-head">
+                    <div class="item-row">
+                        <div class="item-title"><span v-text="product.pro_name"></span></div>
+                        <div class="item-price">¥<span v-text="product.pro_price"></span></div>
+                    </div>
+                    <div class="item-desc" v-text="product.pro_desc"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script src="/static/js/decorate-mall.js"></script>
+<script type="application/javascript">
+    var app = new Vue({
+        el: '#mall',
+        data: {
+            cats: {$cat},
+            data: {$data},
+            activeIndex: null,
+        },
+        methods: {
+            pro: function (url) {
+                location.href = url;
+            },
+
+            hoverNavItem: function(k) {
+                this.activeIndex = k;
+            },
+
+            hideChildNavBar: function() {
+                this.activeIndex = null;
+            },
+            more:function (id) {
+                location.href = '/goods-list/1/'+id;
+            },
+            second:function (id) {
+                location.href= '/goods-list/2/0/'+id;
+            }
+        }
+    });
+</script>
+{/block}

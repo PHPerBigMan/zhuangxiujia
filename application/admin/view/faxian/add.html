@@ -1,0 +1,219 @@
+{include file="layout/head"}
+<body>
+
+<div class="page-container">
+	<form action="{:url('faxian/add')}" method="post" class="form form-horizontal layui-form" id="rw" enctype="multipart/form-data">
+		<div class="row cl">
+
+			<div class="layui-tab" lay-filter="test">
+				<ul class="layui-tab-title">
+					<li class="layui-this" lay-id="11">资料基本信息</li>
+					<li lay-id="23">资料图片</li>
+					<li lay-id="22">资料详情</li>
+
+				</ul>
+				<div class="layui-tab-content">
+					<div class="layui-tab-item layui-show">
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">资料标题：</label>
+							<div class="formControls col-xs-8 col-sm-9">
+								<input type="text" class="input-text" value="{$data.zl_title}" placeholder="" id="" name="zl_title">
+							</div>
+						</div>
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">资料属性：</label>
+							<div class="formControls col-xs-8 col-sm-9">
+								<div class="">
+									<select name="zl_cat" lay-filter="aihao">
+										{foreach name="cat" item="v1"}
+											<option value="{$v1.id}" <?php if($data['zl_cat'] == $v1['id']){echo "selected";}?>>{$v1.cat_name}</option>
+										{/foreach}
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">展示方式：</label>
+							<div class="formControls col-xs-8 col-sm-9">
+								<select name="zl_type" lay-filter="aihao">
+									<option value="0" <?php if($data['zl_type'] == 0){echo "selected";}?>>图文展示</option>
+									<option value="1" <?php if($data['zl_type'] == 1){echo "selected";}?>>图片展示</option>
+								</select>
+							</div>
+						</div>
+					</div>
+
+
+
+					<div class="layui-tab-item">
+						<span style="margin-left: 300px;color: red">* 图片展示方式时请上传3张以上图片</span>
+						<p style="margin-left: 300px;color: red">* 【施工详情】:486*373</p>
+						<p style="margin-left: 300px;color: red">* 【施工规范/施工培训】: 730*346</p>
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">资料图片：</label>
+							<div class="formControls col-xs-8 col-sm-9" id="rw_img">
+								<a  class='btn btn-primary radius'  onclick='add()' style="" >添加相册</a>
+
+								{eq name="data.zl_pic" value=""}
+								<div>
+									<input type="file" name="zl_pic[]" style='margin-top: 15px'>
+								</div>
+								{else/}
+								{foreach name="$data.zl_pic" item="v1"}
+								<img src="{$v1}" alt="" style="width: 145px;height: 110px">
+								{/foreach}
+								{/eq}
+							</div>
+
+						</div>
+
+					</div>
+
+
+					<div class="layui-tab-item">
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">资料详情：</label>
+							<script id="editor" type="text/plain"  name="content" class="zl_fwb">
+								{$data.content}
+							</script>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row cl">
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+				<button class="btn btn-primary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+				<input type="hidden" name="id" value="{$data.id}">
+			</div>
+		</div>
+	</form>
+</div>
+
+
+{include file="layout/foot"}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="/lib/webuploader/0.1.5/webuploader.min.js"></script>
+<script type="text/javascript" src="/lib/ueditor/1.4.3/ueditor.config.js"></script>
+<script type="text/javascript" src="/lib/ueditor/1.4.3/ueditor.all.min.js"> </script>
+<script type="text/javascript" src="/lib/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script>
+<script type="text/javascript" src="/lib/img.js"></script>
+<script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/core.js"></script>
+<script type="text/javascript">
+    var ue = UE.getEditor('editor');
+    var ue = UE.getEditor('pic');
+    function add() {
+        var img= "<div><input type='file' name='zl_pic[]' style='margin-top: 15px'></div>";
+        $('#rw_img').append(img)
+    }
+
+
+
+    layui.use("form", function () {
+        var form = layui.form();
+
+        //- 代码写在这里面.
+
+        form.on('select(area)', function(data){
+            console.log(data.value); //得到被选中的值
+			$.post("{:url('Renwu/area')}",{father:data.value},function (obj) {
+                var optionstring = "";
+				$.each(obj,function (i,item) {
+                    optionstring += "<option value=\"" + item.city + "\" id=\"" + item.city + "\">" + item.city + "</option>";
+                });
+                $("#rw_city").html('<option value=""></option>' + optionstring);
+                form.render('select');  //layui 这点很重要  不能缺失
+            });
+        });
+    })
+
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+
+        var start = {
+            min: laydate.now()
+            ,max: '2099-06-16 23:59:59'
+            ,istoday: false
+            ,choose: function(datas){
+                end.min = datas; //开始日选好后，重置结束日的最小日期
+                end.start = datas //将结束日的初始值设定为开始日
+            }
+        };
+
+        var end = {
+            min: laydate.now()
+            ,max: '2099-06-16 23:59:59'
+            ,istoday: false
+            ,choose: function(datas){
+                start.max = datas; //结束日选好后，重置开始日的最大日期
+            }
+        };
+
+        document.getElementById('LAY_demorange_s').onclick = function(){
+            start.elem = this;
+            laydate(start);
+        }
+        document.getElementById('LAY_demorange_e').onclick = function(){
+            end.elem = this
+            laydate(end);
+        }
+
+
+    });
+
+
+    layui.use('element', function(){
+        var $ = layui.jquery
+            ,element = layui.element(); //Tab的切换功能，切换事件监听等，需要依赖element模块
+
+        //触发事件
+        var active = {
+            tabAdd: function(){
+                //新增一个Tab项
+                element.tabAdd('demo', {
+                    title: '新选项'+ (Math.random()*1000|0) //用于演示
+                    ,content: '内容'+ (Math.random()*1000|0)
+                    ,id: new Date().getTime() //实际使用一般是规定好的id，这里以时间戳模拟下
+                })
+            }
+            ,tabDelete: function(othis){
+                //删除指定Tab项
+                element.tabDelete('demo', '44'); //删除：“商品管理”
+
+
+                othis.addClass('layui-btn-disabled');
+            }
+            ,tabChange: function(){
+                //切换到指定Tab项
+                element.tabChange('demo', '22'); //切换到：用户管理
+            }
+        };
+
+        $('.site-demo-active').on('click', function(){
+            var othis = $(this), type = othis.data('type');
+            active[type] ? active[type].call(this, othis) : '';
+        });
+
+
+        //Hash地址的定位
+        var layid = location.hash.replace(/^#test=/, '');
+        element.tabChange('test', layid);
+
+        element.on('tab(test)', function(elem){
+            location.hash = 'test='+ $(this).attr('lay-id');
+        });
+
+
+
+    });
+
+
+</script>
+
+
+</body>
+</html>

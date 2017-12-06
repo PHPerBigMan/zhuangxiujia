@@ -1,0 +1,8 @@
+<div class="m-crumbs-nav">
+    <div class="p-wrap">
+        <span>您的位置</span>
+        {foreach $nav as $item}
+        <span>&gt;<a href="{$item.url}">{$item.name}</a></span>
+        {/foreach}
+    </div>
+</div>

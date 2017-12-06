@@ -1,0 +1,290 @@
+{include file="layout/head"}
+<body>
+
+<div class="page-container">
+	<form action="{:url('renwu/add')}" method="post" class="form form-horizontal layui-form" id="rw" enctype="multipart/form-data">
+		<div class="row cl">
+
+			<div class="layui-tab" lay-filter="test">
+				<ul class="layui-tab-title">
+					<li class="layui-this" lay-id="11">任务基本信息</li>
+					<li lay-id="22">任务图片</li>
+					<li lay-id="33">任务时间</li>
+					<li lay-id="44">任务地点</li>
+				</ul>
+				<div class="layui-tab-content">
+					<div class="layui-tab-item layui-show">
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">任务名称：</label>
+							<div class="formControls col-xs-8 col-sm-9">
+								<input type="text" class="input-text" value="{$data.rw_title}" placeholder="" id="" name="rw_title">
+							</div>
+						</div>
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">任务佣金：</label>
+							<div class="formControls col-xs-8 col-sm-9">
+								<input type="text" class="input-text" value="{$data.rw_yj}" placeholder="" id="" name="rw_yj">
+							</div>
+						</div>
+
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">任务订金：</label>
+							<div class="formControls col-xs-8 col-sm-9">
+								<input type="text" class="input-text" value="{$data.rw_ding}" placeholder="" id="" name="rw_ding">
+							</div>
+						</div>
+
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">任务属性：</label>
+							<div class="formControls col-xs-8 col-sm-9">
+								<select name="rw_cat" id="">
+									{foreach name="$rw_cat" item="v1"}
+										<option value="{$v1.id}" <?php if($data['rw_cat'] == $v1['id']){echo "selected=selectede";}?>>{$v1.cat_name}</option>
+									{/foreach}
+								</select>
+							</div>
+						</div>
+
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">任务审核：</label>
+							<div class="formControls col-xs-8 col-sm-9">
+								{$data.rw_pass}
+							</div>
+						</div>
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">任务状态：</label>
+							<div class="formControls col-xs-8 col-sm-9">
+								{$data.rw_status}
+							</div>
+						</div>
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">任务详情：</label>
+							<div class="formControls col-xs-8 col-sm-9">
+								<textarea name="rw_main" id="" cols="30" rows="10" style="width: 850px;height: 250px;">
+									{$data.rw_main}
+								</textarea>
+							</div>
+						</div>
+					</div>
+					<div class="layui-tab-item">
+
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">任务封面图片：</label>
+							<div class="formControls col-xs-8 col-sm-9">
+								<input type="file" class="input-text" value="0" placeholder="" id="" name="rw_cover">
+								<!--<p style="color: red">*图片最佳尺寸-&#45;&#45; 宽 : 高  750:236</p>-->
+								{eq name="data.rw_cover" value=""}
+								{else/}
+								<img src="{$data.rw_cover}" alt="" style="width: 126px;height: 214px">
+								{/eq}
+							</div>
+						</div>
+							<div class="row cl">
+								<label class="form-label col-xs-4 col-sm-2">任务图片：</label>
+
+								<div class="formControls col-xs-8 col-sm-9" id="rw_img">
+									<a  class='btn btn-primary radius'  onclick='add()' style="" >添加相册</a>
+
+									{eq name="data.rw_cover" value=""}
+									<div>
+										<input type="file" name="rw_img[]">
+									</div>
+									{else/}
+									{foreach name="$data.rw_img" item="v1"}
+									<img src="{$v1}" alt="" style="width: 145px;height: 110px">
+									{/foreach}
+									{/eq}
+
+
+								</div>
+							</div>
+					</div>
+					<div class="layui-tab-item">
+
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">发布时间：</label>
+							<div class="layui-input-inline">
+								<input class="layui-input" placeholder="发布时间" id="LAY_demorange_s" name="create_time" value="{$data.create_time}">
+							</div>
+						</div>
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">开工时间：</label>
+							<div class="layui-input-inline">
+								<input class="layui-input" placeholder="开工时间" id="LAY_demorange_e" name="start_time" value="{$data.start_time}">
+							</div>
+						</div>
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">支付限时：</label>
+							<div class="layui-input-inline">
+								<input type="text" class="input-text" value="{$data.pay_limit_time}" placeholder="支付限时" id="" name="pay_limit_time">
+								<span style="color: red">*支付时间为 秒</span>
+							</div>
+						</div>
+					</div>
+					<div class="layui-tab-item">
+
+						<div class="layui-form-item">
+							<label class="layui-form-label" style="margin-left: 145px">任务地区</label>
+							<div class="layui-input-inline">
+								<select name="rw_provice" id="province" lay-filter="area">
+									<option value="">请选择省</option>
+									{foreach name="$province" item="v1"}
+									<option value="{$v1.provinceID}"  <?php if($v1['province'] == $data['rw_province']){echo "selected=selected";}?>>{$v1.province}</option>
+									{/foreach}
+								</select>
+							</div>
+							<div class="layui-input-inline">
+								<select name="rw_city" id="rw_city">
+									<option value="">请选择市</option>
+									{foreach name="$city" item="v1"}
+									<option value="{$v1.cityID}"  <?php if($v1['city'] == $data['rw_area']){echo "selected=selected";}?>>{$v1.city}</option>
+									{/foreach}
+								</select>
+							</div>
+
+						</div>
+
+						<!--<input type="button" onclick="pro()" value="aaaa">-->
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+		<div class="row cl">
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+				<input type="hidden" name="id" value="{$data.id}">
+				<input type="hidden" name="city" value="{$data.rw_area}" id="area">
+				<button class="btn btn-primary radius" type="submit"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+
+{include file="layout/foot"}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="/lib/webuploader/0.1.5/webuploader.min.js"></script>
+<script type="text/javascript" src="/lib/ueditor/1.4.3/ueditor.config.js"></script>
+<script type="text/javascript" src="/lib/ueditor/1.4.3/ueditor.all.min.js"> </script>
+<script type="text/javascript" src="/lib/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script>
+<script type="text/javascript" src="/lib/img.js"></script>
+<script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/core.js"></script>
+<script type="text/javascript">
+    var ue = UE.getEditor('editor');
+    var ue = UE.getEditor('pic');
+    function add() {
+        var img= "<div><input type='file' name='rw_img[]' style='margin-top: 15px'></div>";
+        $('#rw_img').append(img)
+    }
+
+
+
+    layui.use("form", function () {
+        var form = layui.form();
+
+        //- 代码写在这里面.
+
+        form.on('select(area)', function(data){
+            console.log(data.value); //得到被选中的值
+			$.post("{:url('Renwu/area')}",{father:data.value},function (obj) {
+                var optionstring = "";
+				$.each(obj,function (i,item) {
+                    optionstring += "<option value=\"" + item.city + "\" id=\"" + item.city + "\">" + item.city + "</option>";
+                });
+                $("#rw_city").html('<option value=""></option>' + optionstring);
+                form.render('select');  //layui 这点很重要  不能缺失
+            });
+        });
+    })
+
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+
+        var start = {
+            min: laydate.now()
+            ,max: '2099-06-16 23:59:59'
+            ,istoday: false
+            ,choose: function(datas){
+                end.min = datas; //开始日选好后，重置结束日的最小日期
+                end.start = datas //将结束日的初始值设定为开始日
+            }
+        };
+
+        var end = {
+            min: laydate.now()
+            ,max: '2099-06-16 23:59:59'
+            ,istoday: false
+            ,choose: function(datas){
+                start.max = datas; //结束日选好后，重置开始日的最大日期
+            }
+        };
+
+        document.getElementById('LAY_demorange_s').onclick = function(){
+            start.elem = this;
+            laydate(start);
+        }
+        document.getElementById('LAY_demorange_e').onclick = function(){
+            end.elem = this
+            laydate(end);
+        }
+
+
+    });
+
+
+    layui.use('element', function(){
+        var $ = layui.jquery
+            ,element = layui.element(); //Tab的切换功能，切换事件监听等，需要依赖element模块
+
+        //触发事件
+        var active = {
+            tabAdd: function(){
+                //新增一个Tab项
+                element.tabAdd('demo', {
+                    title: '新选项'+ (Math.random()*1000|0) //用于演示
+                    ,content: '内容'+ (Math.random()*1000|0)
+                    ,id: new Date().getTime() //实际使用一般是规定好的id，这里以时间戳模拟下
+                })
+            }
+            ,tabDelete: function(othis){
+                //删除指定Tab项
+                element.tabDelete('demo', '44'); //删除：“商品管理”
+
+
+                othis.addClass('layui-btn-disabled');
+            }
+            ,tabChange: function(){
+                //切换到指定Tab项
+                element.tabChange('demo', '22'); //切换到：用户管理
+            }
+        };
+
+        $('.site-demo-active').on('click', function(){
+            var othis = $(this), type = othis.data('type');
+            active[type] ? active[type].call(this, othis) : '';
+        });
+
+
+        //Hash地址的定位
+        var layid = location.hash.replace(/^#test=/, '');
+        element.tabChange('test', layid);
+
+        element.on('tab(test)', function(elem){
+            location.hash = 'test='+ $(this).attr('lay-id');
+        });
+
+
+
+    });
+
+
+</script>
+
+
+</body>
+</html>

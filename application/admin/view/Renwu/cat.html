@@ -1,0 +1,116 @@
+﻿{include file="layout/head"}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 任务管理 <span class="c-gray en">&gt;</span> 任务列表 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"> <a class="btn btn-primary radius" data-title="添加分类"  onclick="add_cat(this)" href="javascript:;"><i class="Hui-iconfont">&#xe600;</i> 添加分类</a></span>
+
+<div class="page-container">
+	<div class="mt-20">
+		<table id="cat" class="table table-border table-bordered table-bg table-hover table-sort">
+
+		</table>
+	</div>
+
+</div>
+{include file="layout/foot"}
+<!--请在下方写此页面业务相关的脚本-->
+<!--<script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>-->
+<!--<script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>-->
+<!--<script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script>-->
+
+
+</div>
+</body>
+</html>
+<script type="text/javascript">
+
+
+    $(function () {
+        $('#cat').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "processing": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "ajax": "{:url('Renwu/cat_ajax')}",
+            "columns": [
+                {"title": "ID", "data": "id"},
+                {"title": "分类名称", "data": "cat_name"},
+                {"title": "分类图片", "data": "cat_img"},
+                {"title": "分类类型", "data": "cat_type"},
+                {"title": "操作", "data": "caozuo"},
+            ]
+
+        });
+    });
+
+
+
+	/*删除*/
+    function cat_del(obj,id){
+        layer.confirm('确认要删除吗？',function(index){
+            $.post("{:url('Renwu/cat_del')}",{id:id},function (data) {
+                if(data== 200){
+                    layer.msg("删除成功");
+                    layer.close(index);
+                    setTimeout(function () {
+                        window.location.reload()
+                    },800)
+                }else if(data == 404){
+                    layer.msg("改一级属性下包含二级属性,删除失败!")
+                }else{
+                    layer.msg("您没有权限")
+				}
+
+            })
+        });
+    }
+
+	/*二级分类*/
+    function cat_sec(id) {
+        layer.open({
+            type: 2,
+            title: '查看二级属性',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['780px', '480px'],
+            content: "{:url('Renwu/sec')}?id="+id ,//iframe的url
+            end:function () {
+                location.reload();
+            }
+        });
+    }
+
+    function cat_update(id) {
+        layer.open({
+            type: 2,
+            title: '修改一级属性',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['780px', '480px'],
+            content: "{:url('Renwu/add_cat')}?id="+id ,//iframe的url
+            end:function () {
+                $.post("{:url('Shop/session_del')}");
+                location.reload();
+            }
+        });
+    }
+
+
+
+	function add_cat() {
+        layer.open({
+            type: 2,
+            title: '添加属性',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['780px', '480px'],
+            content: "{:url('Renwu/add_cat')}?id=0" ,//iframe的url
+            end:function () {
+                $.post("{:url('Shop/session_del')}");
+                location.reload();
+            }
+        });
+    }
+</script>

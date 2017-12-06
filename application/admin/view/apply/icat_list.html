@@ -1,0 +1,64 @@
+﻿{include file="layout/head"}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 免费申请 <span class="c-gray en">&gt;</span> 首页申请类型 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+
+
+<div class="page-container">
+	<div class="mt-20">
+		<table id="Product" class="table table-border table-bordered table-bg table-hover table-sort">
+
+		</table>
+	</div>
+
+</div>
+{include file="layout/foot"}
+<!--请在下方写此页面业务相关的脚本-->
+<!--<script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>-->
+<!--<script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>-->
+<!--<script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script>-->
+<script type="text/javascript">
+
+    $(function () {
+        $('#Product').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "processing": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "ajax": "{:url('Apply/sq_list_ajax')}?type=1",
+            "columns": [
+                {"title": "ID", "data": "id"},
+                {"title": "申请人", "data": "free_name"},
+                {"title": "申请人联系方式", "data": "free_phone"},
+                {"title": "房屋面积", "data": "room_mj"},
+                {"title": "房屋风格", "data": "free_fg"},
+                {"title": "详细地址", "data": "free_address"},
+                {"title": "申请类型", "data": "type"},
+                {"title": "申请时间", "data": "create_time"},
+                {"title": "联系状态", "data": "called"},
+                {"title": "操作", "data": "caozuo"},
+            ]
+
+        });
+    });
+
+	function called(id) {
+		layer.confirm('是否联系',{
+		    btn:['是','否']
+		},function () {
+			$.post('/admin/apply/called',{id:id,called:1,type:1},function (obj) {
+			    layer.msg('修改成功');
+			    location.reload();
+            })
+        },function () {
+            $.post('/admin/apply/called',{id:id,called:0,type:1},function (obj) {
+                layer.msg('修改成功');
+                location.reload();
+            })
+        })
+    }
+</script> 
+</body>
+</html>

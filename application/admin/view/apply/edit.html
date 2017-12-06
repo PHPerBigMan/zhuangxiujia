@@ -1,0 +1,93 @@
+{include file="layout/head"}
+<body>
+
+<div class="page-container">
+	<form   class="form form-horizontal layui-form"  id="notice" enctype="multipart/form-data">
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2">分类名称：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="{$data.title}" placeholder="" id="" name="title">
+			</div>
+		</div>
+		<div class="row cl">
+			{if condition="$data.type  == 2"}
+			<label class="form-label col-xs-4 col-sm-2">分类简介：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<script id="editor" type="text/plain"  name="content" class="baidu">
+					{$data.content}
+				</script>
+			</div>
+			{else/}
+			<label class="form-label col-xs-4 col-sm-2">分类图片：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<div class="layui-input-block">
+					<input type="file" name="file" class="layui-upload-file" lay-title="修改分类图片">
+					<img src="{$data.img}" alt="" class="cat_img">
+				</div>
+			</div>
+			{/if}
+		</div>
+		<input type="hidden" name="id" value="{$data.id}">
+
+		<button onClick="add();" class="btn btn-primary radius edit_button" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+
+	</form>
+</div>
+{include file="layout/foot"}
+
+
+</body>
+<script>
+    var ue = UE.getEditor('editor');
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form()
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,laydate = layui.laydate;
+
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+        //自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length < 5){
+                    return '标题至少得5个字符啊';
+                }
+            }
+            ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+            ,content: function(value){
+                layedit.sync(editIndex);
+            }
+        });
+
+        //监听指定开关
+        form.on('switch(switchTest)', function(data){
+            layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+                offset: '6px'
+            });
+            layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+        });
+    });
+
+    layui.use('upload', function(){
+        layui.upload({
+            url: "{:url('Shop/img')}?type=3" //上传接口
+            ,success: function(res){ //上传成功后的回调
+                if(res != ""){
+                    layer.msg("图片上传成功,请提交保存",{icon:1,time:2000})
+
+				}
+            }
+        });
+
+    });
+
+
+    function add(){
+       $.post('/admin/Apply/save',$('#notice').serialize(),function (data) {
+           layer.msg(data.msg,{icon:1,time:2000});
+       })
+    }
+</script>
+</html>

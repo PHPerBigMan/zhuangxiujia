@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="{:url('User/anli_save')}" method="post" enctype="multipart/form-data">
+    <input type="file" name="pic[]">
+    <input type="file" name="pic[]">
+    <input type="text" name="content">
+    <input type="text" name="title">
+    <input type="hidden" name="user_id" value="10">
+    <input type="submit" value="提交" onclick="a(1)">
+</form>
+</body>
+<script>
+</script>
+</html>

@@ -1,0 +1,39 @@
+﻿{include file="layout/head"}
+<body>
+<div class="page-container">
+	<p class="f-20 text-success">欢迎使用装修之家后台管理系统</p>
+	<table class="table table-border table-bordered table-bg">
+		<thead>
+			<tr>
+				<th colspan="7" scope="col">信息统计</th>
+			</tr>
+			<tr class="text-c">
+				<th>统计</th>
+				<th>用户数量</th>
+				<th>任务数量</th>
+				<th>订单总数</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="text-c">
+				<td>总数</td>
+				<td>{$user_count}</td>
+				<td>{$rw_count}</td>
+				<td>{$order_count}</td>
+			</tr>
+
+		</tbody>
+	</table>
+
+</div>
+<footer class="footer mt-20">
+	<div class="container">
+		<p>
+			本后台系统由<a href="http://www.baimifan.net" target="_blank" title="杭州百米贩科技">杭州百米贩科技</a>提供技术支持</p>
+	</div>
+</footer>
+<script type="text/javascript" src="/lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="/static/h-ui/js/H-ui.min.js"></script>
+
+</body>
+</html>

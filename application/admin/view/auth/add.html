@@ -1,0 +1,115 @@
+﻿{include file="layout/head"}
+<body>
+<article class="page-container">
+	<form  method="post" class="form form-horizontal" id="form-admin-role-add" style="margin-right: 220px">
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>角色名称：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="{$role.title}" placeholder="" id="roleName" name="title">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">描述：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="{$role.miaoshu}" placeholder="" id="miaoshu" name="miaoshu">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">网站角色：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				{foreach name="data" item="v1"}
+				<dl class="permission-list">
+					<dt>
+						<label>
+							<input type="checkbox" value="" name="user-Character-0" id="user-Character-0">
+							{$v1.name}</label>
+					</dt>
+					<dd>
+						<dl class="cl permission-list2">
+							<dd>
+								{foreach name="v1.desc" item="v0"}
+								<label class="">
+									<input type="checkbox" value="{$v0.id}" name="rule[]" id="user-Character-0-0-0" <?php foreach($role['rule'] as $k=>$v){
+										if($v == $v0['id']){
+										echo "checked=checked";
+									}
+									}?>>
+									{$v0.desc}</label>
+								<input type="hidden" name="gid" value="{$role.gid}">
+								{/foreach}
+							</dd>
+						</dl>
+					</dd>
+				</dl>
+				{/foreach}
+			</div>
+		</div>
+		<div class="row cl">
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+				<button type="button" class="btn btn-success radius" id="admin-role-save" name="admin-role-save"><i class="icon-ok"></i> 确定</button>
+			</div>
+		</div>
+	</form>
+</article>
+
+{include file="layout/foot"}
+<script type="text/javascript">
+$(function(){
+	$(".permission-list dt input:checkbox").click(function(){
+		$(this).closest("dl").find("dd input:checkbox").prop("checked",$(this).prop("checked"));
+	});
+	$(".permission-list2 dd input:checkbox").click(function(){
+		var l =$(this).parent().parent().find("input:checked").length;
+		var l2=$(this).parents(".permission-list").find(".permission-list2 dd").find("input:checked").length;
+		if($(this).prop("checked")){
+			$(this).closest("dl").find("dt input:checkbox").prop("checked",true);
+			$(this).parents(".permission-list").find("dt").first().find("input:checkbox").prop("checked",true);
+		}
+		else{
+			if(l==0){
+				$(this).closest("dl").find("dt input:checkbox").prop("checked",false);
+			}
+			if(l2==0){
+				$(this).parents(".permission-list").find("dt").first().find("input:checkbox").prop("checked",false);
+			}
+		}
+	});
+	
+//	$("#form-admin-role-add").validate({
+//		rules:{
+//			roleName:{
+//				required:true,
+//			},
+//		},
+//		onkeyup:false,
+//		focusCleanup:true,
+//		success:"valid",
+//		submitHandler:function(form){
+//			$(form).ajaxSubmit();
+//			var index = parent.layer.getFrameIndex(window.name);
+//			parent.layer.close(index);
+//		}
+//	});
+	$('#admin-role-save').click(function () {
+		$.post("{:url('Auth/role_save')}",$('#form-admin-role-add').serialize(),function (code) {
+//			var oname=document.getElementById("roleName");
+//			var omiaoshu=document.getElementById("miaoshu");
+//				if(oname.value.indexOf(" ") >=0 || omiaoshu.value.indexOf(" ") >=0)
+//				{
+//					alert('请输入正确内容');
+//					return;
+//				}
+		    if(code == 200){
+				layer.msg('操作成功',{icon:1,time:1000})
+				return;
+			}else{
+				layer.msg('操作失败',{icon:2,time:1000})
+				return;
+			}
+        });
+    })
+});
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

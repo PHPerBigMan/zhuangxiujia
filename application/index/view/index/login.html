@@ -1,0 +1,49 @@
+{extend name="template/layout" /}
+
+{block name="content"}
+<div class="m-login-wrap p-wrap">
+    <div class="section-title">
+        <div class="main-title">用户登录</div>
+        <div class="sub-title">SIGN IN</div>
+    </div>
+
+
+    <div class="form-wrap">
+
+        <div class="form-login">
+            <div class="top-link">
+                <a href="/register">点击注册></a>
+            </div>
+            <form action="">
+                <div class="form-row">
+                    <div>
+                        <label>手机号码：</label>
+                        <input type="text" placeholder="请输入手机号码" id="user_phone">
+                    </div>
+                    <div class="form-tips" id="phone_error_msg" >错误信息</div>
+                </div>
+
+                <div class="form-row">
+                    <div>
+                        <label>输入密码：</label>
+                        <input type="password" placeholder="请输入密码" id="user_pwd">
+                    </div>
+                    <div class="form-tips" id="pwd_error_msg"></div>
+                </div>
+
+                <hr>
+
+                <div class="p-button login-button" id="submit_login">提交</div>
+            </form>
+
+            <div class="forget-link">
+                <a target="_self" href="/forget">忘记密码</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="login-logo">
+        <img src="/static/img/1-logo.png" alt="">
+    </div>
+</div>
+{/block}

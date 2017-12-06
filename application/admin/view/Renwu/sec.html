@@ -1,0 +1,63 @@
+﻿{include file="layout/head"}
+<body>
+<article class="page-container">
+	<form  method="post" class="form form-horizontal" id="form-admin-role-add" style="margin-right: 220px">
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">二级分类：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+
+				<dl class="permission-list">
+					<dt>
+						<label>
+							{$f_name}
+						</label>
+					</dt>
+					<dd>
+
+						<dl class="">
+							{foreach name="data" item="v1"}
+							<input type="checkbox" value="{$v1.id}" name="id[]" >{$v1.cat_name}
+							{/foreach}
+
+						</dl>
+
+					</dd>
+				</dl>
+
+			</div>
+		</div>
+		<div class="row cl">
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+				<button type="button" class="btn btn-success radius" id="admin-role-save" name="admin-role-save"><i class="icon-ok"></i> 确定</button>
+				<button type="button" class="btn btn-danger radius" id="" name="" onclick="del()"><i class="icon-ok"></i> 删除</button>
+			</div>
+		</div>
+	</form>
+</article>
+
+{include file="layout/foot"}
+<script type="text/javascript">
+
+
+function del() {
+	layer.confirm("确认要删除吗?",function () {
+        $.post("{:url('Renwu/sec_del')}",$("#form-admin-role-add").serialize(),function (code) {
+            if(code.code == 200){
+                layer.msg(code.msg,{icon:1,time:1000});
+                setTimeout(function () {
+					location.reload();
+                },1000);
+			}else if(code.code == 403){
+                layer.msg(code.msg)
+			}else if(code.code == 405){
+				layer.msg(code.msg)
+			}else{
+			    layer.msg('您没有权限')
+			}
+        })
+    })
+}
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

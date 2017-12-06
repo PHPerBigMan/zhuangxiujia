@@ -1,0 +1,105 @@
+﻿{include file="layout/head"}
+<body>
+
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 订单管理 <span class="c-gray en">&gt;</span> 订单详情 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+	<form class="layui-form" id="form">
+		<div class="layui-form-item">
+			<label class="layui-form-label">ID</label>
+			<div class="layui-input-block">
+				<input type="text" name="orderId" lay-verify="title" autocomplete="off" placeholder="订单ID" class="layui-input" value="{$data.id}" disabled>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">用户</label>
+			<div class="layui-input-block">
+				<input type="text" name="user_name" lay-verify="required"  autocomplete="off" class="layui-input" value="{$data.user_name}" disabled>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">房屋类型</label>
+			<div class="layui-input-block">
+				<input type="text" name="rw_title" lay-verify="required"  autocomplete="off" class="layui-input" value="{$data.room_type}" disabled>
+			</div>
+		</div>
+
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">建筑面积</label>
+			<div class="layui-input-block" style="padding-top: 10px">
+				<input type="text" name="rw_ding" lay-verify="required"  autocomplete="off" class="layui-input" value="{$data.room_mj}">
+			</div>
+		</div>
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">装修预算</label>
+			<div class="layui-input-block" style="padding-top: 10px">
+				<input type="text" name="rw_yj" lay-verify="required"  autocomplete="off" class="layui-input" value="{$data.room_ys}">
+			</div>
+		</div>
+
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">装修工期</label>
+			<div class="layui-input-block" style="padding-top: 10px">
+				<input type="text" name="rw_yj" lay-verify="required"  autocomplete="off" class="layui-input" value="{$data.room_time}">
+			</div>
+		</div>
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">联系方式</label>
+			<div class="layui-input-block" style="padding-top: 10px">
+				<input type="text" name="rw_yj" lay-verify="required"  autocomplete="off" class="layui-input" value="{$data.phone}">
+			</div>
+		</div>
+
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">添加时间</label>
+			<div class="layui-input-block" style="padding-top: 10px">
+				{$data.create_time}
+			</div>
+		</div>
+
+		<input type="hidden" value="{$data.id}" name="id">
+	</form>
+
+</div>
+{include file="layout/foot"}
+
+
+</body>
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form()
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,laydate = layui.laydate;
+
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+        //自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length < 5){
+                    return '标题至少得5个字符啊';
+                }
+            }
+            ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+            ,content: function(value){
+                layedit.sync(editIndex);
+            }
+        });
+
+        //监听指定开关
+        form.on('switch(switchTest)', function(data){
+            layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+                offset: '6px'
+            });
+            layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+        });
+    });
+
+</script>
+</html>

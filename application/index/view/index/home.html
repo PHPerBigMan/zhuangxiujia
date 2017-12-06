@@ -1,0 +1,208 @@
+{extend name="template/layout" /}
+
+{block name="content"}
+
+<div class="p-wrap m-index" >
+    <div class="section-1" id="index">
+        <div class="left-form">
+            <!--免费装修等-->
+            <ul class="nav nav-tabs m-tabs-custom" role="tablist" id="index_nav">
+
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content free-form-desc" id="index_nav_msg">
+
+            </div>
+
+            {include file="../application/index/view/template/free-form.html" /}
+        </div>
+
+
+        <div id="index-carousel" class="carousel slide" data-ride="carousel">
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+                <li data-target="#index-carousel" data-slide-to="0" class="active"></li>
+                <li data-target="#index-carousel" data-slide-to="1"></li>
+                <li data-target="#index-carousel" data-slide-to="2"></li>
+            </ol>
+
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner" role="listbox">
+
+            </div>
+        </div>
+
+        <div class="index-news">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs m-tabs-custom" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="#index-news-1" role="tab"
+                       data-toggle="tab">公告</a>
+                </li>
+                <li role="presentation">
+                    <a href="#index-news-2" role="tab"
+                       data-toggle="tab">最新优惠</a>
+                </li>
+                <li role="presentation">
+                    <a href="#index-news-3" role="tab"
+                       data-toggle="tab">热点</a>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="index-news-1">
+                    <ul class="index-news-content">
+
+                    </ul>
+
+                    <div class="p-button" @click="read(1)">查看更多</div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="index-news-2">
+                    <ul class="index-news-content">
+
+                    </ul>
+
+                    <div class="p-button" @click="read(2)">查看更多</div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="index-news-3">
+                    <ul class="index-news-content">
+                       
+                    </ul>
+
+                    <div class="p-button" @click="read(3)">查看更多</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-2">
+        <div class="index-icon">
+            <div class="img-wrap">
+                <a href="/want-decorate/1"><img src="/static/img/4-icon-mianfeisheji-01.png" alt=""></a>
+                <a href="/want-decorate/1"><img src="/static/img/4-icon-mianfeisheji-02.png" alt=""></a>
+            </div>
+        </div>
+
+        <div class="index-icon">
+            <div class="img-wrap">
+                <a href="/want-decorate/2"><img src="/static/img/4-icon-mianfeiyanfang-01.png" alt=""></a>
+                <a href="/want-decorate/2"><img src="/static/img/4-icon-mianfeiyanfang-02.png" alt=""></a>
+            </div>
+        </div>
+
+        <div class="index-icon">
+            <div class="img-wrap">
+                <a href="/want-decorate/3"><img src="/static/img/4-icon-mianfeiliangfang-01.png" alt=""></a>
+                <a href="/want-decorate/3"><img src="/static/img/4-icon-mianfeiliangfang-02.png" alt=""></a>
+            </div>
+        </div>
+
+        <div class="index-icon">
+            <div class="img-wrap">
+                <a href="/want-decorate/4"><img src="/static/img/4-icon-mianfeibaojia-01.png" alt=""></a>
+                <a href="/want-decorate/4"><img src="/static/img/4-icon-mianfeibaojia-02.png" alt=""></a>
+            </div>
+        </div>
+
+        <div class="index-icon">
+            <div class="img-wrap">
+                <a href="/want-decorate/5"><img src="/static/img/4-icon-mianfeizhuangxiu-01.png" alt=""></a>
+                <a href="/want-decorate/5"><img src="/static/img/4-icon-mianfeizhuangxiu-02.png" alt=""></a>
+            </div>
+        </div>
+
+        <div class="index-icon">
+            <div class="img-wrap">
+                <a href="/decorate-case/0"><img src="/static/img/4-icon-mianfeianli-01.png" alt=""></a>
+                <a href="/decorate-case/0"><img src="/static/img/4-icon-mianfeianli-02.png" alt=""></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-3">
+        <div class="decorate-case">
+            <img src="/static/img/05-pic-zhuangxiuanli.png" alt="" class="decorate-case-title">
+            {foreach name="data" item="v1"}
+            <div class="decorate-case-item">
+                <div class="decorate-case-label">{$v1.cat_name}</div>
+                <div>
+                    {foreach name="v1.sec" item="vo"}
+                    <a href="/decorate-case/{$vo.id}/{$v1.id}"><span class="decorate-case-option">{$vo.cat_name}</span></a>
+                    {/foreach}
+                </div>
+            </div>
+            {/foreach}
+        </div>
+
+
+    </div>
+
+    <div class="section-4">
+
+
+
+
+    </div>
+
+    <div class="section-5">
+        <div class="tabs-left">
+            {include file="../application/index/view/template/ads-tabs.html" nav="$nav" /}
+        </div>
+
+        <div class="tabs-right m-tabs-vertical">
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="#index-vertical-tabs-1" role="tab"
+                       data-toggle="tab">
+                        <div class="text-wrap">
+                            <div>装修</div>
+                            <div>培训</div>
+                        </div>
+                    </a>
+                </li>
+
+                <li role="presentation">
+                    <a href="#index-vertical-tabs-2" role="tab"
+                       data-toggle="tab">
+                        <div class="text-wrap">
+                            <div>施工</div>
+                            <div>规范</div>
+                        </div>
+                    </a>
+                </li>
+
+                <li role="presentation">
+                    <a href="#index-vertical-tabs-3" role="tab"
+                       data-toggle="tab">
+                        <div class="text-wrap">
+                            <div>施工</div>
+                            <div>标准</div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content" id="zxzl">
+                <div role="tabpanel" class="tab-pane active" id="index-vertical-tabs-1">
+
+                </div>
+                <div role="tabpanel" class="tab-pane" id="index-vertical-tabs-2">
+
+                </div>
+                <div role="tabpanel" class="tab-pane" id="index-vertical-tabs-3">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+
+
+
+</script>
+{/block}

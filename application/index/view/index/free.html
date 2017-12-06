@@ -1,0 +1,73 @@
+{extend name="template/layout" /}
+
+{block name="content"}
+
+{php}
+$nav = [
+["url"=>"/", "name"=>"免费申请"],
+]
+{/php}
+{include file="../application/index/view/template/crumbs-nav.html" nav="$nav" /}
+
+<div class="p-wrap m-free">
+    <div class="free-section-1">
+        <div class="left-box">
+            <div class="left-box-header">
+                <h3 class="left-box-title">免费设计</h3>
+                <div class="left-box-desc">专业人员免费上门，按照行业标准严格验收</div>
+            </div>
+
+            {include file="../application/index/view/template/free-form.html" /}
+        </div>
+
+        <div class="m-text-tips right-box">
+            <h3 class="tips-title">服务结束：</h3>
+            <div class="tips-content">
+                记者：尤总您好，欢迎您接受我们的采访。随着便装网的不断发展扩大，特别是移动互联4.0上线以后，有越来越多的人开始喜欢上了这个平台，我有一个老乡是普通的装修工，最近用便装网APP开始接单了，非常的兴奋，一定让我转达对尤总的敬意。
+                尤月林：谢谢，其实更应该感谢的是他们，是他们这些劳作在一线的装修施工人员用汗水勾绘出了广大消费者美好的家居生活，让城市变得绚丽多彩富丽堂皇，也让今天的整个装饰行业达到了一个新高度。我有机会能为他们做一点事情，让他们在这个平台上更方便的接到单子，有更多的发展机会，能更好的改善自己的生活条件，我还是非常高兴的。
+            </div>
+        </div>
+    </div>
+
+
+    <div class="m-text-tips">
+        <h3 class="tips-title">装修小贴士：</h3>
+        <div class="tips-content">
+            记者：尤总您好，欢迎您接受我们的采访。随着便装网的不断发展扩大，特别是移动互联4.0上线以后，有越来越多的人开始喜欢上了这个平台，我有一个老乡是普通的装修工，最近用便装网APP开始接单了，非常的兴奋，一定让我转达对尤总的敬意。
+            尤月林：谢谢，其实更应该感谢的是他们，是他们这些劳作在一线的装修施工人员用汗水勾绘出了广大消费者美好的家居生活，让城市变得绚丽多彩富丽堂皇，也让今天的整个装饰行业达到了一个新高度。我有机会能为他们做一点事情，让他们在这个平台上更方便的接到单子，有更多的发展机会，能更好的改善自己的生活条件，我还是非常高兴的。
+        </div>
+    </div>
+
+    <div class="m-text-tips">
+        <h3 class="tips-title">装修猫腻：</h3>
+        <div class="tips-content">
+            记者：尤总您好，欢迎您接受我们的采访。随着便装网的不断发展扩大，特别是移动互联4.0上线以后，有越来越多的人开始喜欢上了这个平台，我有一个老乡是普通的装修工，最近用便装网APP开始接单了，非常的兴奋，一定让我转达对尤总的敬意。
+            尤月林：谢谢，其实更应该感谢的是他们，是他们这些劳作在一线的装修施工人员用汗水勾绘出了广大消费者美好的家居生活，让城市变得绚丽多彩富丽堂皇，也让今天的整个装饰行业达到了一个新高度。我有机会能为他们做一点事情，让他们在这个平台上更方便的接到单子，有更多的发展机会，能更好的改善自己的生活条件，我还是非常高兴的。
+        </div>
+    </div>
+
+    <table class="m-apply-table table">
+        <tr>
+            <th colspan="5">申请列表</th>
+        </tr>
+        <tr>
+            <th>申请日期</th>
+            <th>业主</th>
+            <th>类型</th>
+            <th>面积</th>
+            <th>预算</th>
+        </tr>
+
+        {foreach [1,2,3,4,5] as $item}
+        <tr>
+            <td>2017/01/28</td>
+            <td>李小龙</td>
+            <td>三室一厅</td>
+            <td>120</td>
+            <td>12万</td>
+        </tr>
+        {/foreach}
+    </table>
+</div>
+
+{/block}

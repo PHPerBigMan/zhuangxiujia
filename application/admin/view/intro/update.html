@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="Bookmark" href="/favicon.ico" >
+    <link rel="Shortcut Icon" href="/favicon.ico" />
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="/lib/html5shiv.js"></script>
+    <script type="text/javascript" src="/lib/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" type="text/css" href="/static/h-ui/css/H-ui.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/h-ui.admin/css/H-ui.admin.css" />
+    <link rel="stylesheet" type="text/css" href="/lib/Hui-iconfont/1.0.8/iconfont.css" />
+    <link rel="stylesheet" type="text/css" href="/static/h-ui.admin/skin/default/skin.css" id="skin" />
+    <link rel="stylesheet" type="text/css" href="/static/h-ui.admin/css/style.css" />
+    <link href="/lib/webuploader/0.1.5/webuploader.css" rel="stylesheet" type="text/css" />
+
+    <!--layui-->
+    <link href="/lib/layui/css/layui.css" rel="stylesheet" type="text/css" />
+    <!--[if IE 6]>
+    <script type="text/javascript" src="/lib/DD_belatedPNG_0.0.8a-min.js" ></script>
+    <script>DD_belatedPNG.fix('*');</script>
+    <meta name="keywords" content="杭州百米贩科技">
+    <meta name="description" content="杭州百米贩科技">
+    <![endif]-->
+    <title></title>
+</head>
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 广告图片 <span class="c-gray en">&gt;</span> 图片列表 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"></span>
+    <form action="{:url('Intro/savaupdate',['id'=>$re.id])}" method="post" enctype="multipart/form-data">
+        <div class="page-container">
+        <div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"> </span>
+
+            <div class="mt-20">
+                <table id="table_id_example" class="display table table-border table-bordered table-bg table-hover table-sort">
+                    <tr>
+
+                        <td>原图片&nbsp;(图片尺寸:1920*249)</td>
+                        <td>新图片</td>
+                        <td>跳转地址</td>
+
+                    </tr>
+
+                    <tr>
+                        <input type="hidden" name="tp" value="{$re.url}">
+                        <td ><img style="text-align:centerimg" src="{$re.url}" alt=""></td>
+                        <td><input type="file" name="img"></td>
+                        <td><input type="text" name="url" value="{$re.href}"></td>
+                    </tr>
+
+                </table>
+            </div>
+            <!--<button  class="btn btn-primary radius edit_button" type="button"><i class="Hui-iconfont"></i> 保存</button>-->
+            <button class="btn btn-primary radius edit_button">保存</button>
+        </div>
+    </form>
+        {include file="layout/foot"}

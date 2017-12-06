@@ -1,0 +1,92 @@
+{include file="layout/head"}
+<body>
+
+<div class="page-container">
+	<form class="layui-form" id="form1">
+		<div class="layui-form-item">
+			<label class="layui-form-label">分类名称</label>
+			<div class="layui-input-block">
+				<input type="text" name="cat_name" lay-verify="title" autocomplete="off" placeholder="请输入商品名称" class="layui-input" value="{$data.cat_name}">
+			</div>
+		</div>
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">分类图片</label>
+			<div class="layui-input-block">
+				<input type="file" name="file" class="layui-upload-file" lay-title="添加分类图片">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			{eq name="data.cat_img" value = ""}
+			{else/}
+				<img src="{$data.cat_img}" alt="" style="width: 150px;height: 150px;margin-top: 10px;margin-left: 110px">
+			{/eq}
+		</div>
+
+		<input type="hidden" name="id" value="{$data.id}">
+	</form>
+	<button class="layui-btn"  style="margin-left: 450px" id="button">提交</button>
+</div>
+{include file="layout/foot"}
+
+
+</body>
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form()
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,laydate = layui.laydate;
+
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+        //自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length < 5){
+                    return '标题至少得5个字符啊';
+                }
+            }
+            ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+            ,content: function(value){
+                layedit.sync(editIndex);
+            }
+        });
+
+        //监听指定开关
+        form.on('switch(switchTest)', function(data){
+            layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+                offset: '6px'
+            });
+            layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+        });
+    });
+
+    layui.use('upload', function(){
+        layui.upload({
+            url: "{:url('Shop/img')}?type=2" //上传接口
+            ,success: function(res){ //上传成功后的回调
+                if(res != ""){
+                    layer.msg("图片上传成功",{icon:1,time:1000})
+				}
+            }
+        });
+
+    });
+
+
+    $("#button").click(function () {
+		$.post("{:url('Renwu/save')}",$('#form1').serialize(),function (code) {
+			if(code == 200){
+			    layer.msg("操作成功",{icon:1,time:1000});
+				setTimeout(function () {
+					location.reload();
+                },1000)
+			}else{
+			    layer.msg('您没有权限')
+			}
+        })
+    });
+</script>
+</html>

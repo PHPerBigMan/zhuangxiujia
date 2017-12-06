@@ -1,0 +1,88 @@
+﻿{include file="layout/head"}
+<body>
+
+<form class="layui-form" action="" style="margin-top: 40px" id="form_data">
+	<div class="layui-form-item">
+		<label class="layui-form-label">管理员类型</label>
+		<div class="layui-input-block">
+			<select  name="admin_juese" lay-filter="aihao">
+				<option value=""></option>
+				{foreach name="group" item="v1"}
+					<option value="{$v1.gid}" <?php if($data['admin_juese'] == $v1['gid']){echo "selected=selected";}?>>{$v1.title}</option>
+				{/foreach}
+			</select>
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">登录账号</label>
+		<div class="layui-input-block">
+			<input type="text" name="admin_name"  autocomplete="off" placeholder="" class="layui-input" value="{$data.admin_name}">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">登录密码</label>
+		<div class="layui-input-block">
+			<input type="text" name="admin_pwd" value="{$data.admin_pwd}" placeholder="请输入" autocomplete="off" class="layui-input">
+		</div>
+	</div>
+	<button class="layui-btn" lay-submit="" lay-filter="data" style="margin-left: 250px" id="submit">立即提交</button>
+	<input type="hidden" id="id" value="{$data.id}" name="id">
+</form>
+
+{include file="layout/foot"}
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+//    $('#submit').click(function () {
+//        $.post("{:url('Auth/role_edit')}",$('#form_data').serialize(),function (code) {
+//            if(code == 200){
+//               alert('操作成功')
+//            }
+//        })
+//    })
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form()
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,laydate = layui.laydate;
+
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+        //自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length < 1){
+                    return '标题至少得1个字符啊';
+                }
+            }
+            ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+            ,content: function(value){
+                layedit.sync(editIndex);
+            }
+        });
+
+        //监听指定开关
+        form.on('switch(switchTest)', function(data){
+            layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+                offset: '6px'
+            });
+            layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+        });
+
+        //监听提交
+        form.on('submit(data)', function(data){
+            $.post("{:url('Auth/role_edit')}",$('#form_data').serialize(),function (code) {
+				if(code == 200){
+				    alert('操作成功')
+				}
+        	})
+        });
+
+    });
+
+
+</script>
+
+</body>
+</html>

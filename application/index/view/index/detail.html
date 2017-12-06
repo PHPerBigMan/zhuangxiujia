@@ -1,0 +1,22 @@
+{extend name="template/layout" /}
+
+{block name="content"}
+
+{php}
+
+{/php}
+{include file="../application/index/view/template/crumbs-nav.html" /}
+
+<div class="p-wrap m-detail">
+    <div class="detail-header">
+        <h2 class="detail-title">{$data.title}</h2>
+        <span class="article-date">32576人已浏览 时间 : 3小时前</span>
+    </div>
+    <hr>
+
+    <div class="detail-content">
+        {$data.content}
+    </div>
+</div>
+
+{/block}

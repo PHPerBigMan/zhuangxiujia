@@ -1,0 +1,75 @@
+{extend name="template/layout" /}
+
+{block name="content"}
+
+{php}
+$nav = [
+["url"=>"/", "name"=>"个人中心"],
+["url"=>"/", "name"=>"个人信息"]
+]
+{/php}
+{include file="../application/index/view/template/crumbs-nav.html" nav="$nav" /}
+
+<div class="p-wrap m-user">
+    <div class="user-left-box">
+        <div class="user-tab-item active" onclick="href(1,this)">个人信息</div>
+        <div class="user-tab-item" onclick="href(2,this)">我的装修</div>
+        <div class="user-tab-item" onclick="href(3,this)">我的发布</div>
+    </div>
+
+    <div class="user-right-box">
+        <div class="user-edit-container">
+            <form id="user_edit">
+                <div class="avatar-wrap">
+                    <img id="LAY_demo_upload" src="{$data.user_pic}" class="user-avatar">
+                    <div class="site-demo-upbar">
+                        <input type="file" name="file" class="layui-upload-file " id="test">
+                    </div>
+                </div>
+
+                <div class="input-row head_img">
+                    <label>昵称：</label>
+                    <input type="text" placeholder="请输入您的昵称" value="{$data.user_name}" name="user_name">
+                </div>
+
+                <div class="input-row">
+                    <label>手机：</label>
+                    <input type="text" placeholder="请输入您的手机号码" value="{$data.user_phone}" name="user_phone">
+                </div>
+
+                <div class="input-row">
+                    <label>性别：</label>
+                    <input type="radio" name="user_sex" value="1" {php}if($data['user_sex'] == 1){echo "checked";}{/php}>男
+                    <input type="radio" name="user_sex" value="0" {php}if($data['user_sex'] == 0){echo "checked";}{/php}>女
+                </div>
+
+                <div class="input-row">
+                    <label>职业：</label>
+                    <input type="text" placeholder="请输入您的职业" value="{$data.user_job}" name="user_job">
+                </div>
+
+                <div class="input-row user_edit_select">
+                    <label>地址：</label>
+                    <select id="province" onchange="pro()" name="user_area">
+
+                    </select>
+
+                    <select id="city" onchange="city_a()" name="user_city">
+
+                    </select>
+
+                </div>
+
+                <div class="input-row">
+                    <div class="p-button" onclick="user_edit()">提交</div>
+                    <div class="p-button gray" onclick="user_history()">取消</div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<script>
+
+</script>
+{/block}

@@ -1,0 +1,108 @@
+{include file="layout/head"}
+<body>
+
+<div class="page-container">
+	<form class="layui-form" id="form1">
+		<div class="layui-form-item">
+			<label class="layui-form-label">分类等级</label>
+			<div class="layui-input-block">
+				<input type="radio" name="level" lay-filter="radio" value="1" title="一级分类" <?php if($data['level']==1){echo "checked";}?>>
+				<input type="radio" name="level" lay-filter="radio" value="2" title="二级分类" <?php if($data['level']==2){echo "checked";}?>>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">分类名称</label>
+
+			<div class="layui-input-block">
+				<input type="text" name="cat_name"  lay-title="分类名称" value="{$data.cat_name}" class="layui-input">
+			</div>
+		</div>
+
+		{if condition="$data['level'] == 2 OR $data['level']==''" }
+		<div class="layui-form-item first_cat">
+			<label class="layui-form-label">一级分类</label>
+			<div class="layui-input-inline">
+				<select name="p_id">
+					<option value="">请选择分类</option>
+					{foreach $first as $vo}
+					<option value="{$vo.id}" <?php if($vo['id']==$data['p_id']){echo "selected";}?>>{$vo.cat_name}</option>
+					{/foreach}
+				</select>
+			</div>
+		</div>
+
+		<div class="row cl first_cat">
+			<div class="layui-form-item">
+				<label class="layui-form-label">分类图片</label>
+
+				<div class="layui-input-block">
+					<input type="file" name="file" class="layui-upload-file" lay-title="修改图片">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				{eq name="data" value = ""}
+				<img  id="LAY_demo_upload" class="banner_img">
+				{else/}
+				<img src="{$data.img}" id="LAY_demo_upload" class="banner_img">
+				{/eq}
+			</div>
+		</div>
+		{/if}
+
+		<input type="hidden" name="id" value="{$data.id}">
+	</form>
+	<button class="layui-btn cat_btn"  id="button">提交</button>
+</div>
+{include file="layout/foot"}
+
+
+</body>
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form()
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,laydate = layui.laydate;
+
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+        //监听指定开关
+        form.on('radio(radio)', function(data){
+           if(data.value == 1){
+               $('.first_cat').css({'display':'none'});
+		   }else{
+               $('.first_cat').css({'display':'block'});
+		   }
+        });
+    });
+
+    layui.use('upload', function(){
+        layui.upload({
+            url: "{:url('Shop/img')}?type=5" //上传接口
+            ,success: function(res){ //上传成功后的回调
+                if(res != ""){
+                    layer.msg("图片上传成功,请提交保存",{icon:1,time:2000});
+                    LAY_demo_upload.src = res;
+                }
+            }
+        });
+
+    });
+
+    $("#button").click(function () {
+		$.post("{:url('Shop/cat_save')}",$('#form1').serialize(),function (obj) {
+			if(obj.code == 200){
+			    layer.msg(obj.msg,{icon:1,time:1000});
+				setTimeout(function () {
+					location.reload();
+                },1000)
+			}else if(obj.code == 403){
+			    layer.msg(obj.msg)
+			}else{
+			    layer.msg('您没有权限')
+			}
+        })
+    });
+</script>
+</html>

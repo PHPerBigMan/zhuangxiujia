@@ -1,0 +1,61 @@
+﻿{include file="layout/head"}
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 系统管理 <span class="c-gray en">&gt;</span> 广告管理 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"> <a class="btn btn-primary radius" data-title="添加图书" data-href="{:url('setting/lun_add')}" onclick="Hui_admin_tab(this)" href="javascript:;"><i class="Hui-iconfont">&#xe600;</i> 添加广告</a></span></div>
+
+<div class="page-container">
+
+
+		<div class="mt-20">
+		<table id="banner" class="table table-border table-bordered table-bg table-hover table-sort">
+
+		</table>
+	</div>
+
+</div>
+
+{include file="layout/foot"}
+
+<script type="text/javascript">
+    $(function () {
+        $('#banner').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "processing": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "ajax": "{:url('Setting/banner_ajax')}",
+            "columns": [
+                {"title": "ID", "data": "id"},
+                {"title": "广告图片", "data": "banner_url"},
+                {"title": "广告图类型", "data": "banner_type"},
+                {"title": "添加时间", "data": "create_time"},
+                {"title": "编辑时间", "data": "update_time"},
+                {"title": "操作", "data": "caozuo"},
+            ]
+
+        });
+    });
+
+    function del(obj,id){
+        layer.confirm('确认要删除吗？',function(index){
+            $.post("{:url('Setting/del')}",{id:id},function (data) {
+                if(data.code == 200){
+                    layer.msg(data.msg);
+                    layer.close(index);
+                    setTimeout(function () {
+                        window.location.reload()
+                    },800)
+                }else{
+                    layer.msg(data.msg)
+                }
+
+            })
+        });
+    }
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+{include file="layout/head"}
+<body>
+
+<div class="page-container">
+	<form class="layui-form" id="form1">
+		<div class="layui-form-item">
+			<label class="layui-form-label">轮播图类型</label>
+			<div class="layui-input-block">
+				<input type="radio" name="type" lay-filter="radio" value="0" title="APP" <?php if($data['type']==0){echo "checked";}?>>
+				<input type="radio" name="type" lay-filter="radio" value="1" title="官网" <?php if($data['type']==1){echo "checked";}?>>
+			</div>
+			<p class="shop_jy App" style="display: none">建议图片像素:</p>
+			<p class="shop_jy Web" style="display: none">建议图片像素: 550*416</p>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">轮播图链接</label>
+
+			<div class="layui-input-block">
+				<input type="text" name="href"  lay-title="轮播图链接" value="{$data.href}" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">轮播图片</label>
+
+			<div class="layui-input-block">
+				<input type="file" name="file" class="layui-upload-file" lay-title="修改图片">
+			</div>
+			<p class="shop_jy">建议图片像素: 1920*864</p>
+		</div>
+		<div class="layui-form-item">
+			{eq name="data" value = ""}
+				<img  id="LAY_demo_upload" class="banner_img">
+			{else/}
+				<img src="{$data.banner_url}" id="LAY_demo_upload" class="banner_img">
+			{/eq}
+		</div>
+
+		<input type="hidden" name="id" value="{$data.id}">
+	</form>
+	<button class="layui-btn"  style="margin-left: 450px" id="button">提交</button>
+</div>
+{include file="layout/foot"}
+
+
+</body>
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form()
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,laydate = layui.laydate;
+
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+        //监听指定开关
+        form.on('radio(radio)', function(data){
+           if(data.value == 0){
+               $('.Web').css({'display':'none'});
+               $('.App').css({'display':'block'});
+		   }else{
+               $('.App').css({'display':'none'});
+               $('.Web').css({'display':'block'});
+		   }
+        });
+    });
+
+    layui.use('upload', function(){
+        layui.upload({
+            url: "{:url('Shop/img')}?type=4" //上传接口
+            ,success: function(res){ //上传成功后的回调
+                if(res != ""){
+                    layer.msg("图片上传成功,请提交保存",{icon:1,time:2000});
+                    LAY_demo_upload.src = res;
+				}
+            }
+        });
+
+    });
+
+
+    $("#button").click(function () {
+		$.post("{:url('Intro/banner_save')}",$('#form1').serialize(),function (code) {
+			if(code == 200){
+			    layer.msg("操作成功",{icon:1,time:1000})
+				setTimeout(function () {
+					location.reload();
+                },1000)
+			}else{
+			    layer.msg('您没有权限')
+			}
+        })
+    });
+</script>
+</html>

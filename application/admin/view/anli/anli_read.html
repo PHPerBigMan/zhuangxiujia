@@ -1,0 +1,202 @@
+{include file="layout/head"}
+<body>
+<div class="page-container">
+	<form   class="form form-horizontal layui-form"  id="anli" enctype="multipart/form-data">
+		<div class="layui-tab">
+			<ul class="layui-tab-title">
+				<li class="layui-this">案例基本信息</li>
+				<li>案例分类</li>
+			</ul>
+			<div class="layui-tab-content">
+				<div class="layui-tab-item layui-show">
+					<div class="row cl">
+						<label class="form-label col-xs-4 col-sm-2">案例标题：</label>
+						<div class="formControls col-xs-8 col-sm-9">
+							<input type="text" class="input-text" value="{$data.title}" placeholder="" id="" name="title">
+						</div>
+					</div>
+					<div class="row cl">
+						<label class="form-label col-xs-4 col-sm-2">发布用户：</label>
+						<div class="formControls col-xs-8 col-sm-9">
+							<input type="text" class="input-text" value="{$data.user_name}" placeholder="" id="" name="user_name">
+						</div>
+					</div>
+
+					<div class="row cl">
+						<label class="form-label col-xs-4 col-sm-2">是否审核通过：</label>
+						<div class="formControls col-xs-8 col-sm-9">
+							<div class="layui-form-item" pane="" style="margin-left: -110px">
+								<div class="layui-input-block">
+									<input type="radio" name="is_pass" value="1" title="通过" <?php if($data['is_pass']==1){echo "checked";}?>>
+									<input type="radio" name="is_pass" value="0" title="不通过" <?php if($data['is_pass']==0){echo "checked";}?>>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="row cl">
+
+						<label class="form-label col-xs-4 col-sm-2">案例详情：</label>
+						<p style="margin-left: 300px;color: red">图片大小:452*137</p>
+						<div class="formControls col-xs-8 col-sm-9">
+							<script id="editor" type="text/plain"  name="pass_content">
+							{eq name="data.pass_content" value=""}
+								{foreach name='data.pic' item='vo'}
+									<img src="{$vo}" alt="">
+								{/foreach}
+								{$data.content}
+							{else/}
+								{$data.pass_content}
+							{/eq}
+
+				</script>
+						</div>
+					</div>
+				</div>
+				<div class="layui-tab-item">
+					<div class="row cl" style="margin-bottom: 20px">
+						<label  class="form-label col-xs-4 col-sm-2">选择案例分类</label>
+						<br>
+						{foreach name = 'cat' item='v1'}
+						<span class="form-label col-xs-4 col-sm-2">{$v1.cat_name}:
+							<div class="layui-input-inline">
+								<select name="{$v1.name}">
+									<option value="">请选择</option>
+									{foreach name="v1.sec" item="v2"}
+										<option value="{$v2.id}" <?php if($v2['select']==1){echo "selected";}?>>{$v2.cat_name}</option>
+									{/foreach}
+								</select>
+							</div>
+						</span>
+						{/foreach}
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+
+
+
+
+		<div class="row cl">
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+				<input type="hidden" name="id" value="{$data.id}">
+				<button onClick="add();" class="btn btn-primary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+
+{include file="layout/foot"}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="/lib/webuploader/0.1.5/webuploader.min.js"></script>
+<script type="text/javascript" src="/lib/ueditor/1.4.3/ueditor.config.js"></script>
+<script type="text/javascript" src="/lib/ueditor/1.4.3/ueditor.all.min.js"> </script>
+<script type="text/javascript" src="/lib/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script>
+<script type="text/javascript">
+    var ue = UE.getEditor('editor');
+    var ue = UE.getEditor('pic');
+
+	function add(){
+		$.post("{:url('Anli/add')}",$('#anli').serialize(),function(data){
+			if(data.code == 200){
+				layer.msg("操作成功",{icon:1,time:2000});
+			}else{
+				layer.msg("数据暂未修改",{icon:2,time:2000});
+			}
+		})
+
+	}
+</script>
+
+<script>
+	layui.use(['form', 'layedit', 'laydate'], function(){
+		var form = layui.form()
+				,layer = layui.layer
+				,layedit = layui.layedit
+				,laydate = layui.laydate;
+
+		//创建一个编辑器
+		var editIndex = layedit.build('LAY_demo_editor');
+
+		//自定义验证规则
+		form.verify({
+			title: function(value){
+				if(value.length < 5){
+					return '标题至少得5个字符啊';
+				}
+			}
+			,pass: [/(.+){6,12}$/, '密码必须6到12位']
+			,content: function(value){
+				layedit.sync(editIndex);
+			}
+		});
+
+		//监听指定开关
+		form.on('switch(switchTest)', function(data){
+			layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+				offset: '6px'
+			});
+			layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+		});
+
+		//监听提交
+		form.on('submit(demo1)', function(data){
+			layer.alert(JSON.stringify(data.field), {
+				title: '最终的提交信息'
+			})
+			return false;
+		});
+	});
+
+    layui.use('element', function(){
+        var $ = layui.jquery
+            ,element = layui.element(); //Tab的切换功能，切换事件监听等，需要依赖element模块
+
+        //触发事件
+        var active = {
+            tabAdd: function(){
+                //新增一个Tab项
+                element.tabAdd('demo', {
+                    title: '新选项'+ (Math.random()*1000|0) //用于演示
+                    ,content: '内容'+ (Math.random()*1000|0)
+                    ,id: new Date().getTime() //实际使用一般是规定好的id，这里以时间戳模拟下
+                })
+            }
+            ,tabDelete: function(othis){
+                //删除指定Tab项
+                element.tabDelete('demo', '44'); //删除：“商品管理”
+
+
+                othis.addClass('layui-btn-disabled');
+            }
+            ,tabChange: function(){
+                //切换到指定Tab项
+                element.tabChange('demo', '22'); //切换到：用户管理
+            }
+        };
+
+        $('.site-demo-active').on('click', function(){
+            var othis = $(this), type = othis.data('type');
+            active[type] ? active[type].call(this, othis) : '';
+        });
+
+        //Hash地址的定位
+        var layid = location.hash.replace(/^#test=/, '');
+        element.tabChange('test', layid);
+
+        element.on('tab(test)', function(elem){
+            location.hash = 'test='+ $(this).attr('lay-id');
+        });
+
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+{include file="layout/head"}
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 用户管理 <span class="c-gray en">&gt;</span> 案例分类 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+
+<div class="page-container">
+    <div class="mt-20">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">分类名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="cat_name" lay-verify="cat_name" autocomplete="off" placeholder="请输入分类" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">单选框</label>
+                <div class="layui-input-block" >
+                    <input type="radio" name="level" value="1" title="一级分类" checked="" lay-filter="radio">
+                    <input type="radio" name="level" value="2" title="二级分类" lay-filter="radio">
+                </div>
+            </div>
+            <div class="layui-form-item" style="display: none;" id="select">
+                <label class="layui-form-label">一级分类</label>
+                <div class="layui-input-inline">
+                    <select name="p_id">
+                        <option value="">请选择</option>
+                        {foreach name='data' item="v1"}
+                            <option value="{$v1.id}">{$v1.cat_name}</option>
+                        {/foreach}
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{include file="layout/foot"}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+<script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script>
+</body>
+</html>
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form()
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,laydate = layui.laydate;
+
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+        //自定义验证规则
+        form.verify({
+            cat_name: function(value){
+                if(value.length == 0){
+                    return '请输入分类名称';
+                }
+            }
+            ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+            ,content: function(value){
+                layedit.sync(editIndex);
+            }
+        });
+
+        //监听指定开关
+        form.on('submit(formDemo)', function(data){
+            console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+            $.post('/admin/user/save',{id:0,data:data.field},function (obj) {
+                if(obj.code == 200){
+                    layer.msg('添加成功',{icon:1,time:1000})
+                    setTimeout(function () {
+                        location.reload()
+                    },1000)
+                }
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+
+        //监听提交
+        form.on('radio(radio)', function(data){
+
+            if(data.value == 2){
+                $('#select').css({'display':'block'})
+            }else{
+                $('#select').css({'display':'none'})
+            }
+            console.log(data.value); //被点击的radio的value值
+        });
+
+
+    });
+</script>
