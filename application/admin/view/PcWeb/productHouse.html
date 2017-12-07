@@ -20,9 +20,14 @@
 </body>
 </html>
 <script>
+    /**
+     * 是否推荐
+     * @param obj
+     * @param id
+     */
 
     function hot(obj,id) {
-        layer.confirm('推荐为经典案例？', {
+        layer.confirm('是否推荐？', {
                 btn: ['推荐','不推荐','取消'],
                 shade: false,
                 closeBtn: 0
@@ -44,6 +49,22 @@
                 })
             });
     }
+
+    function del(obj,id) {
+        layer.confirm('是否删除产品？', {
+                btn: ['删除','取消'],
+                shade: false,
+                closeBtn: 0
+            },
+            function(){
+                $.post("{:url('ProductHouse/del')}",{id:id},function (data) {
+                    layer.msg(data.msg, {time:1000});
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                })
+            });
+    }
     $(function () {
         $('#user').DataTable({
             "paging": true,
@@ -56,9 +77,9 @@
             "ajax": "{:url('ProductHouse/GetList')}",
             "columns": [
                 {"title": "ID", "data": "id"},
-                {"title": "案例标题", "data": "title"},
-                {"title": "案例缩略图", "data": "suolve"},
-                {"title": "是否推荐为热门展示", "data": "is_hot"},
+                {"title": "产品标题", "data": "title"},
+                {"title": "产品缩略图", "data": "suolve"},
+                {"title": "是否推为热门产品", "data": "is_hot"},
                 {"title": "操作", "data": "caozuo"},
             ]
 

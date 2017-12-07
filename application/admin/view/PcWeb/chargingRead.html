@@ -6,34 +6,33 @@
 		<div class="row cl">
 			<div class="layui-tab" lay-filter="test">
 				<ul class="layui-tab-title">
-					<li class="layui-this" lay-id="11">产品基本内容</li>
-					<li lay-id="22">产品图片</li>
+					<li class="layui-this" lay-id="11">基本内容</li>
+					<li lay-id="22">图片</li>
 				</ul>
 				<div class="layui-tab-content">
 					<div class="layui-tab-item layui-show">
 						<div class="row cl">
-							<label class="form-label col-xs-4 col-sm-2">产品标题：</label>
+							<label class="form-label col-xs-4 col-sm-2">标题：</label>
 							<div class="formControls col-xs-8 col-sm-9">
 								<input type="text" class="input-text" value="<?php if(!empty($data->title)) echo $data->title;?>" placeholder="例如：杭州江景湾"  name="title" required >
 							</div>
 						</div>
 						<div class="row cl">
-							<label class="form-label col-xs-4 col-sm-2">产品描述：</label>
+							<label class="form-label col-xs-4 col-sm-2">区域：</label>
 							<div class="formControls col-xs-8 col-sm-9">
-								<input type="text" class="input-text" value="<?php if(!empty($data->desc)) echo $data->desc;?>" placeholder="例如：89方全包"  name="desc">
+								<select name="area" id="">
+									{volist name="area" id="vo"}
+									<option value="{$vo['province']}">{$vo['province']}</option>
+									{/volist}
+								</select>
 							</div>
 						</div>
 						<div class="row cl">
-							<label class="form-label col-xs-4 col-sm-2">产品价格：</label>
-							<div class="formControls col-xs-8 col-sm-9">
-								<input type="text" class="input-text" value="<?php if(!empty($data->pay)) echo $data->pay;?>" placeholder="例如：240万"  name="pay">
-							</div>
-						</div>
-						<div class="row cl">
-							<label class="form-label col-xs-4 col-sm-2">产品详情：</label>
+							<label class="form-label col-xs-4 col-sm-2">详情：</label>
 							<textarea placeholder="请输入内容" style="width: 600px;height: 300px;" name="content"><?php if(!empty($data->content)) echo $data->content;?>
 							</textarea>
 						</div>
+
 					</div>
 					<div class="layui-tab-item">
 						<div class="row cl">

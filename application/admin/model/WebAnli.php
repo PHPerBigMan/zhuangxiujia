@@ -19,4 +19,8 @@ class WebAnli extends Model{
             return '<span class="label label-defaunt radius">未推荐</span>';
         }
     }
+
+    public function getLunboAttr($value){
+        return json_decode($value,true);
+    }
 }

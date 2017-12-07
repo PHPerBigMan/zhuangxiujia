@@ -1,26 +1,28 @@
 <?php
 namespace app\admin\controller;
 
+use app\admin\model\AnliCat;
 use app\common\model\Kefu;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use think\Db;
 //use app\model\ProductHouse;
-use app\admin\model\Charging as C;
+use app\admin\model\Construction as C;
 use think\Request;
 
 
-class Charging extends Base
+class Construction extends Base
 {
-    protected $charging;
+    protected $construction;
     public function __construct(Request $request = null)
     {
         parent::__construct($request);
-        $this->charging = new C();
+        $this->construction = new C();
     }
 
     public function index()
     {
-        $title = "热装小区";
-        return view("PcWeb/charging", compact('title'));
+        $title = "案例展示";
+        return view("PcWeb/construction", compact('title'));
     }
 
 
@@ -32,7 +34,7 @@ class Charging extends Base
     public function GetList(){
         $data = [];
 
-        $data = $this->charging->select();
+        $data = $this->construction->select();
 
 
         foreach ($data as $v){
@@ -55,7 +57,7 @@ class Charging extends Base
     public function handel(){
         $Get = input('post.');
 
-        $s = $this->charging->where('id',$Get['id'])->update([
+        $s = $this->construction->where('id',$Get['id'])->update([
             'is_hot'=>$Get['is_hot']
         ]);
 
@@ -70,9 +72,9 @@ class Charging extends Base
 
     public function read(){
         $id = input('id');
-        $title = '热装小区操作';
+        $title = '案例展示操作';
         if(isset($id)){
-            $data = $this->charging->find($id);
+            $data = $this->construction->find($id);
             if(!empty($data->lunbo)){
                 $data->lunbojson = implode(',',$data->lunbo);
             }else{
@@ -84,11 +86,11 @@ class Charging extends Base
             $data->lunbo = "";
             $data->lunbojson = "";
             $data->id = "";
+            $data->qrcode = "";
         }
-        // 区域数据
-        $area = Db::name('hat_province')->select();
-//        dd($area);
-        return view('PcWeb/chargingRead',compact('data','title','area'));
+
+
+        return view('PcWeb/consAnli',compact('data','title'));
     }
 
     /**
@@ -108,6 +110,8 @@ class Charging extends Base
      */
 
     public function save(){
+
+
         $data = input('post.');
         if(!empty($data['lunbo'])){
             $lunbo = explode(',',$data['lunbo']);
@@ -117,27 +121,26 @@ class Charging extends Base
             sort($lunbo);
             $data['lunbo'] = json_encode($lunbo);
         }
-//        dd($data);
+
+        if(!empty($data['qrcode'])){
+            // 制作二维码
+            $data['qrcode'] = makeQrcode($data['qrcode']);
+        }
         if(!empty($data['id'])){
             // 修改
             $map['id'] = $data['id'];
             unset($data['id']);
-            $s = $this->charging->where($map)->update($data);
+            $s = $this->construction->where($map)->update($data);
         }else{
             // 新增
-            $s = $this->charging->insert($data);
+            $s = $this->construction->insert($data);
         }
         return returnStatus($s);
     }
 
-    /**
-     * @return \think\response\Json
-     * author hongwenyang
-     * method description : 删除数据
-     */
     public function del(){
         $id = input('id');
-        $s = $this->charging->where('id',$id)->delete();
+        $s = $this->construction->where('id',$id)->delete();
         return returnStatus($s);
     }
 }

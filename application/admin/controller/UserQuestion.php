@@ -3,24 +3,25 @@ namespace app\admin\controller;
 
 use app\common\model\Kefu;
 use think\Db;
-//use app\model\ProductHouse;
-use app\admin\model\Charging as C;
+//use app\model\userQuestion;
+use app\admin\model\userQuestion as P;
 use think\Request;
 
 
-class Charging extends Base
+class UserQuestion extends Base
 {
-    protected $charging;
+    protected $userQuestion;
     public function __construct(Request $request = null)
     {
         parent::__construct($request);
-        $this->charging = new C();
+        $this->userQuestion = new P();
     }
 
     public function index()
     {
-        $title = "热装小区";
-        return view("PcWeb/charging", compact('title'));
+
+        $title = "用户提问";
+        return view("PcWeb/userQuestion", compact('title'));
     }
 
 
@@ -30,10 +31,9 @@ class Charging extends Base
      * method description : 获取数据列表
      */
     public function GetList(){
+
         $data = [];
-
-        $data = $this->charging->select();
-
+        $data = $this->userQuestion->select();
 
         foreach ($data as $v){
             $v->suolve = "<img class='layui-upload-img product_suolve' id='demo1' src='$v->suolve'>";
@@ -41,7 +41,6 @@ class Charging extends Base
  | <a href=\"read?id=$v->id\" title=\"编辑\"><i class=\"Hui-iconfont\" >&#xe6df;</i></a> | 
  <a style=\"text-decoration:none\" class=\"ml-5\" onClick=\"del(this,$v->id)\" href=\"javascript:;\" title=\"删除\"><i class=\"Hui-iconfont\">&#xe6e2;</i></a>";
         }
-
         return json(['data'=>$data]);
     }
 
@@ -55,7 +54,7 @@ class Charging extends Base
     public function handel(){
         $Get = input('post.');
 
-        $s = $this->charging->where('id',$Get['id'])->update([
+        $s = $this->userQuestion->where('id',$Get['id'])->update([
             'is_hot'=>$Get['is_hot']
         ]);
 
@@ -70,9 +69,9 @@ class Charging extends Base
 
     public function read(){
         $id = input('id');
-        $title = '热装小区操作';
+        $title = '产品展示操作';
         if(isset($id)){
-            $data = $this->charging->find($id);
+            $data = $this->userQuestion->find($id);
             if(!empty($data->lunbo)){
                 $data->lunbojson = implode(',',$data->lunbo);
             }else{
@@ -85,10 +84,7 @@ class Charging extends Base
             $data->lunbojson = "";
             $data->id = "";
         }
-        // 区域数据
-        $area = Db::name('hat_province')->select();
-//        dd($area);
-        return view('PcWeb/chargingRead',compact('data','title','area'));
+        return view('PcWeb/product',compact('data','title'));
     }
 
     /**
@@ -117,27 +113,21 @@ class Charging extends Base
             sort($lunbo);
             $data['lunbo'] = json_encode($lunbo);
         }
-//        dd($data);
         if(!empty($data['id'])){
             // 修改
             $map['id'] = $data['id'];
             unset($data['id']);
-            $s = $this->charging->where($map)->update($data);
+            $s = $this->userQuestion->where($map)->update($data);
         }else{
             // 新增
-            $s = $this->charging->insert($data);
+            $s = $this->userQuestion->insert($data);
         }
         return returnStatus($s);
     }
 
-    /**
-     * @return \think\response\Json
-     * author hongwenyang
-     * method description : 删除数据
-     */
     public function del(){
         $id = input('id');
-        $s = $this->charging->where('id',$id)->delete();
+        $s = $this->userQuestion->where('id',$id)->delete();
         return returnStatus($s);
     }
 }

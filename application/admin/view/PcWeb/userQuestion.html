@@ -1,6 +1,8 @@
 {include file="layout/head"}
-<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> PC网站管理 <span class="c-gray en">&gt;</span> 热装小区 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> Pc网站管理 <span class="c-gray en">&gt;</span> 产品展示 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
 <div class="page-container">
+    <div class="cl pd-5 bg-1 bk-gray mt-20">  <a href="read"  class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加产品</a></span></div>
+
     <div class="mt-20">
         <div class="mt-20">
             <table id="user" class="display table table-border table-bordered table-bg table-hover table-sort">
@@ -18,6 +20,11 @@
 </body>
 </html>
 <script>
+    /**
+     * 是否推荐
+     * @param obj
+     * @param id
+     */
 
     function hot(obj,id) {
         layer.confirm('是否推荐？', {
@@ -26,7 +33,7 @@
                 closeBtn: 0
             },
             function(){
-                $.post("{:url('Charging/handel')}",{id:id,is_hot:1},function (data) {
+                $.post("{:url('userQuestion/handel')}",{id:id,is_hot:1},function (data) {
                     layer.msg(data.msg, {time:1000});
                     setTimeout(function () {
                         location.reload();
@@ -34,7 +41,23 @@
                 })
             },
             function(){
-                $.post("{:url('Charging/handel')}",{id:id,is_hot:0},function (data) {
+                $.post("{:url('userQuestion/handel')}",{id:id,is_hot:0},function (data) {
+                    layer.msg(data.msg, {time:1000});
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                })
+            });
+    }
+
+    function del(obj,id) {
+        layer.confirm('是否删除产品？', {
+                btn: ['删除','取消'],
+                shade: false,
+                closeBtn: 0
+            },
+            function(){
+                $.post("{:url('userQuestion/del')}",{id:id},function (data) {
                     layer.msg(data.msg, {time:1000});
                     setTimeout(function () {
                         location.reload();
@@ -51,12 +74,14 @@
             "ordering": true,
             "info": true,
             "autoWidth": false,
-            "ajax": "{:url('Charging/GetList')}",
+            "ajax": "{:url('userQuestion/GetList')}",
             "columns": [
                 {"title": "ID", "data": "id"},
-                {"title": "案例标题", "data": "title"},
-                {"title": "案例缩略图", "data": "suolve"},
-                {"title": "是否推荐为热门展示", "data": "is_hot"},
+                {"title": "用户", "data": "name"},
+                {"title": "联系方式", "data": "phone"},
+                {"title": "提问", "data": "question"},
+                {"title": "回答", "data": "answer"},
+                {"title": "是否回答", "data": "is_answer"},
                 {"title": "操作", "data": "caozuo"},
             ]
 

@@ -37,3 +37,24 @@ function makeImg(){
     }
     return $filename;
 }
+
+
+//function dd($data){
+//    dump($data);die;
+//}
+
+function makeQrcode($url){
+    $saveUrl = './qrcodes/';
+    $returnUrl = '/qrcodes/';
+    $filename = md5(rand(1000,9999).time()).'.png';
+    $imgName = $saveUrl.$filename;
+    $returnName = $returnUrl.$filename;
+
+    vendor('phpqrcode.phpqrcode');
+    $level = 'L';
+    $size = 7;
+//    dump($imgName);die;
+    header('Content-Type: image/png');
+    QRcode::png($url,$imgName,$level,$size);
+    return $returnName;
+}

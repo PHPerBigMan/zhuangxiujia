@@ -6,31 +6,50 @@
 		<div class="row cl">
 			<div class="layui-tab" lay-filter="test">
 				<ul class="layui-tab-title">
-					<li class="layui-this" lay-id="11">产品基本内容</li>
-					<li lay-id="22">产品图片</li>
+					<li class="layui-this" lay-id="11">案例基本内容</li>
+					<li lay-id="22">案例图片</li>
 				</ul>
 				<div class="layui-tab-content">
 					<div class="layui-tab-item layui-show">
 						<div class="row cl">
-							<label class="form-label col-xs-4 col-sm-2">产品标题：</label>
+							<label class="form-label col-xs-4 col-sm-2">案例标题：</label>
 							<div class="formControls col-xs-8 col-sm-9">
 								<input type="text" class="input-text" value="<?php if(!empty($data->title)) echo $data->title;?>" placeholder="例如：杭州江景湾"  name="title" required >
 							</div>
 						</div>
 						<div class="row cl">
-							<label class="form-label col-xs-4 col-sm-2">产品描述：</label>
+							<label class="form-label col-xs-4 col-sm-2">案例户型描述：</label>
 							<div class="formControls col-xs-8 col-sm-9">
-								<input type="text" class="input-text" value="<?php if(!empty($data->desc)) echo $data->desc;?>" placeholder="例如：89方全包"  name="desc">
+								<input type="text" class="input-text" value="<?php if(!empty($data->desc)) echo $data->desc;?>" placeholder="例如：高雅混搭复式"  name="desc">
 							</div>
 						</div>
 						<div class="row cl">
-							<label class="form-label col-xs-4 col-sm-2">产品价格：</label>
+							<label class="form-label col-xs-4 col-sm-2">案例户型：</label>
 							<div class="formControls col-xs-8 col-sm-9">
-								<input type="text" class="input-text" value="<?php if(!empty($data->pay)) echo $data->pay;?>" placeholder="例如：240万"  name="pay">
+								<input type="text" class="input-text" value="<?php if(!empty($data->hx)) echo $data->hx;?>" placeholder="例如：三居室"  name="hx">
 							</div>
 						</div>
 						<div class="row cl">
-							<label class="form-label col-xs-4 col-sm-2">产品详情：</label>
+							<label class="form-label col-xs-4 col-sm-2">案例面积：</label>
+							<div class="formControls col-xs-8 col-sm-9">
+								<select name="measure" id="">
+									{volist name="measure" id="vo"}
+										<option value="{$vo->cat_name}">{$vo->cat_name}</option>
+									{/volist}
+								</select>
+							</div>
+						</div>
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">案例二维码地址：</label>
+							<div class="formControls col-xs-8 col-sm-9">
+								<input type="text" class="input-text"  placeholder="如果要修改请填写内容，否则请为空 例如: http://www.baidu.com"  name="qrcode">
+								{if condition="$data->qrcode neq ''"}
+									<img src="{$data->qrcode}" alt="">
+								{/if}
+							</div>
+						</div>
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">案例详情：</label>
 							<textarea placeholder="请输入内容" style="width: 600px;height: 300px;" name="content"><?php if(!empty($data->content)) echo $data->content;?>
 							</textarea>
 						</div>
