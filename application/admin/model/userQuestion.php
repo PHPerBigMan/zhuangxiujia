@@ -11,5 +11,10 @@ use think\Model;
 class userQuestion extends Model{
     protected $table = "zjx_user_question";
 
-
+    public function getIsHotAttr($value){
+        if($value){
+            return "是";
+        }
+        return "否";
+    }
 }

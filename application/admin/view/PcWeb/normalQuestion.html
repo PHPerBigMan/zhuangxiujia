@@ -1,6 +1,7 @@
 {include file="layout/head"}
-<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> Pc网站管理 <span class="c-gray en">&gt;</span> 用户问答 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> Pc网站管理 <span class="c-gray en">&gt;</span> 常见问答 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
 <div class="page-container">
+    <div class="cl pd-5 bg-1 bk-gray mt-20">  <a onclick="answer(0,'','')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加常见问答</a></span></div>
 
     <div class="mt-20">
         <div class="mt-20">
@@ -32,7 +33,7 @@
                 closeBtn: 0
             },
             function(){
-                $.post("{:url('userQuestion/handel')}",{id:id,is_hot:1},function (data) {
+                $.post("{:url('normalQuestion/handel')}",{id:id,is_hot:1},function (data) {
                     layer.msg(data.msg, {time:1000});
                     setTimeout(function () {
                         location.reload();
@@ -40,13 +41,30 @@
                 })
             },
             function(){
-                $.post("{:url('userQuestion/handel')}",{id:id,is_hot:0},function (data) {
+                $.post("{:url('normalQuestion/handel')}",{id:id,is_hot:0},function (data) {
                     layer.msg(data.msg, {time:1000});
                     setTimeout(function () {
                         location.reload();
                     },1000)
                 })
             });
+    }
+
+    function answer(id,answer,question) {
+        layer.prompt({title: '请输入问题',value:question, formType: 2}, function(questionTitle, index){
+            layer.close(index);
+            layer.prompt({title: '请输入回答', value:answer,formType: 2}, function(text, index){
+                layer.close(index);
+                $.post('saveAnswer',{id:id,answer:text,question:questionTitle},function (data) {
+                    layer.msg(data.msg, {time:1000});
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                });
+            });
+        });
+
+
     }
 
     function del(obj,id) {
@@ -56,25 +74,13 @@
                 closeBtn: 0
             },
             function(){
-                $.post("{:url('userQuestion/del')}",{id:id},function (data) {
+                $.post("{:url('normalQuestion/del')}",{id:id},function (data) {
                     layer.msg(data.msg, {time:1000});
                     setTimeout(function () {
                         location.reload();
                     },1000)
                 })
             });
-    }
-
-    function answer(id,answer) {
-        layer.prompt({title: '请输入回答', value:answer,formType: 2}, function(text, index){
-            layer.close(index);
-            $.post('saveAnswer',{id:id,answer:text},function (data) {
-                layer.msg(data.msg, {time:1000});
-                setTimeout(function () {
-                    location.reload();
-                },1000)
-            });
-        });
     }
     $(function () {
         $('#user').DataTable({
@@ -85,15 +91,12 @@
             "ordering": true,
             "info": true,
             "autoWidth": false,
-            "ajax": "{:url('userQuestion/GetList')}",
+            "ajax": "{:url('normalQuestion/GetList')}",
             "columns": [
                 {"title": "ID", "data": "id"},
-                {"title": "用户", "data": "name"},
-                {"title": "联系方式", "data": "phone"},
                 {"title": "提问", "data": "question"},
                 {"title": "回答", "data": "answer"},
                 {"title": "创建时间", "data": "created_at"},
-                {"title": "是否精彩问答", "data": "is_hot"},
                 {"title": "操作", "data": "caozuo"},
             ]
 
