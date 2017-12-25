@@ -11,10 +11,19 @@ use think\Model;
 class userQuestion extends Model{
     protected $table = "zjx_user_question";
 
+    public function getIsCommonAttr($value){
+        if($value){
+            return "是";
+        }
+        return "否";
+    }
+
+
     public function getIsHotAttr($value){
         if($value){
             return "是";
         }
         return "否";
     }
+
 }

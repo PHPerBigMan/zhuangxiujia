@@ -44,6 +44,23 @@
                 })
             });
     }
+
+    function del(id) {
+        layer.confirm('是否删除数据？', {
+                btn: ['删除','取消'],
+                shade: false,
+                closeBtn: 0
+            },
+            function(){
+                $.post("{:url('Construction/del')}",{id:id},function (data) {
+                    layer.msg(data.msg, {time:1000});
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                })
+            });
+    }
+
     $(function () {
         $('#user').DataTable({
             "paging": true,

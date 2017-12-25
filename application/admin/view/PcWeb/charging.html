@@ -1,6 +1,8 @@
 {include file="layout/head"}
 <nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> PC网站管理 <span class="c-gray en">&gt;</span> 热装小区 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
 <div class="page-container">
+    <div class="cl pd-5 bg-1 bk-gray mt-20">  <a href="read"  class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加热装小区</a></span></div>
+
     <div class="mt-20">
         <div class="mt-20">
             <table id="user" class="display table table-border table-bordered table-bg table-hover table-sort">
@@ -35,6 +37,22 @@
             },
             function(){
                 $.post("{:url('Charging/handel')}",{id:id,is_hot:0},function (data) {
+                    layer.msg(data.msg, {time:1000});
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                })
+            });
+    }
+
+    function del(obj,id) {
+        layer.confirm('是否删除？', {
+                btn: ['删除','取消'],
+                shade: false,
+                closeBtn: 0
+            },
+            function(){
+                $.post("{:url('Charging/del')}",{id:id},function (data) {
                     layer.msg(data.msg, {time:1000});
                     setTimeout(function () {
                         location.reload();

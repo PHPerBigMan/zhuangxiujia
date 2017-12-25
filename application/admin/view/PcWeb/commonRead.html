@@ -1,0 +1,153 @@
+{include file="layout/head"}
+<body>
+
+<div class="page-container">
+	<form  class="form form-horizontal layui-form" id="product" enctype="multipart/form-data">
+		<div class="row cl">
+			<div class="layui-tab" lay-filter="test">
+				<ul class="layui-tab-title">
+					<li class="layui-this" lay-id="11">装修小常识</li>
+				</ul>
+				<div class="layui-tab-content">
+					<div class="layui-tab-item layui-show">
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">标题：</label>
+							<div class="formControls col-xs-8 col-sm-9">
+								<input type="text" class="input-text" value="<?php if(isset($data->question)) echo $data->question;?>"   name="title"  >
+							</div>
+						</div>
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">案例详情：</label>
+							<textarea placeholder="请输入内容" class="text-area" name="content"><?php if(isset($data->answer)) echo $data->answer;?></textarea>
+						</div>
+
+						<input type="hidden" name="id" value="{$data->id}">
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+		<div class="row cl">
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+				<p class="btn btn-primary radius" onclick="submit()"><i class="Hui-iconfont">&#xe632;</i> 保存</p>
+			</div>
+		</div>
+	</form>
+</div>
+
+
+
+<!--请在下方写此页面业务相关的脚本-->
+
+<script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="/layui/layui.all.js"></script>
+
+<script type="text/javascript">
+    function submit() {
+            $.post('add',$('#product').serialize(),function (obj) {
+                if(obj.code == 200){
+                    layer.msg('保存成功');
+				}
+            });
+    }
+    layui.use('element', function(){
+        var $ = layui.jquery
+            ,element = layui.element; //Tab的切换功能，切换事件监听等，需要依赖element模块
+        $('.site-demo-active').on('click', function(){
+            var othis = $(this), type = othis.data('type');
+            active[type] ? active[type].call(this, othis) : '';
+        });
+
+
+    });
+
+    var html ;
+    var id = $('#lunbocount').val();
+    layui.use('upload', function(){
+        var $ = layui.jquery
+            ,upload = layui.upload;
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#suolve'
+            ,url: 'saveImg'
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#demo1').attr('src', result); //图片链接（base64）
+
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败');
+                }
+                //上传成功
+
+                $('#suo').val(res);
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+
+        //多图片上传
+        upload.render({
+            elem: '#lunbo'
+            ,url: 'saveImg'
+            ,multiple: true
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                });
+            }
+            ,done: function(res){
+                var lun = $('#lun').val();
+                //上传完毕
+//                lun = lun+','+res;
+                id++;
+                $('#demo2').append('<img src="'+ res +'"  class="product_lunbo" id="'+id+'"><i class="layui-icon layui-unselect layui-tab-close img-cur '+id+'" onclick="delLun('+id+')">ဆ</i>')
+                if(lun == ""){
+                    lun = res;
+                }else{
+                    lun = lun+','+res;
+                }
+                $('#lun').val(lun);
+            }
+        });
+    });
+
+    /**
+     *
+     * 删除轮播预览图
+     * @param id
+     */
+    var temp;
+    function delLun(id) {
+        var lun = $('#lun').val();
+        var arr = lun.split(',');
+        $.each(arr,function(index,item) {
+            // index是索引值（即下标）   item是每次遍历得到的值；
+            if (item == $('#'+id).attr('src')) {
+                arr.splice(index, 1);
+            }
+        });
+        temp = arr.join(',');
+        //  将处理对的数据赋给 对应的标签
+        $('#lun').val(temp);
+        console.log(temp);
+        $("#"+id).remove();
+        $("."+id).remove();
+    }
+</script>
+
+
+</body>
+</html>

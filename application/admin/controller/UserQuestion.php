@@ -31,9 +31,9 @@ class UserQuestion extends Base
     public function GetList(){
 
         $data = [];
-        $data = $this->userQuestion->select();
+        $data = $this->userQuestion->where('is_common',0)->order('created_at','asc')->select();
         foreach ($data as $v){
-            $v->caozuo = "<a style=\"text-decoration:none\" onclick=\"hot(this,$v->id)\">推荐</a>
+            $v->caozuo = "<a style=\"text-decoration:none\" onclick=\"hot(this,$v->id)\">是否精彩问答</a>
  | <a onclick=answer($v->id,"."'".$v->answer."'".") title=\"编辑\" ><i class=\"Hui-iconfont\" >&#xe6df;</i></a> | 
  <a style=\"text-decoration:none\" class=\"ml-5\" onClick=\"del(this,$v->id)\" href=\"javascript:;\" title=\"删除\"><i class=\"Hui-iconfont\">&#xe6e2;</i></a>";
 
@@ -78,8 +78,79 @@ class UserQuestion extends Base
     public function saveAnswer(){
        $data = input('post.');
        $s = $this->userQuestion->where('id',$data['id'])->update([
-           'answer'=>$data['answer']
+           'answer'=>$data['answer'],
+           'answer_at'=>date("Y-m-d",time()),
+           'is_answer'=>1,
+           'author'=>'翼家装饰'
        ]);
        return returnStatus($s);
+    }
+
+    public function save(){
+        $data = input('post.');
+        $s = $this->userQuestion->where('id',$data['id'])->update([
+            'is_common'=>1
+        ]);
+
+        return returnStatus($s);
+    }
+
+    /**
+     * @return \think\response\Json
+     * author hongwenyang
+     * method description : 新增装修小知识
+     */
+
+    public function add(){
+        $data = input('post.');
+        if(empty($data['id'])){
+            $s = $this->userQuestion->insert([
+                'question'=>$data['title'],
+                'answer'=>$data['content'],
+                'is_common'=>1
+            ]);
+        }else{
+            $s = $this->userQuestion->where('id',$data['id'])->update([
+                'question'=>$data['title'],
+                'answer'=>$data['content'],
+                'is_common'=>1
+            ]);
+        }
+
+        return returnStatus($s);
+    }
+
+
+    public function common(){
+        $title = "装修小常识";
+
+        return view('PcWeb/common',compact('title'));
+    }
+
+
+    public function GetListCommon(){
+        $data = $this->userQuestion->where('is_common',1)->select();
+
+
+        foreach($data as $v){
+            $v->caozuo = "<a href='commonRead?id=$v->id' title=\"编辑\" ><i class=\"Hui-iconfont\" >&#xe6df;</i></a> |
+ <a style=\"text-decoration:none\" class=\"ml-5\" onClick=\"del(this,$v->id)\" href=\"javascript:;\" title=\"删除\"><i class=\"Hui-iconfont\">&#xe6e2;</i></a>";
+        }
+
+        return json(['data'=>$data]);
+    }
+
+    public function commonRead(){
+        $id = input('id');
+
+        $title = '装修小常识编辑';
+
+        $data = $this->userQuestion->where('id',$id)->find();
+
+        if(!$id){
+            $data = json_decode('{}');
+            $data->id = "";
+        }
+        return view('/PcWeb/commonRead',compact('data','title'));
     }
 }

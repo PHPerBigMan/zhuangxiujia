@@ -69,21 +69,26 @@ class ProductHouse extends Base
 
     public function read(){
         $id = input('id');
+
         $title = '产品展示操作';
         if(isset($id)){
             $data = $this->productHouse->find($id);
+            $data->lunbocount = count($data->lunbo);
             if(!empty($data->lunbo)){
                 $data->lunbojson = implode(',',$data->lunbo);
             }else{
                 $data->lunbojson = "";
             }
+
         }else{
             $data = json_decode("{}");
             $data->suolve = "";
             $data->lunbo = "";
             $data->lunbojson = "";
             $data->id = "";
+            $data->lunbocount = 0;
         }
+
         return view('PcWeb/product',compact('data','title'));
     }
 
@@ -105,12 +110,14 @@ class ProductHouse extends Base
 
     public function save(){
         $data = input('post.');
+//        dump($data);die;
         if(!empty($data['lunbo'])){
             $lunbo = explode(',',$data['lunbo']);
             if($lunbo[0] == ""){
                 unset($lunbo[0]);
             }
             sort($lunbo);
+            $data['suolve'] = $lunbo[0];
             $data['lunbo'] = json_encode($lunbo);
         }
         if(!empty($data['id'])){

@@ -44,6 +44,7 @@ class WebAnli extends Base
             $v->caozuo = "<a style=\"text-decoration:none\" onclick=\"hot(this,$v->id)\">推荐</a>
  | <a href=\"read?id=$v->id\" title=\"编辑\"><i class=\"Hui-iconfont\" >&#xe6df;</i></a> | 
  <a style=\"text-decoration:none\" class=\"ml-5\" onClick=\"del(this,$v->id)\" href=\"javascript:;\" title=\"删除\"><i class=\"Hui-iconfont\">&#xe6e2;</i></a>";
+
         }
 
         return json(['data'=>$data]);
@@ -77,6 +78,7 @@ class WebAnli extends Base
         $title = '案例展示操作';
         if(isset($id)){
             $data = $this->webAnli->find($id);
+            $data->lunbocount = count($data->lunbo);
             if(!empty($data->lunbo)){
                 $data->lunbojson = implode(',',$data->lunbo);
             }else{
@@ -89,12 +91,17 @@ class WebAnli extends Base
             $data->lunbojson = "";
             $data->id = "";
             $data->qrcode = "";
+            $data->hx = "";
+            $data->measure = "";
+            $data->lunbocount = 0;
         }
 
         // 面积
         $measure = $this->anliCat->where('p_id',2)->select();
+        // 户型
+        $hx = $this->anliCat->where('p_id',1)->select();
 
-        return view('PcWeb/anli',compact('data','title','measure'));
+        return view('PcWeb/anli',compact('data','title','measure','hx'));
     }
 
     /**
@@ -123,6 +130,7 @@ class WebAnli extends Base
                 unset($lunbo[0]);
             }
             sort($lunbo);
+            $data['suolve'] = $lunbo[0];
             $data['lunbo'] = json_encode($lunbo);
         }
 
@@ -130,8 +138,14 @@ class WebAnli extends Base
             // 制作二维码
             $data['qrcode'] = makeQrcode($data['qrcode']);
         }
+//        //处理户型和案例面积
+//        $data['hx']         = Db::table('anli_cat')->where('cat_name',$data['hx'])->value('id');
+//        $data['measure']    = Db::table('anli_cat')->where('cat_name',$data['measure'])->value('id');
         if(!empty($data['id'])){
             // 修改
+            if(empty($data['qrcode'])){
+                $data['qrcode'] = $this->webAnli->where('id',$data['id'])->value('qrcode');
+            }
             $map['id'] = $data['id'];
             unset($data['id']);
             $s = $this->webAnli->where($map)->update($data);

@@ -13,7 +13,7 @@ class Index extends Base
             'title'     =>"后台首页",
             'admin_name'=>$admin_name
         ];
-        return view("index/index",$j);
+        return view("index/a",$j);
     }
 
 

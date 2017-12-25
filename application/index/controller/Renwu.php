@@ -12,11 +12,12 @@ class Renwu
     public function read(){
 
         $id = input('id');
-        $data = Db::name('Renwu')->where(['id'=>$id])->field('id,rw_yj,rw_title,rw_img,rw_main,rw_ding,create_time,start_time')->find();
+        $data =\app\model\Renwu::with('task')->where(['id'=>$id])->field('id,rw_yj,rw_title,rw_img,rw_main,rw_ding,create_time,start_time,type,bid_time')->find();
+
+//        dd($data);die;
+        $data['task']           = count($data['task']);
         $data['rw_img']         = json_decode($data['rw_img'],true);
-        $data['rw_main']        = explode(',',$data['rw_main']);
-        $data['create_time']    = date('Y/m/d',$data['create_time']);
-        $data['start_time']     = date('Y/m/d',$data['start_time']);
+        $data['start_time']     = strtotime($data['start_time']);
 
         $j = $this->return_data($data);
         return json($j);
@@ -56,7 +57,7 @@ class Renwu
 
     /**
      * @return \think\response\Json
-     * 任务搜索   搜索条件需要修改
+     * 任务搜索
      */
 
     public function search(){

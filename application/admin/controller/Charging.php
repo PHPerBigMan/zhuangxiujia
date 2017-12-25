@@ -73,6 +73,7 @@ class Charging extends Base
         $title = '热装小区操作';
         if(isset($id)){
             $data = $this->charging->find($id);
+            $data->lunbocount = count($data->lunbo);
             if(!empty($data->lunbo)){
                 $data->lunbojson = implode(',',$data->lunbo);
             }else{
@@ -84,9 +85,10 @@ class Charging extends Base
             $data->lunbo = "";
             $data->lunbojson = "";
             $data->id = "";
+            $data->lunbocount = 0;
         }
         // 区域数据
-        $area = Db::name('hat_province')->select();
+        $area = Db::name('hat_area')->where('father',330100)->select();
 //        dd($area);
         return view('PcWeb/chargingRead',compact('data','title','area'));
     }
@@ -115,6 +117,7 @@ class Charging extends Base
                 unset($lunbo[0]);
             }
             sort($lunbo);
+            $data['suolve'] = $lunbo[0];
             $data['lunbo'] = json_encode($lunbo);
         }
 //        dd($data);

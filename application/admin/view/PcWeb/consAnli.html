@@ -23,6 +23,13 @@
 								<input type="text" class="input-text" value="<?php if(!empty($data->address)) echo $data->address;?>" placeholder="例如：杭州江景湾5幢8楼"  name="title" required >
 							</div>
 						</div>
+
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">开工时间：</label>
+							<div class="layui-input-inline formControls col-xs-8 col-sm-9">
+								<input type="text" class="layui-input" id="test5" placeholder="yyyy-MM-dd HH:mm:ss" name="created_at" value="{$data->created_at}">
+							</div>
+						</div>
 						<div class="row cl">
 							<label class="form-label col-xs-4 col-sm-2">更改施工状态：</label>
 							<div class="formControls col-xs-8 col-sm-9">
@@ -44,23 +51,8 @@
 					</div>
 					<div class="layui-tab-item">
 						<div class="row cl">
-							<label class="form-label col-xs-4 col-sm-2">列表缩略图：</label>
-							<div class="layui-upload">
-								<button type="button" class="layui-btn" id="suolve">上传图片</button>
-								<div class="layui-upload-list">
-									<!---->
-									{if condition="($data->suolve == '') "}
-											<img class="layui-upload-img product_suolve" id="demo1" >
-										{else /}
-											<img class="layui-upload-img product_suolve" id="demo1" src="{$data->suolve}">
-									{/if}
-									<input type="hidden" id="suo" name="suolve" value="{$data->suolve}">
-								</div>
-							</div>
-						</div>
-
-						<div class="row cl">
-							<label class="form-label col-xs-4 col-sm-2">产品轮播图：</label>
+							<label class="form-label col-xs-4 col-sm-2">施工轮播图：</label>
+							<p class="img-sign">图片尺寸: 433px * 346px</p>
 							<div class="layui-upload">
 								<button type="button" class="layui-btn" id="lunbo">上传图片</button>
 								 <div style="width: 1080px;margin: 10px 120px">
@@ -71,13 +63,15 @@
 
 											 {else /}
 												 {volist name="$data->lunbo" id="img"}
-											 		<img src="{$img}" alt="" class="product_lunbo">
+											 <img src="{$img}" alt="" class="product_lunbo" id="{$i}" name="lunbo[]">
+											 <i class="layui-icon layui-unselect layui-tab-close img-cur {$i}" onclick="delLun({$i})">ဆ</i>
 												 {/volist}
 
 											 {/if}
 										 </div>
 										 <input type="hidden" id="lun" name="lunbo" value="{$data->lunbojson}">
 										 <input type="hidden" name="id" value="{$data->id}">
+										 <input type="hidden" id="lunbocount" value="{$data->lunbocount}">
 									 </blockquote>
 								 </div>
 							</div>
@@ -105,11 +99,8 @@
 
 <script type="text/javascript">
     function submit() {
-        var suolve = $('#suo').val();
         var lunbo = $('#lun').val();
-        if(suolve == ""){
-            layer.msg("请上传缩略图");
-		}else if(lunbo == ""){
+        if(lunbo == ""){
             layer.msg("请上传轮播图");
 		}else{
             $.post('save',$('#product').serialize(),function (obj) {
@@ -130,7 +121,9 @@
 
     });
 
-    var lun = $('#lun').val();
+
+    var html ;
+    var id = $('#lunbocount').val();
     layui.use('upload', function(){
         var $ = layui.jquery
             ,upload = layui.upload;
@@ -174,14 +167,53 @@
                 //预读本地文件示例，不支持ie8
                 obj.preview(function(index, file, result){
 
-                    $('#demo2').append('<img src="'+ result +'" alt="'+ file.name +'" style="" class="product_lunbo">')
                 });
             }
             ,done: function(res){
+                var lun = $('#lun').val();
                 //上传完毕
-                lun = lun+','+res;
+//                lun = lun+','+res;
+                id++;
+                $('#demo2').append('<img src="'+ res +'"  class="product_lunbo" id="'+id+'"><i class="layui-icon layui-unselect layui-tab-close img-cur '+id+'" onclick="delLun('+id+')">ဆ</i>')
+                if(lun == ""){
+                    lun = res;
+                }else{
+                    lun = lun+','+res;
+                }
                 $('#lun').val(lun);
             }
+        });
+    });
+    /**
+     *
+     * 删除轮播预览图
+     * @param id
+     */
+    var temp;
+    function delLun(id) {
+        var lun = $('#lun').val();
+        var arr = lun.split(',');
+        $.each(arr,function(index,item) {
+            // index是索引值（即下标）   item是每次遍历得到的值；
+            if (item == $('#'+id).attr('src')) {
+                arr.splice(index, 1);
+            }
+        });
+        temp = arr.join(',');
+        //  将处理对的数据赋给 对应的标签
+        $('#lun').val(temp);
+        console.log(temp);
+        $("#"+id).remove();
+        $("."+id).remove();
+    }
+
+
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        //时间选择器
+        laydate.render({
+            elem: '#test5'
+            ,type: 'datetime'
         });
     });
 </script>

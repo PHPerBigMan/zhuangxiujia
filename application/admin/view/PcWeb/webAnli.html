@@ -44,6 +44,22 @@
                 })
             });
     }
+
+    function del(obj,id) {
+        layer.confirm('是否删除案例？', {
+                btn: ['删除','取消'],
+                shade: false,
+                closeBtn: 0
+            },
+            function(){
+                $.post("{:url('WebAnli/del')}",{id:id},function (data) {
+                    layer.msg(data.msg, {time:1000});
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                })
+            });
+    }
     $(function () {
         $('#user').DataTable({
             "paging": true,

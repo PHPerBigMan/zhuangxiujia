@@ -1,6 +1,7 @@
 <?php
 namespace app\index\controller;
 
+use app\model\UserRw;
 use think\Db;
 use JPush\Client as JPush;
 class User
@@ -20,6 +21,69 @@ class User
     }
 
     /**
+     * 我的任务备用
+     * @return \think\response\Json
+     */
+
+    public function myTask(){
+        $post = input();
+         return json($this->return_data(UserRw::MyTask($post)));
+    }
+
+    /**
+     * @return \think\response\Json
+     * author hongwenyang
+     * method description : 我的任务 业主端
+     */
+    public function OwnerTask(){
+        $post = input();
+        Db::table('zjx_log')->insert([
+            'msg'=>'我的任务',
+            'data'=>json_encode($post)
+        ]);
+        return json($this->return_data(UserRw::OwnerTask($post)));
+    }
+    /**
+     * @return \think\response\Json
+     * author hongwenyang
+     * method description : 服务商端 我的任务
+     */
+
+    public function MerchantTask(){
+        $post = input();
+        switch ($post['type']){
+            // 全部
+            case 0:
+                $status = [7,8,9,4];
+                break;
+            // 投标中
+            case 1:
+                $status = [7];
+                break;
+            // 已中标
+            case 2:
+                $status = [8];
+                break;
+            // 设计稿确认中
+            case 3:
+                $status = [10];
+                break;
+            // 已完成
+            case 4:
+                $status = [4];
+                break;
+        }
+        $data = UserRw::alias('ur')->join('renwu t','t.id = ur.rw_id')
+            ->where(['ur.user_id'=>$post['user_id'],'t.type'=>2])
+            ->whereIn('ur.order_status',$status)
+           ->select();
+
+        $data = UserRw::ReturnOrderList($data);
+        return json($this->return_data($data));
+    }
+
+
+    /**
      * 我的任务列表
      * 0:未付款
      * 1:进行中
@@ -33,19 +97,21 @@ class User
         $type = input('type');
         switch ($type) {
             case 0:
-                $where = "user_id = $id AND order_status = 0";
+                $where = "ur.user_id = $id AND ur.order_status = 0";
                 break;
             case 1:
-                $where = "user_id = $id AND order_status = 1 OR order_status = 2 OR order_status = 3";
+                $where = "ur.user_id = $id AND ur.order_status = 1 OR ur.order_status = 2 OR ur.order_status = 3";
                 break;
             case 2:
-                $where = "user_id = $id AND order_status = 4 AND order_status != 5 AND order_status != 6";
+                $where = "ur.user_id = $id AND ur.order_status = 4 AND ur.order_status != 5 AND ur.order_status != 6";
                 break;
             case 5:
-                $where = "user_id = $id";
+                $where = "ur.user_id = $id";
+                break;
+            case 7:
+                $where = "ur.user_id = $id AND ur.order_status = 7";
         }
-        $data = Db::name('UserRw')->where($where)->select();
-
+        $data = Db::name('UserRw')->alias('ur')->join('renwu rw','rw.id = ur.rw_id')->where('rw.type',1)->where($where)->select();
 
         foreach ($data as $k => $v) {
             $data[$k]['create_time'] = date('Y/m/d', $v['create_time']);
@@ -85,13 +151,26 @@ class User
                     $msg = "进行中";
                     break;
                 case 4:
-                    $msg = "已完成";
+                    $msg = "审核通过任务完成";
                     break;
                 case 5:
                     $msg = "已取消";
                     break;
+                case 6:
+                    $msg ="已取消" ;
+                    break;
+                case 7:
+                    $msg = "投标中";
+                    break;
+                case 8:
+                    $msg = "已中标";
+                    break;
+                case 9:
+                    $msg = "未中标";
+                    break;
+
                 default :
-                    $msg = "已取消";
+                    $msg = "已完成";
 
             }
             $data[$k]['status_msg'] = $msg;
@@ -150,6 +229,18 @@ class User
                 break;
             case 5:
                 $msg = "定金支付超时,此订单已自动取消";
+                $data['pay_limit_time']        = $rw['pay_limit_time'];
+                break;
+            case 7:
+                $msg = "任务投标中";
+                $data['pay_limit_time']        = $rw['pay_limit_time'];
+                break;
+            case 8:
+                $msg = "任务投标已中";
+                $data['pay_limit_time']        = $rw['pay_limit_time'];
+                break;
+            case 9:
+                $msg = "任务投标未中";
                 $data['pay_limit_time']        = $rw['pay_limit_time'];
                 break;
             default:
@@ -370,13 +461,12 @@ class User
      */
 
     public function anli_save(){
-        $data['user_id']    = input('user_id');
-        $data['title']      = input('title');
-        $data['content']    = input('content');
+        $data = input('');
         $data['is_pass']    = 0;
         $data['jidian']     = 0;
         $data['create_time']= time();
 
+        // 案例图片
         if(request()->file('pic') !=NULL){
             $files = request()->file('pic');
             foreach($files as $file){
@@ -384,23 +474,38 @@ class User
                 $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
                 if($info){
                     $user_pic[] = DS.'uploads'.DS.$info->getSaveName();
-                }else{
-                    // 上传失败获取错误信息
-                    echo $file->getError();
                 }
             }
         }
+
         $url = SITE_URL;
         foreach($user_pic as $k=>$v){
             $save_url = $url.'/'.$v;
             $user_img[$k] = "<img src='$save_url' style='width: 330px;height: 180px'>";
         }
+
+        // 案例封面
+        if(request()->file('cover') !=NULL){
+            $files = request()->file('cover');
+
+            foreach($files as $k=>$file){
+                // 移动到框架应用根目录/public/uploads/ 目录下
+                $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
+                if($info){
+                    $cover[$k] = DS.'uploads'.DS.$info->getSaveName();
+                }
+            }
+
+            $data['cover'] = json_encode($cover);
+        }
+
         //初始圖片img 样式
         $data['content'] = "<p>".$data['content']."</p>";
         $user_img = implode('',$user_img);
         $data['pass_content'] = $data['content'].$user_img;
-//        echo "<pre>";
-//        var_dump($data['pass_content']);die;
+
+
+        // 案例多图
         $data['pic']  = json_encode($user_pic);
 
         $s = Db::name('UserAnli')->insert($data);

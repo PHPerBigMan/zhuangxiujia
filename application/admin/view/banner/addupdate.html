@@ -1,0 +1,130 @@
+{include file="layout/head"}
+<body>
+
+<div class="page-container">
+	<form  class="form form-horizontal layui-form" id="product" enctype="multipart/form-data">
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2">广告图位置：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<select name="type" id="">
+					<option value="listadd"  <?php if($bannerUrl->type == 'listadd')echo "selected";?>> Go来装修页面广告位</option>
+					<option value="detailadd" <?php if($bannerUrl->type == 'detailadd')echo "selected";?>> 详情页广告位</option>
+				</select>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-2">广告图：</label>
+			<div class="layui-upload">
+				<p class="img-sign img-sign-add">图片尺寸: 1903px * 250px</p>
+				<button type="button" class="layui-btn" id="suolve">上传图片</button>
+				<div class="layui-upload-list">
+					<!---->
+					{if condition="($bannerUrl == '') "}
+					<img class="layui-upload-img add_suolve" id="demo1" >
+					{else /}
+					<img class="layui-upload-img add_suolve" id="demo1" src="{$bannerUrl->banner_url}">
+					{/if}
+					<input type="hidden" id="suo" name="bannerUrl" value="{$bannerUrl->banner_url}">
+				</div>
+			</div>
+		</div>
+		<div class="row cl">
+			<input type="hidden" name="id" value="{$bannerUrl->id}">
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+				<p class="btn btn-primary radius" onclick="submit()"><i class="Hui-iconfont">&#xe632;</i> 保存</p>
+			</div>
+		</div>
+
+	</form>
+</div>
+
+
+
+<!--请在下方写此页面业务相关的脚本-->
+
+<script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="/layui/layui.all.js"></script>
+
+<script type="text/javascript">
+    function submit() {
+        var suolve = $('#suo').val();
+        if(suolve == ""){
+            layer.msg("请上传图片");
+		}else{
+            $.post('/admin/banner/save',$('#product').serialize(),function (obj) {
+                if(obj.code == 200){
+                    layer.msg('保存成功');
+				}
+            });
+		}
+    }
+    layui.use('element', function(){
+        var $ = layui.jquery
+            ,element = layui.element; //Tab的切换功能，切换事件监听等，需要依赖element模块
+        $('.site-demo-active').on('click', function(){
+            var othis = $(this), type = othis.data('type');
+            active[type] ? active[type].call(this, othis) : '';
+        });
+
+
+    });
+
+    var lun = $('#lun').val();
+    layui.use('upload', function(){
+        var $ = layui.jquery
+            ,upload = layui.upload;
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#suolve'
+            ,url: '/admin/product_house/saveImg'
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#demo1').attr('src', result); //图片链接（base64）
+
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败');
+                }
+                //上传成功
+
+                $('#suo').val(res);
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+
+        //多图片上传
+        upload.render({
+            elem: '#lunbo'
+            ,url: 'saveImg'
+            ,multiple: true
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+
+                    $('#demo2').append('<img src="'+ result +'" alt="'+ file.name +'" style="" class="add_suolve">')
+                });
+            }
+            ,done: function(res){
+                //上传完毕
+                lun = lun+','+res;
+                $('#lun').val(lun);
+            }
+        });
+    });
+</script>
+
+
+</body>
+</html>

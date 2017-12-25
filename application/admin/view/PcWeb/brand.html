@@ -1,0 +1,60 @@
+{include file="layout/head"}
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> Pc网站管理 <span class="c-gray en">&gt;</span> 品牌展示 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <div class="cl pd-5 bg-1 bk-gray mt-20">  <a href="read"  class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加品牌</a></span></div>
+
+    <div class="mt-20">
+        <div class="mt-20">
+            <table id="user" class="display table table-border table-bordered table-bg table-hover table-sort">
+
+            </table>
+        </div>
+    </div>
+</div>
+{include file="layout/foot"}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+<script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script>
+</body>
+</html>
+<script>
+
+    function del(obj,id) {
+        layer.confirm('是否删除产品？', {
+                btn: ['删除','取消'],
+                shade: false,
+                closeBtn: 0
+            },
+            function(){
+                $.post("{:url('brand/del')}",{id:id},function (data) {
+                    layer.msg(data.msg, {time:1000});
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                })
+            });
+    }
+    $(function () {
+        $('#user').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "processing": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "ajax": "{:url('brand/GetList')}",
+            "columns": [
+                {"title": "ID", "data": "id"},
+                {"title": "标题", "data": "name"},
+                {"title": "品牌缩略图", "data": "url"},
+                {"title": "操作", "data": "caozuo"},
+            ]
+
+        });
+    });
+
+
+</script>

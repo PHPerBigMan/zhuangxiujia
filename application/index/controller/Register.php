@@ -69,37 +69,51 @@ class Register extends Controller
 
    public function login(){
        session('user.code',1);
-       session('user.phone',13858126467);
-       $mobile  = input('mobile');
-       $code    = input('code');
-       if(empty($mobile)){
+//       session('user.phone',13858126467);
+       $data = input('');
+       if(empty($data['mobile'])){
            $code = 404;
            $msg = "手机号不能为空";
        }else{
-           if($mobile != session('user.phone') ){
+           if(!$data['mobile'] ){ // TODO:先关闭验证手机
                $code  = 404;
                $msg   = "请检查手机号是否正确";
-           }else if($mobile == session('user.phone')&& $code != session('user.code')){
+           }else if($data['mobile'] == session('user.phone')&& $data['code'] != 1){ // TODO:发送短信暂时无法使用  先将验证码定死
                $code = 404;
                $msg  = "请输入正确的验证码";
            }else{
-               if(empty(Db::name('User')->where(['user_phone'=>$mobile])->value('id'))){
-                   $data['user_phone'] = $mobile;
-                   $data['create_time'] = time();
-                   Db::name('User')->insert($data);
+               // 判断用户 是否已有另外的身份
+               if($data['type'] == 1){
+                   $checkType = 2;
+               }else{
+                   $checkType = 1;
                }
-               $data['user_phone'] = $mobile;
-               $id = Db::name('User')->where(['user_phone'=>$mobile])->value('id');
-               session('user.id',$id);
-               $code   = 200;
-               $msg  = "登录成功";
+               $checkUser = Db::name("User")->where(['user_phone'=>$data['mobile'],'type'=>$checkType])->value('id');
+               if($checkUser){
+                   // 存在另外身份
+                   $code = 404;
+                   $msg = "该用户已有另外身份";
+               }else{
+                   if(empty(Db::name('User')->where(['user_phone'=>$data['mobile']])->value('id'))){
+                       $insert['user_phone'] = $data['mobile'];
+                       $insert['type']      = $data['type'];
+                       Db::name('User')->insert($insert);
+                   }
+
+                   $id = Db::name('User')->where(['user_phone'=>$data['mobile']])->value('id');
+                   session('user.id',$id);
+                   $code   = 200;
+                   $msg  = "登录成功";
+               }
+
            }
        }
 
        $j = [
            'code'=>$code,
            'msg' =>$msg,
-           'user_id'=> empty($id) ? "" :(int)$id
+           'user_id'=> empty($id) ? "" :(int)$id,
+           'type'=>$data['type']
        ];
        return json($j);
    }
@@ -167,6 +181,8 @@ class Register extends Controller
 
    public function login_out(){
        session('web_user',null);
+   }
 
+   public function demo(){
    }
 }

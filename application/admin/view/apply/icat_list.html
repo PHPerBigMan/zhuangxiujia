@@ -27,35 +27,30 @@
             "ordering": true,
             "info": true,
             "autoWidth": false,
-            "ajax": "{:url('Apply/sq_list_ajax')}?type=1",
+            "ajax": "{:url('Apply/data')}",
             "columns": [
                 {"title": "ID", "data": "id"},
-                {"title": "申请人", "data": "free_name"},
-                {"title": "申请人联系方式", "data": "free_phone"},
-                {"title": "房屋面积", "data": "room_mj"},
-                {"title": "房屋风格", "data": "free_fg"},
-                {"title": "详细地址", "data": "free_address"},
-                {"title": "申请类型", "data": "type"},
-                {"title": "申请时间", "data": "create_time"},
-                {"title": "联系状态", "data": "called"},
+                {"title": "申请人", "data": "name"},
+                {"title": "申请人联系方式", "data": "phone"},
+                {"title": "房屋风格", "data": "house_type"},
+                {"title": "房屋面积", "data": "acreage"},
+                {"title": "详细地址", "data": "address"},
+                {"title": "申请时间", "data": "created_at"},
                 {"title": "操作", "data": "caozuo"},
             ]
 
         });
     });
 
-	function called(id) {
-		layer.confirm('是否联系',{
+	function del(id) {
+		layer.confirm('是否删除申请信息',{
 		    btn:['是','否']
 		},function () {
-			$.post('/admin/apply/called',{id:id,called:1,type:1},function (obj) {
-			    layer.msg('修改成功');
-			    location.reload();
-            })
-        },function () {
-            $.post('/admin/apply/called',{id:id,called:0,type:1},function (obj) {
-                layer.msg('修改成功');
-                location.reload();
+			$.post('/admin/apply/del',{id:id},function (obj) {
+			    layer.msg('删除成功');
+			    setTimeout(function () {
+                    location.reload();
+                },1000)
             })
         })
     }

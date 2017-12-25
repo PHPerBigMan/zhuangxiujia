@@ -31,7 +31,7 @@ class Shop extends Base
 
 
             $id = $v['id'];
-            $data[$k]['create_time']    = date('Y-m-d H:i:s',$v['create_time']);
+//            $data[$k]['create_time']    = date('Y-m-d H:i:s',$v['create_time']);
 
             $name                       = $v['is_show'] == 0 ? "上架" : "下架";
             $data[$k]['caozuo']         = "<a onclick='is_show(this,$id)'>$name</a> | <a onclick=\"pro_edit(this,$id)\" title=\"编辑\"><i class=\"Hui-iconfont\">&#xe6df;</i></a> | 
@@ -86,7 +86,7 @@ class Shop extends Base
             $longimg   = $img[2];
         }
         if($id ==0){
-            $data['create_time']        = time();
+//            $data['create_time']        = time();
             $data['is_show']            = 0;
             $s = Db::name('Product')->insert($data);
         }else{
@@ -258,7 +258,7 @@ class Shop extends Base
                 //一级分类
                 $data['p_id'] = 0;
             }
-            $data['create_time'] = time();
+//            $data['create_time'] = time();
             $s = Db::name('mall_cat')->insert($data);
         }else{
             //编辑

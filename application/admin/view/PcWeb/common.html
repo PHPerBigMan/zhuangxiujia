@@ -1,0 +1,104 @@
+{include file="layout/head"}
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> Pc网站管理 <span class="c-gray en">&gt;</span> 装修小常识 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <div class="cl pd-5 bg-1 bk-gray mt-20">  <a href="commonRead?id=0"  class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加装修小常识</a></span></div>
+
+    <div class="mt-20">
+        <div class="mt-20">
+            <table id="user" class="display table table-border table-bordered table-bg table-hover table-sort">
+
+            </table>
+        </div>
+    </div>
+</div>
+{include file="layout/foot"}
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+<script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script>
+</body>
+</html>
+<script>
+    /**
+     * 是否推荐
+     * @param obj
+     * @param id
+     */
+
+    function hot(obj,id) {
+        layer.confirm('是否设置为精彩问答？', {
+                btn: ['是','否','取消'],
+                shade: false,
+                closeBtn: 0
+            },
+            function(){
+                $.post("{:url('userQuestion/handel')}",{id:id,is_hot:1},function (data) {
+                    layer.msg(data.msg, {time:1000});
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                })
+            },
+            function(){
+                $.post("{:url('userQuestion/handel')}",{id:id,is_hot:0},function (data) {
+                    layer.msg(data.msg, {time:1000});
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                })
+            });
+    }
+
+    function del(obj,id) {
+        layer.confirm('是否删除问答？', {
+                btn: ['删除','取消'],
+                shade: false,
+                closeBtn: 0
+            },
+            function(){
+                $.post("{:url('userQuestion/del')}",{id:id},function (data) {
+                    layer.msg(data.msg, {time:1000});
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                })
+            });
+    }
+
+    $(function () {
+        $('#user').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "processing": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "ajax": "{:url('userQuestion/GetListCommon')}",
+            "columns": [
+                {"title": "ID", "data": "id","width":"30px"},
+                {"title": "标题", "data": "question"},
+                {"title": "内容", "data": "answer"},
+                {"title": "创建时间", "data": "created_at"},
+                {"title": "操作", "data": "caozuo"},
+            ]
+
+        });
+    });
+    
+    function add() {
+        layer.prompt({title: '输入标题', formType: 3}, function(title, index){
+            layer.close(index);
+            layer.prompt({title: '输入内容', formType: 2,area:["400px","200px"],btn: ['保存', '取消']}, function(text, index){
+                layer.close(index);
+//                layer.msg('演示完毕！您的口令：'+ pass +'<br>您最后写下了：'+text);
+                $.post("/admin/user_question/add",{title:title,content:text},function (obj) {
+                    if(obj.code ==200){
+                        layer.msg(obj.msg);
+                    }
+                });
+            });
+        });
+    }
+</script>

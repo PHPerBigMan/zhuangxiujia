@@ -19,7 +19,7 @@ class Faxian extends Base
     {
     	$data = Db::name('ZlCat')->select();
     	foreach($data  as $k=>$v){
-    		$data[$k]['create_time'] = date('Y-m-d H:i:s',$v['create_time']);
+//    		$data[$k]['create_time'] = date('Y-m-d H:i:s',$v['create_time']);
     		$id = $v['id'];
             $data[$k]['caozuo'] = "<a onclick=\"fa_edit('分类编辑','cat_edit?id=$id',500,200)\" title=\"编辑\"><i class=\"Hui-iconfont\" >&#xe6df;</i></a> | <a style=\"text-decoration:none\" class=\"ml-5\" onClick=\"fx_del(this,$id)\" href=\"javascript:;\" title=\"删除\"><i class=\"Hui-iconfont\">&#xe6e2;</i></a>";
 
@@ -50,7 +50,6 @@ class Faxian extends Base
         $id = input('id');
         $data['cat_name'] = input('cat_name');
         if($id == 0){
-            $data['create_time']  = time();
             $s = Db::name('ZlCat')->insert($data);
         }else{
             $s = Db::name('ZlCat')->where(['id'=>$id])->update(['cat_name'=>$data['cat_name']]);
@@ -90,7 +89,7 @@ class Faxian extends Base
     public function data_ajax(){
         $data = Db::name('Zl')->select();
         foreach($data as $k=>$v){
-            $data[$k]['create_time'] = date('Y-m-d H:i:s',$v['create_time']);
+//            $data[$k]['create_time'] = date('Y-m-d H:i:s',$v['create_time']);
 
             $id = $v['id'];
 
@@ -169,7 +168,6 @@ class Faxian extends Base
             }else{
                 $data['zl_pic'] = json_encode($zl_pic);
             }
-            $data['create_time'] = time();
             $s = Db::name('Zl')->insert($data);
         }else{
             if(empty($zl_pic)){

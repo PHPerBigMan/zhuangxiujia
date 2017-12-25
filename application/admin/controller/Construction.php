@@ -41,7 +41,7 @@ class Construction extends Base
             $v->suolve = "<img class='layui-upload-img product_suolve' id='demo1' src='$v->suolve'>";
             $v->caozuo = "<a style=\"text-decoration:none\" onclick=\"hot(this,$v->id)\">推荐</a>
  | <a href=\"read?id=$v->id\" title=\"编辑\"><i class=\"Hui-iconfont\" >&#xe6df;</i></a> | 
- <a style=\"text-decoration:none\" class=\"ml-5\" onClick=\"del(this,$v->id)\" href=\"javascript:;\" title=\"删除\"><i class=\"Hui-iconfont\">&#xe6e2;</i></a>";
+ <a style=\"text-decoration:none\" class=\"ml-5\" onClick=\"del($v->id)\" href=\"javascript:;\" title=\"删除\"><i class=\"Hui-iconfont\">&#xe6e2;</i></a>";
         }
 
         return json(['data'=>$data]);
@@ -75,6 +75,7 @@ class Construction extends Base
         $title = '案例展示操作';
         if(isset($id)){
             $data = $this->construction->find($id);
+            $data->lunbocount = count($data->lunbo);
             if(!empty($data->lunbo)){
                 $data->lunbojson = implode(',',$data->lunbo);
             }else{
@@ -87,8 +88,10 @@ class Construction extends Base
             $data->lunbojson = "";
             $data->id = "";
             $data->qrcode = "";
+            $data->status = 0;
+            $data->lunbocount = 0;
+            $data->created_at = "";
         }
-
 
         return view('PcWeb/consAnli',compact('data','title'));
     }
@@ -113,12 +116,15 @@ class Construction extends Base
 
 
         $data = input('post.');
+
+//        dump($data);die;
         if(!empty($data['lunbo'])){
             $lunbo = explode(',',$data['lunbo']);
             if($lunbo[0] == ""){
                 unset($lunbo[0]);
             }
             sort($lunbo);
+            $data['suolve'] = $lunbo[0];
             $data['lunbo'] = json_encode($lunbo);
         }
 

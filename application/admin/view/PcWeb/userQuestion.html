@@ -65,6 +65,13 @@
             });
     }
 
+    /**
+     *
+     * 输入解答
+     * @param id
+     * @param answer
+     */
+
     function answer(id,answer) {
         layer.prompt({title: '请输入回答', value:answer,formType: 2}, function(text, index){
             layer.close(index);
@@ -75,6 +82,22 @@
                 },1000)
             });
         });
+    }
+
+    function common(id) {
+        layer.confirm('是否设置为常见问题？', {
+                btn: ['是','否'],
+                shade: false,
+                closeBtn: 0
+            },
+            function(){
+                $.post("{:url('userQuestion/save')}",{id:id},function (data) {
+                    layer.msg(data.msg, {time:1000});
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                })
+            });
     }
     $(function () {
         $('#user').DataTable({
@@ -87,18 +110,32 @@
             "autoWidth": false,
             "ajax": "{:url('userQuestion/GetList')}",
             "columns": [
-                {"title": "ID", "data": "id"},
-                {"title": "用户", "data": "name"},
-                {"title": "联系方式", "data": "phone"},
-                {"title": "提问", "data": "question"},
-                {"title": "回答", "data": "answer"},
+                {"title": "ID", "data": "id","width":"30px"},
+                {"title": "用户", "data": "name","width":"100px"},
+                {"title": "联系方式", "data": "phone","width":"100px"},
+                {"title": "提问", "data": "question","width":"140px"},
+                {"title": "回答", "data": "answer","width":"500px"},
                 {"title": "创建时间", "data": "created_at"},
-                {"title": "是否精彩问答", "data": "is_hot"},
+                {"title": "是否精彩问答", "data": "is_hot","width":"100px"},
+                {"title": "是否常见问答", "data": "is_common"},
                 {"title": "操作", "data": "caozuo"},
             ]
 
         });
     });
-
-
+    
+    function add() {
+        layer.prompt({title: '输入标题', formType: 3}, function(title, index){
+            layer.close(index);
+            layer.prompt({title: '输入内容', formType: 2,area:["400px","200px"],btn: ['保存', '取消']}, function(text, index){
+                layer.close(index);
+//                layer.msg('演示完毕！您的口令：'+ pass +'<br>您最后写下了：'+text);
+                $.post("/admin/user_question/add",{title:title,content:text},function (obj) {
+                    if(obj.code ==200){
+                        layer.msg(obj.msg);
+                    }
+                });
+            });
+        });
+    }
 </script>

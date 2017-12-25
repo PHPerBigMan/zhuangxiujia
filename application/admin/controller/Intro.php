@@ -9,6 +9,7 @@ use think\Request;
 class Intro extends Base
 {
     public function index(){
+
         $j = [
             'title'=>'平台介绍'
         ];
@@ -172,15 +173,15 @@ class Intro extends Base
         $id = input('post.');
         if($id['id'] == 0){
             unset($id['id']);
-            $id['banner_url'] = session('banner');
+//            $id['banner_url'] =
             $id['create_time'] = time();
 
             Db::name('Banner')->insert($id);
         }else{
             Db::name('Banner')->where(['id'=>$id['id']])->update([
-                'banner_url'=> empty(session('banner')) ? Db::name('Banner')->where(['id'=>$id['id']])->value('banner_url'):session('banner'),
+                'banner_url'=> empty($id['banner_url']) ? Db::name('Banner')->where(['id'=>$id['id']])->value('banner_url'):$id['banner_url'],
                 'type'=>$id['type'],
-                'herf'=>$id['href']
+                'href'=>$id['href']
             ]);
         }
 

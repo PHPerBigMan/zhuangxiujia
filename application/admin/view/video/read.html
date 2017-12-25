@@ -1,0 +1,51 @@
+{include file="layout/head"}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 视频管理 <span class="c-gray en">&gt;</span> 视频编辑 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<!--<div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"> <a href="{:url('banner/addupdate')}"class="btn btn-primary radius" data-title="添加图片" ><i class="Hui-iconfont">&#xe600;</i> 添加图片</a></span>-->
+
+    <div class="page-container">
+        <form  action="/admin/video/save" class="form form-horizontal layui-form" id="about" enctype="multipart/form-data" method="post" onsubmit="return video()">
+            <div class="a-upload-div">
+                <label>上传视频:</label>
+                <a href="javascript:;" class="a-upload">
+                    <input type="file" name="file" id="file">点击这里上传文件
+                </a>
+            </div>
+            <input type="hidden" name="id" value="{$id}">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button type="submit" class="btn btn-primary radius" id="submit"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+            </div>
+        </form>
+
+</body>
+
+<script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="/layui/layui.all.js"></script>
+
+<script>
+   function video() {
+
+
+
+
+
+       var video_src_file = $('#file').val();
+
+       var fileTypes = new Array("flv","3gp","mpeg","avi","mp4","ogg","mpg");  //定义可支持的文件类型数组
+       var fileTypeFlag = "0";
+       var newFileName = video_src_file.split('.');pg
+       newFileName = newFileName[newFileName.length-1];
+       for(var i=0;i<fileTypes.length;i++){
+           if(fileTypes[i] == newFileName){
+               fileTypeFlag = "1";
+           }
+       }
+       if(fileTypeFlag == "0"){
+           layer.msg("视频文件必须是flv、mpeg、avi、ogg、mpg或3gp格式！");
+           return false;
+       }
+
+       layer.load(4, {time: 20*1000});
+   }
+</script>
+</html>
