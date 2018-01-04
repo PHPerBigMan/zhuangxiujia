@@ -1,7 +1,9 @@
 <?php
 namespace app\index\controller;
 
+use app\admin\model\Cat;
 use app\model\OrderBid;
+use app\model\OrderManuscript;
 use app\model\RenwuTask;
 use app\model\UserRw;
 use think\Db;
@@ -58,16 +60,28 @@ class Index
      * 二级分类下的任务
      */
     public function sec_rw(){
-        $id = input('id');
-        $area = input('area');
+        $id         = input('id');
+        $area       = input('area');
+
+
+        $type = 1;
+        // 判断任务类型 是否为装修前期
+        $cat_id_pid     = Cat::where('id',$id)->value('p_id');
+        $cat_id         = Cat::where('id',$cat_id_pid)->value('id');
+        if($cat_id == 1){
+            // 设计任务
+            $type = 2;
+        }
+
         if(!empty($area)){
-            $data   = Db::name('Renwu')->where(['rw_cat'=>$id])->where("rw_status = 2")->where("is_show = 1")->where("rw_area","like","%$area%")->field('rw_title,start_time,id,rw_yj,rw_cover img')->select();
+            $data   = Db::name('Renwu')->where(['rw_cat'=>$id,'type'=>$type])->where("rw_status = 2")->where("is_show = 1")->where("rw_area","like","%$area%")->field('rw_title,start_time,id,rw_yj,rw_cover img,type')->select();
         }else{
-            $data   = Db::name('Renwu')->where(['rw_cat'=>$id])->where("rw_status = 2")->where("is_show = 1")->field('rw_title,start_time,id,rw_yj,rw_cover img')->select();
+            $data   = Db::name('Renwu')->where(['rw_cat'=>$id,'type'=>$type])->where("rw_status = 2")->where("is_show = 1")->field('rw_title,start_time,id,rw_yj,rw_cover img,type')->select();
         }
 
         foreach($data as $k=>$v){
             $data[$k]['start_time'] = date('Y/m/d');
+            $data[$k]['task']   = count(UserRw::where('rw_id',$v['id'])->select());
         }
         $j = $this->return_data($data);
 
@@ -106,14 +120,14 @@ class Index
         // TODO:: 这里还有问题
         if(!empty($area)){
 
-            $renovation = Renwu::where(['is_show'=>1,'rw_status'=>2,'type'=>1])->where('rw_area','like',"%$area%")->field('id,rw_title,rw_yj,start_time,rw_cover img,type')->select();
+            $renovation = Renwu::where(['is_show'=>1,'rw_status'=>2,'type'=>1,'rw_hot'=>1])->where('rw_area','like',"%$area%")->field('id,rw_title,rw_yj,start_time,rw_cover img,type')->select();
 
-            $design = Renwu::where(['is_show'=>1,'rw_status'=>2,'type'=>2])->where('rw_area','like',"%$area%")->field('id,rw_title,rw_yj,start_time,rw_cover img,type')->select();
+            $design = Renwu::where(['is_show'=>1,'rw_status'=>2,'type'=>2,'rw_hot'=>1])->where('rw_area','like',"%$area%")->field('id,rw_title,rw_yj,start_time,rw_cover img,type')->select();
         }else{
 
-            $renovation = Renwu::where(['is_show'=>1,'rw_status'=>2,'type'=>1])->field('id,rw_title,rw_yj,start_time,rw_cover img,type')->select();
+            $renovation = Renwu::where(['is_show'=>1,'rw_status'=>2,'type'=>1,'rw_hot'=>1])->field('id,rw_title,rw_yj,start_time,rw_cover img,type')->select();
 
-            $design = Renwu::where(['is_show'=>1,'rw_status'=>2,'type'=>2])->field('id,rw_title,rw_yj,start_time,rw_cover img,type')->select();
+            $design = Renwu::where(['is_show'=>1,'rw_status'=>2,'type'=>2,'rw_hot'=>1])->field('id,rw_title,rw_yj,start_time,rw_cover img,type')->select();
 
         }
 
@@ -148,6 +162,39 @@ class Index
         return OrderBid::addProgramme($file,$data);
     }
 
+    /**
+     * @return \think\response\Json
+     * author hongwenyang
+     * method description : 上传设计师设计稿
+     */
+    public function manuscript(){
+        $data = input();
+        $file = request()->file('img');
+        return OrderManuscript::addManuscript($file,$data);
+    }
+
+    /**
+     * @return \think\response\Json
+     * author hongwenyang
+     * method description : 获取设计稿
+     */
+    public function getManuscript(){
+        $post = input();
+        $data = OrderManuscript::where($post)->find();
+        return json($this->return_data($data));
+    }
+
+    /**
+     * @return \think\response\Json
+     * author hongwenyang
+     * method description : 业主确认方案
+     */
+    public function Confirm(){
+        $post = input();
+        Db::name('log')->insert(['msg'=>'确认方案','data'=>json_encode($post)]);
+        $data = OrderManuscript::confirm($post);
+        return json($data);
+    }
 
     /**
      * @return array
@@ -167,15 +214,16 @@ class Index
                 $orderStatus = [7];
             }else{
                 // 中标
-                $orderStatus = [8];
+                $orderStatus = [1,8];
             }
             // 查找对应任务的 投标或中标用户
-            $user_id = UserRw::where('rw_id',$data['rw_id'])->whereIn('order_status',$orderStatus)->column('user_id');
+            $user_id = UserRw::where('rw_id',$data['rw_id'])->column('user_id');
+
             // 获取用户信息
             $userInfo = \app\model\User::whereIn('id',$user_id)->field('user_pic,id,user_name')->select();
-
+//            dump($userInfo);die;
             $data['user'] = $userInfo;
-
+//            dd($userInfo);die;
             $Task = Renwu::where('id',$data['rw_id'])->find();
             $data['rw_title'] = $Task['rw_title'];
             $data['rw_yj']    = $Task['rw_yj'];
@@ -198,21 +246,38 @@ class Index
         $id = input();
         $data = Renwu::where('id',$id['id'])->field('id,rw_title,rw_yj,create_time,bid_time,rw_main,status as taskStatus')->find()->toArray();
         // 获取已投标用户
-        $data['design'] = UserRw::where(['rw_id'=>$data['id']])->with(['user'=>function($query){$query->field('id,user_name,user_pic');}])->select();
+        if($data['taskStatus'] == 0){
+            // 投标中
+            $data['design'] = UserRw::where(['rw_id'=>$data['id']])->with(['user'=>function($query){$query->field('id,user_name,user_pic');}])->select();
+        }else{
+            // 进行中 已完成
+            $data['design'] = UserRw::where(['rw_id'=>$data['id']])->whereIn('order_status',[8,10,4,1])->with(['user'=>function($query){$query->field('id,user_name,user_pic');}])->select();
+
+        }
 
         if(!empty($data['design'])){
             $data['task'] = count($data['design']);
             foreach ($data['design'] as $k=>$v){
                 $data['user'][$k]['orderId'] = $v['orderId'];
+                $data['orderId'] = $v['orderId'];
                 $data['user'][$k]['id'] = $v['user']['id'];
                 $data['user'][$k]['user_name'] = $v['user']['user_name'];
                 $data['user'][$k]['user_pic'] = $v['user']['user_pic'];
+                $isSend = OrderBid::where('orderId',$v['orderId'])->find();
+                $data['user'][$k]['is_send'] = !empty($isSend) ? 1 : 0;
             }
+//            dump($data);die;
             unset($data['design']);
         }else{
             $data['task'] = 0;
         }
         return json($this->return_data($data));
+    }
+
+    public function Confirmation(){
+        $post = input('orderId');
+        $data = UserRw::Confirmation($post);
+        return json($data);
     }
     /**
      * @return \think\response\Json

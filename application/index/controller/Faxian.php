@@ -27,7 +27,7 @@ class Faxian
 
     public function read(){
         $id     = input('id');
-        $data   = Db::name('Zl')->where(['zl_cat'=>$id])->field('id zl_id,zl_title,zl_pic,zl_type,create_time')->select();
+        $data   = Db::name('Zl')->where(['zl_cat'=>$id])->field('id zl_id,zl_title,zl_pic,zl_type,created_at')->select();
         foreach($data as $k=>$v){
             if($v['zl_type'] == 0){
                 $zl_pic = json_decode($v['zl_pic'],true);
@@ -37,7 +37,6 @@ class Faxian
                 $data[$k]['zl_pic'] = array_slice($zl_pic,0,4);
             }
 
-            $data[$k]['create_time'] = date("Y-m-d",$v['create_time']);
         }
 //        echo "<pre>";
 //        var_dump($data);die;
@@ -53,9 +52,7 @@ class Faxian
 
     public function more(){
         $id                     = input('zl_id');
-        $data                   = Db::name('Zl')->where(['id'=>$id])->field('zl_title,content zl_content,create_time')->find();
-
-        $data['create_time']    = date("Y-m-d H:i",$data['create_time']);
+        $data                   = Db::name('Zl')->where(['id'=>$id])->field('zl_title,content zl_content,created_at')->find();
         $j = $this->return_data($data);
         return json($j);
     }

@@ -25,13 +25,18 @@ class Anli
 
     public function anli_list(){
         $type = input('type');
+        $case_type = [input('case_type')];
+        if(empty(input('case_type'))){
+            $case_type = [1,2];
+        }
+
         if($type == 1){
-            $data = Db::name('UserAnli')->where(['jidian'=>1])->field('id,pic,title')->select();
+            $data = Db::name('UserAnli')->where(['jidian'=>1])->whereIn('case_type',$case_type)->field('id,pic,title')->select();
 
         }else if($type == 2){
-            $data = Db::name('UserAnli')->field('id,pic,title')->order('create_time desc')->select();
+            $data = Db::name('UserAnli')->field('id,pic,title')->whereIn('case_type',$case_type)->order('create_time desc')->select();
         }else if($type == 3){
-            $sql = "SELECT anli_id,count(anli_id) as num FROM zjx_anli_read group by anli_id order by num DESC ";
+            $sql = "SELECT anli_id,count(anli_id) as num FROM zjx_anli_read WHERE IN case_type = ".$case_type."group by anli_id order by num DESC ";
             $anli_id = Db::query($sql);
 
             foreach ($anli_id as $k=>$v) {

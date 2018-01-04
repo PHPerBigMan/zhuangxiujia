@@ -123,13 +123,28 @@ class Intro extends Base
 
         return view('intro/banner',$j);
     }
+    /**
+     * @return \think\response\View app轮播图
+     */
+
+    public function AppBanner(){
+        $j = [
+            'title'=>'轮播图管理'
+        ];
+
+        return view('intro/AppBanner',$j);
+    }
 
     public function banner_ajax(){
-        $data = Db::name('Banner')->select();
+        $type = 1;
+        if(isset($_GET['type'])){
+            $type = 0;
+        }
+        $data = Db::name('Banner')->where('type',$type)->select();
         foreach($data as $k=>$v){
             $data[$k]['banner_url'] = "<img src='".$v['banner_url']."' style='width:150px;height:100px'>";
 
-            $data[$k]['caozuo'] = "<a onclick='banner_edit(".$v['id'].")' title=\"编辑\"><i class=\"Hui-iconfont\" >&#xe6df;</i></a> | 
+            $data[$k]['caozuo'] = "<a onclick='banner_edit(".$v['id'].",$type)' title=\"编辑\"><i class=\"Hui-iconfont\" >&#xe6df;</i></a> | 
  <a style=\"text-decoration:none\" class=\"ml-5\" onClick=\"banner_del(".$v['id'].")\" href=\"javascript:;\" title=\"删除\"><i class=\"Hui-iconfont\">&#xe6e2;</i></a>";
 
 
@@ -152,11 +167,17 @@ class Intro extends Base
      */
 
     public function banner_edit(){
+        $type = 1;
+        if(isset($_GET['type'])){
+            $type = 0;
+        }
+
         $data = Db::name('Banner')->where(['id'=>input('id')])->find();
 
         $j = [
             'title'=>'轮播图编辑',
-            'data'=>$data
+            'data'=>$data,
+            'type'=>$type
         ];
 
         return view('/intro/banner_edit',$j);

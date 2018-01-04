@@ -19,7 +19,7 @@ class Room extends Base
     public function room_ajax(){
         $data = Db::name('Zx')->select();
         foreach ($data as $k=>$v){
-            $data[$k]['create_time'] = date('Y-m-d H:i:s',$v['create_time']);
+//            $data[$k]['create_time'] = date('Y-m-d H:i:s',$v['create_time']);
             $data[$k]['user_name'] = Db::name('User')->where(['id'=>$v['user_id']])->value('user_name');
             $id = $v['id'];
             $data[$k]['caozuo'] = "<a href=\"/admin/Room/read?id=$id\" title=\"编辑\"><i class=\"Hui-iconfont\" >&#xe6df;</i></a>  | 

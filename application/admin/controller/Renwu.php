@@ -1,8 +1,13 @@
 <?php
 namespace app\admin\controller;
 
+use app\admin\model\Cat;
+use app\admin\model\Demand;
+use app\admin\model\Log;
 use app\common\model\BookCategory;
 use app\common\model\BookLose;
+use app\model\UserRw;
+use function EasyWeChat\Payment\get_client_ip;
 use think\Db;
 
 class Renwu extends Base
@@ -21,11 +26,22 @@ class Renwu extends Base
      */
 
     public function index(){
+        $keyword = "";
+        if(isset($_GET['keyword'])){
+            $keyword = $_GET['keyword'];
+        }
+
         $count = Db::name('Renwu')->count();
+
+        $cat = Cat::where('level','1')->select();
+
         $j = [
-            'title' => "任务列表",
-            'count'=>$count,
+            'title'     => "任务列表",
+            'count'     =>$count,
+            'cat'       =>$cat,
+            'keyword'   =>$keyword
         ];
+
         return view("Renwu/index", $j);
     }
 
@@ -35,45 +51,17 @@ class Renwu extends Base
      */
 
     public function renwu_ajax(){
-        $data = $this->model;
-        foreach($data as $k=>$v){
-            $data[$k]['create_time'] = date("Y-m-d",$v['create_time']);
-            $data[$k]['start_time']  = date("Y-m-d",$v['start_time']);
-            $img                     = $v['rw_cover'];
-            $data[$k]['rw_cover']    = "<img src='$img' style='width: 100px;height: 100px;'>";
-            $data[$k]['rw_cat']      = Db::name('cat')->where(['id'=>$v['rw_cat']])->value('cat_name');
-            switch ($v['rw_status']){
-                case 0:
-                    $status = "<span class=\"label label-defaunt radius\">未支付佣金</span>";
-                    break;
-                case 1:
-                    $status = "<span class=\"label label-success radius\">已支付佣金</span>";
-                    break;
-                case 2:
-                    $status = "<span class=\"label label-defaunt radius\">未被接单</span>";
-                    break;
-            }
-            $data[$k]['rw_status'] = $status;
-
-            switch ($v['is_show']){
-                case 0:
-                    $is_show ="<span class=\"label label-defaunt radius\">未发布</span>" ;
-                    break;
-                case 1:
-                    $is_show = "<span class=\"label label-success radius\">已发布</span>";
-                    break;
-
-            }
-            $data[$k]['is_show'] = $is_show;
-            $id = $v['id'];
-            $name = $v['is_show'] == 0 ? "发布" : "取消发布";
-            $data[$k]['caozuo'] = "<a onclick=\"rw_fb(this,$id)\" id='fb'>$name</a> | <a style=\"text-decoration:none\" onclick=\"rw_rm(this,$id)\">推荐热门</a>
- | <a href=\"/admin/Renwu/read?id=$id\" title=\"编辑\"><i class=\"Hui-iconfont\" >&#xe6df;</i></a> | 
- <a style=\"text-decoration:none\" class=\"ml-5\" onClick=\"rw_del(this,$id)\" href=\"javascript:;\" title=\"删除\"><i class=\"Hui-iconfont\">&#xe6e2;</i></a>";
-
-            $data[$k]['rw_hot'] = $v['rw_hot'] == 0 ? "<span class=\"label label-defaunt radius\">非热门任务</span>" : "<span class=\"label label-success radius\">热门任务</span>";
+        $whereIn = Cat::where('level',2)->column('id');
+        if(!empty(input('keyword'))){
+            $whereIn = Cat::where('p_id',input('keyword'))->column('id');
         }
-        return json(['data'=>$data]);
+
+        $data = \app\model\Renwu::order("id desc")->whereIn('rw_cat',$whereIn)->order('create_time','desc')->select();
+
+
+
+
+        return json(['data'=>\app\model\Renwu::getBackAll($data)]);
     }
 
     /**
@@ -134,6 +122,15 @@ class Renwu extends Base
 
         $data['rw_pass'] = $pass;
         $data['rw_img']  = json_decode($data['rw_img'],true);
+
+        if(empty($data['rw_img'])) {
+            $data['lunbojson'] = "";
+        }else{
+            $data['lunbojson'] = implode(',',$data['rw_img']);
+        }
+
+        $data['lunbocount'] = count($data['rw_img']);
+
         $data['create_time'] = date('Y-m-d',$data['create_time']);
         $data['start_time'] = date('Y-m-d',$data['start_time']);
         //省份
@@ -144,35 +141,31 @@ class Renwu extends Base
 
         //任务属性
         $rw_cat = Db::name('Cat')->field('id,cat_name')->where(['level'=>2])->select();
+
+        // 获取发布用户的数据
+        $TaskUserId=  \app\model\Renwu::where('id',$id)->value('user_id');
+
+
+        if(!empty($TaskUserId)){
+            $phone = Demand::where('user_id',$TaskUserId)->value('phone');
+            if(empty($phone)){
+                $phone =  \app\model\User::where('id',$TaskUserId)->value('user_phone');
+            }
+        }else{
+            $phone ="";
+        }
+//        dump($TaskUserId);die;
         $j = [
             'title'=>"任务详情",
             'data'=>$data,
             'province'=>$province,
             'rw_cat'=>$rw_cat,
-            'city'=>$city
+            'city'=>$city,
+            'phone'=>$phone
         ];
         return view('Renwu/add',$j);
     }
 
-
-    /**
-     * 任务图片处理
-     */
-
-    /*public function img(){
-        if ((request()->file('file')) != NULL) {
-            $file = request()->file('file');
-            // 移动到框架应用根目录/public/uploads/ 目录下
-            $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
-            $img = '/uploads/' . $info->getSaveName();
-            if(session('rw_img') == ""){
-                session('rw_img',$img);
-            }else{
-                $iimg = session('rw_img').','.$img;
-                session('rw_img',$iimg);
-            }
-        }
-    }*/
 
 
     /**
@@ -182,19 +175,9 @@ class Renwu extends Base
 
     public function add(){
         $id         = input('id');
-        $data['rw_title']               = input('rw_title');
-        $data['rw_yj']                  = input('rw_yj');
-        $data['rw_ding']                = input('rw_ding');
-        $data['rw_main']                = input('rw_main');
-        $data['create_time']            = strtotime(input('create_time'));
-        $data['start_time']             = strtotime(input('start_time'));
-        $data['rw_province']             = Db::name('HatProvince')->where(['provinceID'=>input('rw_provice')])->value('province');
-        $data['rw_city']                = input('rw_city');
-        $data['rw_cat']                 = input('rw_cat');
-
-        $data['rw_area']                = $data['rw_city'];
-        $data['pay_limit_time']         = input('pay_limit_time');
-//        unset($data['rw_provice']);
+        $data = input();
+        $rw_province             = Db::name('HatProvince')->where(['provinceID'=>input('rw_province')])->value('province');
+        $data['rw_area']         = $data['city'];
         unset($data['rw_city']  );
         if (!is_numeric($data['rw_yj'])|| !is_numeric($data['rw_ding']) || !is_numeric($data['pay_limit_time']) )
         {
@@ -202,19 +185,18 @@ class Renwu extends Base
                     history.go(-1)
                     },500)</script>";
         }
-
-        if (preg_match("/^[\x{4e00}-\x{9fa5}]+$/u",$data['rw_title'])) {
-
-        } else {
-            return "<script>alert('任务名称只能为汉字');setTimeout(function() {
-                    history.go(-1)
-                    },500)</script>";
+        $data['rw_province'] = $rw_province;
+        $data['type'] = 1;
+        // 判断任务类型 是否为装修前期
+        $cat_id_pid = Cat::where('id',$data['rw_cat'])->value('p_id');
+        $cat_id = Cat::where('id',$cat_id_pid)->value('id');
+        if($cat_id == 1){
+            // 设计任务
+            $data['type'] = 2;
+            $user_id = Demand::where(['phone'=>input('user_phone'),'called'=>0])->value('user_id');
+            $data['user_id']                = empty($user_id) ?
+                \app\model\User::where('user_phone',input('user_phone'))->value('id'):$user_id;
         }
-
-
-
-
-
         if ((request()->file('rw_cover')) != NULL) {
             $file = request()->file('rw_cover');
             // 移动到框架应用根目录/public/uploads/ 目录下
@@ -222,49 +204,48 @@ class Renwu extends Base
             $data['rw_cover'] = '/uploads/' . $info->getSaveName();
         }
 
-        if(request()->file('rw_img') !=NULL){
-            $files = request()->file('rw_img');
-            foreach($files as $file){
-                // 移动到框架应用根目录/public/uploads/ 目录下
-                $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
-                if($info){
-                    $rw_img[] = DS.'uploads'.DS.$info->getSaveName();
-                }else{
-                    // 上传失败获取错误信息
-                    echo $file->getError();
-                }
-            }
+        // 处理任务图册
+        if(!empty($data['lunbo'])){
+            $data['rw_img'] = json_encode(explode(',',$data['lunbo']));
         }
+        unset($data['city']);
+        unset($data['lunbo']);
 
+        $data['create_time'] = strtotime($data['create_time']);
+        $data['start_time'] = strtotime($data['start_time']);
 
+        if($data['rw_cat'] == 4){
+            // 根据手机号查询
+            $data['apply_id'] = Demand::where(['phone'=>$data['user_phone'],'called'=>0])->value('id');
+            if(!empty($data['apply_id'])){
+                // 查询用户的id
+                $data['user_id'] = Demand::where(['phone'=>$data['user_phone'],'called'=>0])->value('user_id');
+                // 改变申请状态
+                Demand::where('id',$data['apply_id'])->update(['called'=>1]);
+            }else{
+                unset($data['apply_id']);
+            }
 
+            unset($data['user_phone']);
+        }
         if(empty($id)){
+
             $data['rw_status'] = 2;
 
-            $data['rw_img'] = empty($rw_img) ? '':json_encode($rw_img);
+            // 如果是设计任务添加申请id
+
             $s = Db::name('Renwu')->insert($data);
 
             if($s){
                 return "<script>alert('添加成功');setTimeout(function() {
-                    history.go(-1)
+                    location.href = '/admin/renwu/index';
 },500)</script>";
             }else{
-                return "<script>alert('修改失败');setTimeout(function() {
+                return "<script>alert('添加失败');setTimeout(function() {
                     history.go(-1)
 },500)</script>";
             }
         }else{
-            $img = Db::name('Renwu')->where(['id'=>$id])->value('rw_img');
-            if(!empty($img)) {
-                $img = json_decode($img, true);
-                if(!empty($rw_img)){
-                    $rw_img = array_merge($rw_img,$img);
-                }
-            }
-
-            $rw_img = empty($rw_img) ? $img : $rw_img;
-
-            $data['rw_img'] = json_encode($rw_img);
 
             $status = Db::name('Renwu')->where(['id'=>$id])->value('rw_status');
 
@@ -274,9 +255,10 @@ class Renwu extends Base
 },500)</script>";
             }else{
                 $s = Db::name('Renwu')->where(['id'=>$id])->update($data);
+
                 if($s){
                     return "<script>alert('修改成功');setTimeout(function() {
-                    history.go(-1)
+                   location.href = '/admin/renwu/index';
 },500)</script>";
                 }else{
                     return "<script>alert('修改失败');setTimeout(function() {
@@ -316,6 +298,8 @@ class Renwu extends Base
         $data['start_time']     = date('Y-m-d',time());
         $data['pay_limit_time']  = "";
         $data['id']  = "";
+        $data['lunbojson']  = "";
+        $data['lunbocount']  = 0;
         $province = Db::name('HatProvince')->select();
 
         $city = Db::name('HatCity')->where(['father'=>Db::name('HatCity')->where(['city'=>$data['rw_area']])->value('father')])->select();
@@ -326,7 +310,8 @@ class Renwu extends Base
             'data'      =>$data,
             'province'  =>$province,
             'rw_cat'    =>$rw_cat,
-            'city'      =>$city
+            'city'      =>$city,
+            'phone'     =>''
         ];
         return view('Renwu/add',$j);
     }
@@ -409,6 +394,10 @@ class Renwu extends Base
      */
     public function cat_del(){
         $id = input('id');
+        Log::create([
+            'msg'=>get_client_ip(),
+            'data'=>\think\Request::instance()->controller()
+        ]);
         $check = Db::name('Cat')->where(['p_id'=>$id])->find();
         if(empty($check)){
             $s = Db::name('Cat')->where(['id'=>$id])->delete();
@@ -555,40 +544,7 @@ class Renwu extends Base
 
     public function cat_save(){
         $data = input('post.');
-        if($data['f'] == 0){
-            unset($data['f']);
-            if(!empty($data['fcat_name']) || !empty($data['scat_name'])){
-                if($data['type'] == 0){
 
-                    //二级分类
-                    unset($data['fcat_name']);
-                    unset($data['type']);
-                    $data['level'] = 2;
-                    $data['cat_name'] = $data['scat_name'];
-                    unset($data['scat_name']);
-
-                }else{
-
-                    //一级分类
-                    unset($data['scat_name']);
-                    unset($data['type']);
-                    unset($data['p_id']);
-                    $data['level'] = 1;
-                    $data['p_id'] = 0;
-                    $data['cat_name'] = $data['fcat_name'];
-                    unset($data['fcat_name']);
-                    $data['cat_img']   = session('cat_img');
-                }
-
-                $data['create_time'] = time();
-                $s = Db::name('Cat')->insert($data);
-                if($s){
-                    $code = 200;
-                }
-            }
-        }
-
-
-        return json($code);
+        return Cat::saveCat($data);
     }
 }

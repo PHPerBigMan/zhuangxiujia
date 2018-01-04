@@ -6,6 +6,7 @@
  * Time: 18:58
  */
 namespace app\model;
+use think\Db;
 use think\Model;
 
 class OrderBid extends Model{
@@ -21,6 +22,10 @@ class OrderBid extends Model{
      * method description : 保存设计师的方案
      */
     public static function addProgramme($files,$data){
+        Db::name('log')->insert([
+            'msg'=>'提交方案',
+            'data'=> json_encode($data)
+        ]);
         $programme = array();
         foreach($files as $k=>$file){
             // 移动到框架应用根目录/public/uploads/ 目录下
@@ -32,13 +37,23 @@ class OrderBid extends Model{
                 return $file->getError();
             }
         }
-
         $programme = json_encode($programme);
-        // 保存数据
-        $s = OrderBid::insert([
-            'orderId'=>$data['orderId'],
-            'programme'=>$programme
-        ]);
+
+        $isHave = OrderBid::where('orderId',$data['orderId'])->find();
+        if($isHave){
+            // 保存数据
+            $s = OrderBid::where('orderId',$data['orderId'])->update([
+                'programme'=>$programme,
+                'updated_at'=>date('Y-m-d H:i:s',time())
+            ]);
+        }else{
+            // 保存数据
+            $s = OrderBid::insert([
+                'orderId'=>$data['orderId'],
+                'programme'=>$programme
+            ]);
+        }
+
 
         return returnStatus($s);
     }

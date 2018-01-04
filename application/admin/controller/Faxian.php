@@ -119,6 +119,7 @@ class Faxian extends Base
 
     public function zl_edit(){
         $data = Db::name('Zl')->where(['id'=>input('id')])->find();
+
         if(empty(input('id'))){
             $data['zl_title']   = "";
             $data['zl_cat']     = 0;
@@ -126,8 +127,17 @@ class Faxian extends Base
             $data['zl_pic']     = "";
             $data['content']    = "";
             $data['id']         = 0;
+            $data['lunbojson'] = "";
+            $data['lunbocount'] = 0;
         }else{
             $data['zl_pic'] = json_decode($data['zl_pic'],true);
+            if(empty($data['zl_pic'])) {
+                $data['lunbojson'] = "";
+            }else{
+                $data['lunbojson'] = implode(',',$data['zl_pic']);
+            }
+
+            $data['lunbocount'] = count($data['zl_pic']);
         }
         $cat = Db::name('ZlCat')->select();
         $j = [
@@ -147,45 +157,22 @@ class Faxian extends Base
     public function add(){
         $data = input('post.');
 
-        if(request()->file('zl_pic') !=NULL){
-            $files = request()->file('zl_pic');
-            foreach($files as $file){
-                // 移动到框架应用根目录/public/uploads/ 目录下
-                $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
-                if($info){
-                    $zl_pic[] = DS.'uploads'.DS.$info->getSaveName();
-                }else{
-                    // 上传失败获取错误信息
-                    echo $file->getError();
-                }
-            }
+        if(!empty($data['lunbo'])){
+            $data['zl_pic'] = json_encode(explode(',',$data['lunbo']));
         }
 
+        unset($data['lunbo']);
         if($data['id'] == 0){
             unset($data['id']);
-            if(empty($zl_pic)){
-                $data['zl_pic'] = "";
-            }else{
-                $data['zl_pic'] = json_encode($zl_pic);
-            }
             $s = Db::name('Zl')->insert($data);
         }else{
-            if(empty($zl_pic)){
-                $s = Db::name('Zl')->where(['id'=>$data['id']])->update([
-                    'zl_title'      =>$data['zl_title'],
-                    'zl_cat'        =>$data['zl_cat'],
-                    'zl_type'        =>$data['zl_type'],
-                    'content'       =>empty($data['content']) ? "" :$data['content'],
-                ]);
-            }else{
-                $s = Db::name('Zl')->where(['id'=>$data['id']])->update([
-                    'zl_title'      =>$data['zl_title'],
-                    'zl_cat'        =>$data['zl_cat'],
-                    'zl_type'        =>$data['zl_type'],
-                    'zl_pic'        =>json_encode($zl_pic),
-                    'content'       =>empty($data['content']) ? "" :$data['content'],
-                ]);
-            }
+            $s = Db::name('Zl')->where(['id'=>$data['id']])->update([
+                'zl_title'      =>$data['zl_title'],
+                'zl_cat'        =>$data['zl_cat'],
+                'zl_type'        =>$data['zl_type'],
+                'zl_pic'        =>$data['zl_pic'],
+                'content'       =>empty($data['content']) ? "" :$data['content'],
+            ]);
         }
 
         if($s){

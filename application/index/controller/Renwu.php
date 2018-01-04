@@ -1,6 +1,7 @@
 <?php
 namespace app\index\controller;
 
+use app\model\UserRw;
 use think\Db;
 
 class Renwu
@@ -12,10 +13,9 @@ class Renwu
     public function read(){
 
         $id = input('id');
-        $data =\app\model\Renwu::with('task')->where(['id'=>$id])->field('id,rw_yj,rw_title,rw_img,rw_main,rw_ding,create_time,start_time,type,bid_time')->find();
+        $data =\app\model\Renwu::where(['id'=>$id])->field('id,rw_yj,rw_title,rw_img,rw_main,rw_ding,create_time,start_time,type,bid_time')->find();
 
-//        dd($data);die;
-        $data['task']           = count($data['task']);
+        $data['task']           = UserRw::where('rw_id',$data['id'])->count();
         $data['rw_img']         = json_decode($data['rw_img'],true);
         $data['start_time']     = strtotime($data['start_time']);
 
@@ -36,20 +36,31 @@ class Renwu
         $insert['orderId']      = date("Ymd",time()).time();
         $insert['order_status'] = 0;
         $insert['create_time']  = time();
-        $s = Db::name('UserRw')->insert($insert);
-
-        Db::name('Renwu')->where(['id'=>$id])->update(['rw_status'=>0]);
-        if($s){
-            $msg = '任务接单成功';
-            $status = 200;
-        }else{
-            $msg = '任务接单失败';
+        $orderId = "";
+        // 判断用户是否已经接过这个任务
+        $isGet = UserRw::where(['user_id'=>$insert['user_id'],'rw_id'=>$id])->value('id');
+        if($isGet){
+            $msg = "该用户已经接过此任务";
             $status = 404;
+
+        }else{
+            $s = Db::name('UserRw')->insertGetId($insert);
+            Db::name('Renwu')->where(['id'=>$id])->update(['rw_status'=>0]);
+            if($s){
+                $msg = '任务接单成功';
+                $status = 200;
+                $orderId = UserRw::where('id',$s)->value('orderId');
+            }else{
+                $msg = '任务接单失败';
+                $status = 404;
+            }
         }
+
 
         $j = [
             'msg'=>$msg,
-            'status'=>$status
+            'status'=>$status,
+            'data'=>$orderId
         ];
 
         return json($j);

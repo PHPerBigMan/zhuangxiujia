@@ -2,18 +2,21 @@
 <body>
 
 <div class="page-container">
-	<form action="{:url('renwu/add')}" method="post" class="form form-horizontal layui-form" id="rw" enctype="multipart/form-data">
+	<form action="{:url('renwu/add')}" method="post" class="form form-horizontal layui-form" id="rw" enctype="multipart/form-data" onsubmit="return check()">
 		<div class="row cl">
 
 			<div class="layui-tab" lay-filter="test">
 				<ul class="layui-tab-title">
 					<li class="layui-this" lay-id="11">任务基本信息</li>
-					<li lay-id="22">任务图片</li>
-					<li lay-id="33">任务时间</li>
-					<li lay-id="44">任务地点</li>
 				</ul>
 				<div class="layui-tab-content">
 					<div class="layui-tab-item layui-show">
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">发布需求的用户：</label>
+							<div class="formControls col-xs-8 col-sm-9">
+								<input type="text" class="input-text" value="{$phone}" placeholder="" id="user_phone" name="user_phone">
+							</div>
+						</div>
 						<div class="row cl">
 							<label class="form-label col-xs-4 col-sm-2">任务名称：</label>
 							<div class="formControls col-xs-8 col-sm-9">
@@ -37,7 +40,7 @@
 						<div class="row cl">
 							<label class="form-label col-xs-4 col-sm-2">任务属性：</label>
 							<div class="formControls col-xs-8 col-sm-9">
-								<select name="rw_cat" id="">
+								<select name="rw_cat" id="cat">
 									{foreach name="$rw_cat" item="v1"}
 										<option value="{$v1.id}" <?php if($data['rw_cat'] == $v1['id']){echo "selected=selectede";}?>>{$v1.cat_name}</option>
 									{/foreach}
@@ -60,14 +63,9 @@
 						<div class="row cl">
 							<label class="form-label col-xs-4 col-sm-2">任务详情：</label>
 							<div class="formControls col-xs-8 col-sm-9">
-								<textarea name="rw_main" id="" cols="30" rows="10" style="width: 850px;height: 250px;">
-									{$data.rw_main}
-								</textarea>
+								<textarea name="rw_main" id="" cols="30" rows="10" style="width: 850px;height: 250px;">{$data.rw_main}</textarea>
 							</div>
 						</div>
-					</div>
-					<div class="layui-tab-item">
-
 						<div class="row cl">
 							<label class="form-label col-xs-4 col-sm-2">任务封面图片：</label>
 							<div class="formControls col-xs-8 col-sm-9">
@@ -79,38 +77,44 @@
 								{/eq}
 							</div>
 						</div>
-							<div class="row cl">
-								<label class="form-label col-xs-4 col-sm-2">任务图片：</label>
 
-								<div class="formControls col-xs-8 col-sm-9" id="rw_img">
-									<a  class='btn btn-primary radius'  onclick='add()' style="" >添加相册</a>
+						<div class="row cl">
+							<label class="form-label col-xs-4 col-sm-2">任务图片：</label>
+							<div class="layui-upload">
+								<button type="button" class="layui-btn" id="lunbo" style="margin-left: 120px">上传图片</button>
+								<div style="width: 1080px;margin: 10px 120px">
+									<blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+										预览图：
+										<div class="layui-upload-list" id="demo2">
+											{if condition="($data.rw_img == '') "}
 
-									{eq name="data.rw_cover" value=""}
-									<div>
-										<input type="file" name="rw_img[]">
-									</div>
-									{else/}
-									{foreach name="$data.rw_img" item="v1"}
-									<img src="{$v1}" alt="" style="width: 145px;height: 110px">
-									{/foreach}
-									{/eq}
+											{else /}
+											{volist name="$data.rw_img" id="img"}
+											<img src="{$img}" alt="" class="product_lunbo" id="{$i}" name="lunbo[]">
+											<i class="layui-icon layui-unselect layui-tab-close img-cur {$i}" onclick="delLun({$i})">ဆ</i>
+											{/volist}
 
-
+											{/if}
+										</div>
+										<input type="hidden" id="lun" name="lunbo" value="{$data['lunbojson']}">
+										<input type="hidden" name="id" value="{$data['id']}">
+										<input type="hidden" id="lunbocount" value="{$data['lunbocount']}">
+									</blockquote>
 								</div>
 							</div>
-					</div>
-					<div class="layui-tab-item">
+						</div>
+
 
 						<div class="row cl">
 							<label class="form-label col-xs-4 col-sm-2">发布时间：</label>
 							<div class="layui-input-inline">
-								<input class="layui-input" placeholder="发布时间" id="LAY_demorange_s" name="create_time" value="{$data.create_time}">
+								<input type="text" class="layui-input" id="create_time" placeholder="yyyy-MM-dd" name="create_time" value="{$data.create_time}">
 							</div>
 						</div>
 						<div class="row cl">
 							<label class="form-label col-xs-4 col-sm-2">开工时间：</label>
 							<div class="layui-input-inline">
-								<input class="layui-input" placeholder="开工时间" id="LAY_demorange_e" name="start_time" value="{$data.start_time}">
+								<input type="text" class="layui-input" id="start_time" placeholder="yyyy-MM-dd" name="start_time" value="{$data.start_time}">
 							</div>
 						</div>
 						<div class="row cl">
@@ -120,31 +124,30 @@
 								<span style="color: red">*支付时间为 秒</span>
 							</div>
 						</div>
-					</div>
-					<div class="layui-tab-item">
+						<div class="row cl">
+							<div class="layui-form-item">
+								<label class="layui-form-label" style="margin-left: 65px">任务地区</label>
 
-						<div class="layui-form-item">
-							<label class="layui-form-label" style="margin-left: 145px">任务地区</label>
-							<div class="layui-input-inline">
-								<select name="rw_provice" id="province" lay-filter="area">
-									<option value="">请选择省</option>
-									{foreach name="$province" item="v1"}
-									<option value="{$v1.provinceID}"  <?php if($v1['province'] == $data['rw_province']){echo "selected=selected";}?>>{$v1.province}</option>
-									{/foreach}
-								</select>
-							</div>
-							<div class="layui-input-inline">
-								<select name="rw_city" id="rw_city">
-									<option value="">请选择市</option>
-									{foreach name="$city" item="v1"}
-									<option value="{$v1.cityID}"  <?php if($v1['city'] == $data['rw_area']){echo "selected=selected";}?>>{$v1.city}</option>
-									{/foreach}
-								</select>
-							</div>
+								<div class="layui-input-inline">
+									<select name="rw_province" id="province" lay-filter="area">
+										<option value="">请选择省</option>
+										{foreach name="$province" item="v1"}
+										<option value="{$v1.provinceID}"  <?php if($v1['province'] == $data['rw_province']){echo "selected=selected";}?>>{$v1.province}</option>
+										{/foreach}
+									</select>
+								</div>
+								<div class="layui-input-inline">
+									<select name="rw_city" id="rw_city">
+										<option value="">请选择市</option>
+										{foreach name="$city" item="v1"}
+										<option value="{$v1.cityID}"  <?php if($v1['city'] == $data['rw_area']){echo "selected=selected";}?>>{$v1.city}</option>
+										{/foreach}
+									</select>
+								</div>
 
+							</div>
 						</div>
 
-						<!--<input type="button" onclick="pro()" value="aaaa">-->
 					</div>
 				</div>
 			</div>
@@ -161,20 +164,81 @@
 	</form>
 </div>
 
-
-{include file="layout/foot"}
+<script type="text/javascript" src="/lib/jquery/1.9.1/jquery.min.js"></script>
 
 <!--请在下方写此页面业务相关的脚本-->
 <script type="text/javascript" src="/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
-<script type="text/javascript" src="/lib/jquery.validation/1.14.0/validate-methods.js"></script>
-<script type="text/javascript" src="/lib/jquery.validation/1.14.0/messages_zh.js"></script>
-<script type="text/javascript" src="/lib/webuploader/0.1.5/webuploader.min.js"></script>
 <script type="text/javascript" src="/lib/ueditor/1.4.3/ueditor.config.js"></script>
 <script type="text/javascript" src="/lib/ueditor/1.4.3/ueditor.all.min.js"> </script>
-<script type="text/javascript" src="/lib/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script>
-<script type="text/javascript" src="/lib/img.js"></script>
-<script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/core.js"></script>
+<!--<script type="text/javascript" src="/lib/layer/2.4/layer.js"></script>-->
+<script type="text/javascript" src="/layui/layui.all.js"></script>
+
 <script type="text/javascript">
+
+    var html ;
+    var id = $('#lunbocount').val();
+    layui.use('upload', function(){
+        var $ = layui.jquery
+            ,upload = layui.upload;
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#suolve'
+            ,url: 'saveImg'
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#demo1').attr('src', result); //图片链接（base64）
+
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败');
+                }
+                //上传成功
+
+                $('#suo').val(res);
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+
+        //多图片上传
+        upload.render({
+            elem: '#lunbo'
+            ,url: '/admin/Charging/saveImg'
+            ,multiple: true
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+
+                });
+            }
+            ,done: function(res){
+                var lun = $('#lun').val();
+                //上传完毕
+//                lun = lun+','+res;
+                id++;
+                $('#demo2').append('<img src="'+ res +'"  class="product_lunbo" id="'+id+'"><i class="layui-icon layui-unselect layui-tab-close img-cur '+id+'" onclick="delLun('+id+')">ဆ</i>')
+                if(lun == ""){
+                    lun = res;
+                }else{
+                    lun = lun+','+res;
+                }
+                $('#lun').val(lun);
+            }
+        });
+    });
+
+
     var ue = UE.getEditor('editor');
     var ue = UE.getEditor('pic');
     function add() {
@@ -184,58 +248,23 @@
 
 
 
-    layui.use("form", function () {
-        var form = layui.form();
-
-        //- 代码写在这里面.
-
-        form.on('select(area)', function(data){
-            console.log(data.value); //得到被选中的值
-			$.post("{:url('Renwu/area')}",{father:data.value},function (obj) {
-                var optionstring = "";
-				$.each(obj,function (i,item) {
-                    optionstring += "<option value=\"" + item.city + "\" id=\"" + item.city + "\">" + item.city + "</option>";
-                });
-                $("#rw_city").html('<option value=""></option>' + optionstring);
-                form.render('select');  //layui 这点很重要  不能缺失
-            });
-        });
-    })
-
-    layui.use('laydate', function(){
-        var laydate = layui.laydate;
-
-        var start = {
-            min: laydate.now()
-            ,max: '2099-06-16 23:59:59'
-            ,istoday: false
-            ,choose: function(datas){
-                end.min = datas; //开始日选好后，重置结束日的最小日期
-                end.start = datas //将结束日的初始值设定为开始日
-            }
-        };
-
-        var end = {
-            min: laydate.now()
-            ,max: '2099-06-16 23:59:59'
-            ,istoday: false
-            ,choose: function(datas){
-                start.max = datas; //结束日选好后，重置开始日的最大日期
-            }
-        };
-
-        document.getElementById('LAY_demorange_s').onclick = function(){
-            start.elem = this;
-            laydate(start);
-        }
-        document.getElementById('LAY_demorange_e').onclick = function(){
-            end.elem = this
-            laydate(end);
-        }
-
-
-    });
-
+//    layui.use("form", function () {
+//        var form = layui.form();
+//
+//        //- 代码写在这里面.
+//
+//        form.on('select(area)', function(data){
+//            console.log(data.value); //得到被选中的值
+//			$.post("{:url('Renwu/area')}",{father:data.value},function (obj) {
+//                var optionstring = "";
+//				$.each(obj,function (i,item) {
+//                    optionstring += "<option value=\"" + item.city + "\" id=\"" + item.city + "\">" + item.city + "</option>";
+//                });
+//                $("#rw_city").html('<option value=""></option>' + optionstring);
+//                form.render('select');  //layui 这点很重要  不能缺失
+//            });
+//        });
+//    })
 
     layui.use('element', function(){
         var $ = layui.jquery
@@ -282,7 +311,122 @@
 
     });
 
+    function check() {
+		var cat = $('#cat option:selected').val();
+		var user = $('#user_phone').val();
+		var city = $('#rw_city option:selected').val();
+		if(cat == 4){
+		    if(user == ""){
+		        layer.msg("请填写用户信息");
+		        return false;
+			}
+		}
 
+		if(city == ""){
+		    layer.msg("请选择任务地区");
+		    return false;
+		}
+    }
+
+    /**
+     *
+     * 删除轮播预览图
+     * @param id
+     */
+    var temp;
+    function delLun(id) {
+        var lun = $('#lun').val();
+        var arr = lun.split(',');
+        $.each(arr,function(index,item) {
+            // index是索引值（即下标）   item是每次遍历得到的值；
+            if (item == $('#'+id).attr('src')) {
+                arr.splice(index, 1);
+            }
+        });
+        temp = arr.join(',');
+        //  将处理对的数据赋给 对应的标签
+        $('#lun').val(temp);
+        console.log(temp);
+        $("#"+id).remove();
+        $("."+id).remove();
+    }
+</script>
+
+
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+
+        //常规用法
+        laydate.render({
+            elem: '#create_time'
+        });
+
+        //国际版
+        laydate.render({
+            elem: '#start_time'
+        });
+
+        //年选择器
+        laydate.render({
+            elem: '#test2'
+            ,type: 'year'
+        });
+    });
+
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,laydate = layui.laydate;
+
+        //日期
+        laydate.render({
+            elem: '#date'
+        });
+        laydate.render({
+            elem: '#date1'
+        });
+
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+        //自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length < 5){
+                    return '标题至少得5个字符啊';
+                }
+            }
+            ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+            ,content: function(value){
+                layedit.sync(editIndex);
+            }
+        });
+
+        //监听指定开关
+        form.on('switch(switchTest)', function(data){
+            layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+                offset: '6px'
+            });
+            layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+        });
+
+        form.on('select(area)', function(data){
+            console.log(data.value); //得到被选中的值
+			$.post("{:url('Renwu/area')}",{father:data.value},function (obj) {
+                var optionstring = "";
+				$.each(obj,function (i,item) {
+                    optionstring += "<option value=\"" + item.city + "\" id=\"" + item.city + "\">" + item.city + "</option>";
+                });
+                $("#rw_city").html('<option value=""></option>' + optionstring);
+                form.render('select');  //layui 这点很重要  不能缺失
+            });
+        });
+
+
+    });
 </script>
 
 

@@ -7,10 +7,12 @@
 			<label class="layui-form-label">轮播图类型</label>
 			<div class="layui-input-block">
 				<input type="radio" name="type" lay-filter="radio" value="0" title="APP" <?php if($data['type']==0){echo "checked";}?>>
+				{if condition="$type eq 1"}
 				<input type="radio" name="type" lay-filter="radio" value="1" title="官网" <?php if($data['type']==1){echo "checked";}?>>
+				{/if}
 			</div>
-			<p class="shop_jy App" style="display: none">建议图片像素:</p>
-			<p class="shop_jy Web" style="display: none">建议图片像素: 550*416</p>
+			<!--<p class="shop_jy App" style="display: none">建议图片像素: 550*416</p>-->
+			<!--<p class="shop_jy Web" style="display: none">建议图片像素: 1920*580</p>-->
 		</div>
 		<div class="layui-form-item">
 			<label class="layui-form-label">轮播图链接</label>
@@ -25,7 +27,8 @@
 			<div class="layui-input-block">
 				<input type="file" name="file" class="layui-upload-file" lay-title="修改图片">
 			</div>
-			<p class="shop_jy">建议图片像素: 1920*864</p>
+			<p class="shop_jy">官网建议图片像素: 1903*532</p>
+			<p class="shop_jy">APP建议图片像素: 550*416</p>
 		</div>
 		<div class="layui-form-item">
 			{eq name="data" value = ""}

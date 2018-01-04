@@ -1,7 +1,9 @@
 <?php
 namespace app\admin\controller;
 
+use app\admin\model\Withdrawals;
 use app\common\model\BookLose;
+use app\model\Bank;
 use think\Db;
 use think\View;
 
@@ -18,47 +20,14 @@ class Tixian extends Base
         return view("tixian/index",$j);
     }
 
+    /**
+     * @return \think\response\Json
+     * author hongwenyang
+     * method description : 获取提现列表数据
+     */
     public function tixian_ajax(){
-        $data = Db::name('Tixian')->select();
-        foreach($data as $k=>$v){
-            $font = "style=\"font-size:14px\"";
-            $data[$k]['user_name']      = Db::name('User')->where(['id'=>$v['user_id']])->value('user_name');
-            $data[$k]['create_time']    = date('Y-m-d H:i:s',$v['create_time']);
-            $data[$k]['end_time']       = date('Y-m-d H:i:s',$v['end_time']);
 
-
-            switch($v['status']){
-                case 0:
-                    $msg = "<span class=\"label label-defaunt radius\" $font>提现中</span>";
-                    break;
-                case 1:
-                    $msg = "<span class=\"label label-success radius\" $font>提现成功</span>";
-                    break;
-                default:
-                    $msg = "<span class=\"label label-defaunt radius\" $font>提现失败</span>";
-            }
-
-            $data[$k]['status'] = $msg;
-
-            switch($v['shenghe']){
-                case 0:
-                    $sh = "<span class=\"label label-defaunt radius\" $font>不通过</span>";
-                    break;
-                case 1:
-                    $sh = "<span class=\"label label-success radius\" $font>通过</span>";
-                    break;
-            }
-
-            $data[$k]['shenghe'] = $sh;
-
-            $id = $v['id'];
-
-            $money = $v['money'];
-            $data[$k]['caozuo'] = "<a style=\"text-decoration:none\" onclick=\"shenghe(this,$id)\">审核</a> | <a onclick='dakuan(this,$id,$money)'>打款</a>";
-
-        }
-
-        return json(['data'=>$data]);
+        return json(['data'=>Withdrawals::getAll()]);
     }
 
 

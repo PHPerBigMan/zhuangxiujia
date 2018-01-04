@@ -2,7 +2,22 @@
 <body>
 <nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 任务管理 <span class="c-gray en">&gt;</span> 任务列表 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
 <div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"> <a class="btn btn-primary radius" data-title="添加任务" data-href="{:url('renwu/add_rw')}" onclick="Hui_admin_tab(this)" href="javascript:;"><i class="Hui-iconfont">&#xe600;</i> 添加任务</a></span>
-
+	<form action="/admin/renwu/index" >
+		<div class="layui-input-inline">
+			<span class="select-box" style="width: 150px;margin-left: 30px">
+				<select name="keyword" class="select">
+					{volist name="cat" id="vo"}
+							<option value="{$vo.id}">{$vo.cat_name}</option>
+					{/volist}
+				</select>
+			</span>
+		</div>
+		<button class="btn btn-success">
+			<i class="Hui-iconfont">&#xe665;</i>
+			筛选
+		</button>
+		<input type="hidden" id="keyword" value="{$keyword}">
+	</form>
 <div class="page-container">
 		<span class="r">共有数据：<strong>{$count}</strong> 条</span> </div>
 	<div class="mt-20">
@@ -43,15 +58,16 @@
     }
 
     $(function () {
+        var keyword = $('#keyword').val();
         $('#Renwu').DataTable({
             "paging": true,
             "lengthChange": true,
             "processing": true,
             "searching": true,
-            "ordering": true,
+            "ordering": false,
             "info": true,
             "autoWidth": false,
-            "ajax": "{:url('Renwu/renwu_ajax')}",
+            "ajax": "{:url('Renwu/renwu_ajax')}?keyword="+keyword,
             "columns": [
                 {"title": "ID", "data": "id"},
                 {"title": "任务标题", "data": "rw_title"},
@@ -59,6 +75,7 @@
                 {"title": "任务定金", "data": "rw_ding"},
                 {"title": "任务封面图", "data": "rw_cover"},
                 {"title": "任务属性", "data": "rw_cat"},
+                {"title": "任务申请者", "data": "bidUser"},
                 {"title": "任务状态", "data": "rw_status"},
                 {"title": "是否热门任务", "data": "rw_hot"},
                 {"title": "是否发布", "data": "is_show"},

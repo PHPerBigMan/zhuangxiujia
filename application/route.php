@@ -45,7 +45,7 @@ Route::rule('notice_read/:id','Web/notice_read','GET');
 Route::rule('youhui_read/:id','Web/youhui_read','GET');
 //首页热门
 Route::rule('hot/:id','Web/hot','GET');
-
+Route::get('/app', 'admin/admin/app');
 return [
     '__pattern__' => [
         'name' => '\w+',

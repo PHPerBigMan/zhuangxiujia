@@ -11,9 +11,9 @@ class Jiancai
      */
 
       public function index(){
-         $data = Db::name('MallCat')->where(['level'=>1])->field('id,cat_name')->select();
+         $data = Db::name('MallCat')->where(['level'=>1])->order('order','asc')->field('id,cat_name')->select();
          foreach ($data as $k=>$v){
-             $data[$k]['child'] = Db::name('MallCat')->where(['p_id'=>$v['id']])->field('id sec_id,cat_name,img')->select();
+             $data[$k]['child'] = Db::name('MallCat')->where(['p_id'=>$v['id']])->order('order','asc')->field('id sec_id,cat_name,img,material')->select();
          }
          $j = $this->return_data($data);
 

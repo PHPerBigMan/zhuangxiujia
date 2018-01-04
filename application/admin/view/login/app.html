@@ -63,12 +63,12 @@
         $.post("{:url('login/login')}",{
             admin_name:admin_name,
             admin_pwd:admin_pwd,
-            type:1
+            type:2
         },function (data) {
             if(data.code == 200){
                 layer.msg(data.msg);
                     setTimeout(function () {
-                        window.location.href= "{:url('index/index')}"
+                        window.location.href= "{:url('index/app')}"
                     }, 1500)
             }else{
                 layer.msg(data.msg)

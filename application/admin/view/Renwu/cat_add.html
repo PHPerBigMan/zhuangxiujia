@@ -3,6 +3,7 @@
 <div class="page-container">
 	<form   class="form form-horizontal layui-form"  id="cat" enctype="multipart/form-data">
 		<input type="hidden" name="f" value="{$f}">
+		<input type="hidden" name="id" value="{$fir['id']}">
 		<div class="row cl">
 			<label class="form-label col-xs-4 col-sm-2">选择属性级别：</label>
 			<div class="formControls col-xs-8 col-sm-9">
@@ -59,10 +60,8 @@
 						<input type="file" name="file" class="layui-upload-file" lay-title="添加分类图片">
 					</div>
 					<div class="layui-form-item">
-						{eq name="fir.cat_img" value = ""}
-						{else/}
-						<img src="{$fir.cat_img}" alt="" style="width: 150px;height: 150px;margin-top: 10px;margin-left: 140px">
-						{/eq}
+						<img src="{$fir.cat_img}" alt="" style="width: 150px;height: 150px;margin-top: 10px;margin-left: 140px" id="cat_img">
+						<input type="hidden" id="cat_img_save" value="{$fir.cat_img}" name="cat_img_save">
 					</div>
 				</div>
 				<div class="row cl">
@@ -93,6 +92,9 @@
                         $.post("{:url('Renwu/cat_save')}",$('#cat').serialize(),function(data){
                             if(data == 200){
                                 layer.msg("操作成功",{icon:1,time:2000});
+                                setTimeout(function () {
+									location.reload();
+                                },2000);
                             }else{
                                 layer.msg("数据暂未修改",{icon:2,time:2000});
                             }
@@ -153,13 +155,16 @@
                     });
 
                     layui.use('upload', function(){
+
                         layui.upload({
-                            url: "{:url('Shop/img')}?type=2" //上传接口
+                            url: "{:url('/admin/Charging/saveImg')}" //上传接口
                             ,success: function(res){ //上传成功后的回调
-								console.log(res);
-                                if(res != ""){
-                                    layer.msg("图片上传成功",{icon:1,time:1000})
-                                }
+                                layer.load(1, {
+                                    shade: [0.1,'#fff'], //0.1透明度的白色背景
+                                    time:3000
+                                });
+                                $('#cat_img').attr('src',res);
+                                $('#cat_img_save').val(res);
                             }
                         });
 

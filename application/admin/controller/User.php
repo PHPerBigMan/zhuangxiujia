@@ -22,7 +22,7 @@ class User extends Base
      */
 
     public function user_info(){
-        $data = Db::name('User')->select();
+        $data = Db::name('User')->order('id','desc')->select();
         foreach($data as $k=>$v){
             $id                         = $v['id'];
             $data[$k]['caozuo']         = "<td class=\"td-manage\"> <a title=\"查看\" href=\"/admin/User/read?id=$id\"  class=\"ml-5\" style=\"text-decoration:none\"><i class=\"Hui-iconfont\">&#xe6df;</i></a> </td>";
@@ -83,7 +83,7 @@ class User extends Base
      */
 
     public function anli_ajax(){
-        $data = Db::name('UserAnli')->field('id,user_id,title,jidian,is_pass,pic,create_time')->select();
+        $data = Db::name('UserAnli')->field('id,user_id,title,jidian,is_pass,pic,create_time')->order('id','desc')->select();
         foreach($data as $k=>$v){
             $data[$k]['create_time'] = date('Y-m-d H:i:s',$v['create_time']);
             $data[$k]['user']        = Db::name('User')->where(['id'=>$v['user_id']])->value('user_name');

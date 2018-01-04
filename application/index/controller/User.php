@@ -1,6 +1,7 @@
 <?php
 namespace app\index\controller;
 
+use app\model\Decorate;
 use app\model\UserRw;
 use think\Db;
 use JPush\Client as JPush;
@@ -37,11 +38,40 @@ class User
      */
     public function OwnerTask(){
         $post = input();
-        Db::table('zjx_log')->insert([
-            'msg'=>'我的任务',
-            'data'=>json_encode($post)
-        ]);
         return json($this->return_data(UserRw::OwnerTask($post)));
+    }
+
+    /**
+     * @return \think\response\Json
+     * author hongwenyang
+     * method description :业主端申请记录
+     */
+    public function OwnerApply(){
+        $post = input();
+        return json($this->return_data(Decorate::getAllData($post)));
+    }
+
+    /**
+     * @return \think\response\Json
+     * author hongwenyang
+     * method description : 申请详情
+     */
+    public function OwnerApplyRead(){
+        $post = input();
+        return json($this->return_data(Decorate::getOneData($post)));
+    }
+
+    /**
+     * @return \think\response\Json
+     * author hongwenyang
+     * method description : 获取用户约
+     */
+    public function getUserBalance(){
+        $post = input();
+
+        $data = \app\model\User::where('id',$post['user_id'])->value('user_money');
+
+        return json($this->return_data($data));
     }
     /**
      * @return \think\response\Json
@@ -54,7 +84,7 @@ class User
         switch ($post['type']){
             // 全部
             case 0:
-                $status = [7,8,9,4];
+                $status = [0,1,2,3,4,5,6,7,8,9,10];
                 break;
             // 投标中
             case 1:
@@ -97,46 +127,47 @@ class User
         $type = input('type');
         switch ($type) {
             case 0:
-                $where = "ur.user_id = $id AND ur.order_status = 0";
+                $where = "user_id = $id AND order_status = 0";
                 break;
             case 1:
-                $where = "ur.user_id = $id AND ur.order_status = 1 OR ur.order_status = 2 OR ur.order_status = 3";
+                $where = "user_id = $id AND order_status = 1 OR order_status = 2 OR order_status = 3";
                 break;
             case 2:
-                $where = "ur.user_id = $id AND ur.order_status = 4 AND ur.order_status != 5 AND ur.order_status != 6";
+                $where = "user_id = $id AND order_status = 4 AND order_status != 5 AND order_status != 6";
                 break;
             case 5:
-                $where = "ur.user_id = $id";
+                $where = "user_id = $id";
                 break;
             case 7:
-                $where = "ur.user_id = $id AND ur.order_status = 7";
+                $where = "user_id = $id AND order_status = 7";
         }
-        $data = Db::name('UserRw')->alias('ur')->join('renwu rw','rw.id = ur.rw_id')->where('rw.type',1)->where($where)->select();
+        $data = Db::name('UserRw')->where($where)->where('order_type','1')->select();
+
 
         foreach ($data as $k => $v) {
             $data[$k]['create_time'] = date('Y/m/d', $v['create_time']);
             $rewu = Db::name('Renwu')->where(['id' => $v['rw_id']])->find();
+//            dump(time() - $v['create_time']."time");
+//            dump($rewu['pay_limit_time']);
             if (($type == 0) || ($type == 5 && $v['order_status'] == 0)) {
                 if ((time() - $v['create_time']) > $rewu['pay_limit_time']) {
+                    $data[$k]['pay_limit_time'] = 1;
                     //如果时间超时更高状态为超时
-                    Db::name('UserRw')->where(['orderId' => $v['orderId']])->update(['order_status' => 5]);
-                    Db::name('Renwu')->where(['id' => $v['id']])->update(['rw_status' => 2]);
+//                    Db::name('UserRw')->where(['orderId' => $v['orderId']])->update(['order_status' => 5]);
+//                    Db::name('Renwu')->where(['id' => $v['id']])->update(['rw_status' => 2]);
                 } else {
 //                    $data[$k]['pay_limit_time']     = ($rewu['pay_limit_time']-(time()-$rewu['pay_limit_time'])) / 60;
 
-                    $time = ($rewu['pay_limit_time'] - (time() - $v['create_time'])) / 60;
+                    $time = $rewu['pay_limit_time'] - (time() - $v['create_time']);
 
-                    $data[$k]['pay_limit_time'] = (int)substr($time, 0, 4);
+                    $data[$k]['pay_limit_time'] = date('s',$time) * 1000;
                 }
             }
-
             $data[$k]['img']                = $rewu['rw_cover'];
             $data[$k]['rw_title']           = $rewu['rw_title'];
             $data[$k]['rw_yj']              = $rewu['rw_yj'];
             $data[$k]['rw_ding']            = $rewu['rw_ding'];
             $data[$k]['order_status']       = Db::name('UserRw')->where(['orderId'=>$v['orderId']])->value('order_status');
-
-
             switch ($data[$k]['order_status']){
                 case 0:
                     $msg = "待付款";
@@ -175,7 +206,7 @@ class User
             }
             $data[$k]['status_msg'] = $msg;
         }
-
+//        dump($data);die;
         $j = $this->return_data($data);
         return json($j);
     }
@@ -201,14 +232,14 @@ class User
                 $msg = "定金支付剩余时间";
                 if ((time() - $data['create_time']) > $rw['pay_limit_time']) {
                     //如果时间超时更高状态为超时
-                    Db::name('UserRw')->where(['orderId' => $data['orderId']])->update(['order_status' => 5]);
-                    Db::name('Renwu')->where(['id' => $data['id']])->update(['rw_status' => 2]);
+                    Db::name('UserRw')->where(['orderId' => $data['orderId']])->update(['order_status' => 10]);
+//                    Db::name('Renwu')->where(['id' => $data['id']])->update(['rw_status' => 2]);
                 } else {
 //                    $data[$k]['pay_limit_time']     = ($rewu['pay_limit_time']-(time()-$rewu['pay_limit_time'])) / 60;
 
-                    $time = ($rw['pay_limit_time'] - (time() - $data['create_time'])) / 60;
+                    $time = $rw['pay_limit_time'] - (time() - $data['create_time']);
 
-                    $data['pay_limit_time'] = (int)substr($time, 0, 4);
+                    $data['pay_limit_time'] = date('s',$time) * 1000;
                 }
                 break;
             case 1:
@@ -272,8 +303,14 @@ class User
                 $o_status = 6;
                 break;
         }
-        if($type == 1){
 
+        // 取消订单 任务释放
+        $TaskId = UserRw::where('orderId',$orderId)->value('rw_id');
+        \app\model\Renwu::where('id',$TaskId)->update([
+            'order_status'=>2
+        ]);
+
+        if($type == 1){
             //取消任务
             $s = Db::name('UserRw')->where(['orderId'=>$orderId])->update(['order_status'=>$o_status]);
         }else{
@@ -441,8 +478,22 @@ class User
         $data['room_time']  = input('room_time');
         $data['phone']      = input('phone');
         $data['remark']     = input('remark');
-        $data['create_time']= time();
-        $s = Db::name('Zx')->insert($data);
+
+        $files = request()->file('imgs');
+        if($files) {
+            foreach ($files as $k => $file) {
+                // 移动到框架应用根目录/public/uploads/ 目录下
+                $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
+                if ($info) {
+                    $img[$k] = '/uploads/' . $info->getSaveName();
+                }
+            }
+
+            $data['imgs'] = json_encode($img);
+        }
+
+
+        $s = Decorate::create($data);
         if($s){
             $msg['code'] = 200;
             $msg['msg']  = "保存成功";

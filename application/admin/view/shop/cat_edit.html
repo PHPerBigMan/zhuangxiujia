@@ -17,7 +17,13 @@
 				<input type="text" name="cat_name"  lay-title="分类名称" value="{$data.cat_name}" class="layui-input">
 			</div>
 		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">分类排序</label>
 
+			<div class="layui-input-block">
+				<input type="text" name="order"  lay-title="分类排序" value="{$data.order}" class="layui-input">
+			</div>
+		</div>
 		{if condition="$data['level'] == 2 OR $data['level']==''" }
 		<div class="layui-form-item first_cat">
 			<label class="layui-form-label">一级分类</label>
@@ -30,7 +36,13 @@
 				</select>
 			</div>
 		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">材质</label>
 
+			<div class="layui-input-block">
+				<input type="text" name="material"  lay-title="material" value="{$data.material}" class="layui-input">
+			</div>
+		</div>
 		<div class="row cl first_cat">
 			<div class="layui-form-item">
 				<label class="layui-form-label">分类图片</label>

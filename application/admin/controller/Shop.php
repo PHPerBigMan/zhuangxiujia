@@ -1,6 +1,7 @@
 <?php
 namespace app\admin\controller;
 
+use app\admin\model\Product;
 use app\common\model\BookLose;
 use think\Db;
 
@@ -69,45 +70,23 @@ class Shop extends Base
      */
 
     public function save(){
-        $id                 = input('id');
-        $data['pro_name']   = input('pro_name');
-        $data['pro_price']  = input('pro_price');
-        $data['pro_cat']    = input('pro_cat');
-        $data['pro_url']    = input('pro_url');
-        $pro_img = "";
-        $suolve = "";
-        $longimg = "";
-        $img_get    = input('product_save_img');
+        $data                 = input('post.');
+//        $data['pro_name']   = input('pro_name');
+//        $data['pro_price']  = input('pro_price');
+//        $data['pro_cat']    = input('pro_cat');
+//        $data['pro_url']    = input('pro_url');
+//        $pro_img = "";
+//        $suolve = "";
+//        $longimg = "";
+//        $img_get    = input('product_save_img');
         //处理前端获取的图片
-        if(!empty($img_get)){
-            $img = explode(',',$img_get);
-            $pro_img    = $img[0];
-            $suolve     = $img[1];
-            $longimg   = $img[2];
-        }
-        if($id ==0){
-//            $data['create_time']        = time();
-            $data['is_show']            = 0;
-            $s = Db::name('Product')->insert($data);
-        }else{
-
-            $s = Db::name('Product')->where(['id'=>$id])->update([
-                'pro_name'=>$data['pro_name'],
-                'pro_price'=>$data['pro_price'],
-                'pro_cat'=>$data['pro_cat'],
-                'pro_url'=>$data['pro_url'],
-                'pro_img'=>$pro_img,
-                'suolve'=>$suolve,
-                'longimg'=>$longimg,
-            ]);
-
-        }
-        if($s){
-            $code = 200;
-        }else{
-            $code = 404;
-        }
-        return json($code);
+//        if(!empty($img_get)){
+//            $img = explode(',',$img_get);
+//            $pro_img    = $img[0];
+//            $suolve     = $img[1];
+//            $longimg   = $img[2];
+//        }
+        return Product::saveProduct($data);
     }
 
     /**

@@ -31,6 +31,17 @@
 		</div>
 
 		<div class="layui-form-item">
+			<label class="layui-form-label">订单类型</label>
+			<div class="layui-input-block" style="padding-top: 10px">
+				{if condition="$data.order_type eq 1"}
+				    装修任务
+				{else/}
+					设计任务
+				{/if}
+			</div>
+		</div>
+
+		<div class="layui-form-item">
 			<label class="layui-form-label">任务定金</label>
 			<div class="layui-input-block" style="padding-top: 10px">
 				<input type="text" name="rw_ding" lay-verify="required"  autocomplete="off" class="layui-input" value="{$data.rw_ding}">
@@ -70,6 +81,23 @@
 			</div>
 		</div>
 
+		{if condition="$userData neq ''"}
+			<div class="layui-form-item">
+				<label class="layui-form-label">投标用户</label>
+				<div class="layui-input-block" style="padding-top: 10px">
+					{$userData}
+				</div>
+			</div>
+		{/if}
+
+		{if condition = "$GetTaskUser neq ''"}
+			<div class="layui-form-item">
+				<label class="layui-form-label">业主选择中设计师</label>
+				<div class="layui-input-block" style="padding-top: 10px">
+					{$GetTaskUser}
+				</div>
+			</div>
+		{/if}
 		<input type="hidden" value="{$data.id}" name="id">
 	</form>
 	{eq name="data.order_status" value="2"}

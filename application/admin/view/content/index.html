@@ -1,0 +1,41 @@
+{include file="layout/head"}
+<link href="//vjs.zencdn.net/4.10/video-js.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/4.10/video.js"></script>
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 右侧悬浮框 <span class="c-gray en">&gt;</span> 右侧悬浮框 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<!--<div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"> <a href="{:url('banner/addupdate')}"class="btn btn-primary radius" data-title="添加图片" ><i class="Hui-iconfont">&#xe600;</i> 添加图片</a></span>-->
+
+    <div class="page-container">
+        <div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"> </span>
+
+            <div class="mt-20">
+                <table id="table_id_example" class="display table table-border table-bordered table-bg table-hover table-sort">
+                    <tr>
+                        <td>ID</td>
+                        <td>标题</td>
+                        <td>联系电话</td>
+                        <td>二维码</td>
+                        <td>操作</td>
+                    </tr>
+                    <tr>
+                        <td>{$data.id}</td>
+                        <td>{$data.title}</td>
+                        <td>
+                           {$data.phone}
+                        </td>
+                        <td><img src="{$data.qrcode}" alt=""></td>
+                        <td>
+                            <a title='编辑' href="{:url('content/update',['id'=>$data.id])}"><i class='Hui-iconfont' >&#xe6df;</i></a>
+                            <!--<a style='text-decoration:none' class='ml-5' onclick="del({$data.id})" title='删除'><i class='Hui-iconfont'>&#xe6e2;</i></a>-->
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+        {include file="layout/foot"}
+</body>
+<script>
+    videojs.options.flash.swf = "video-js.swf";
+</script>
+</html>

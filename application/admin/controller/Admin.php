@@ -16,6 +16,15 @@ class Admin extends Base
         return view("admin/index", $j);
     }
 
+    public function app(){
+        $data = Db::name('Admin')->find();
+        $j = [
+            'data'=>$data,
+            'title' => "登录管理",
+        ];
+        return view("admin/index", $j);
+    }
+
 
     public function edit(){
         $id = input('id');

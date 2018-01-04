@@ -27,22 +27,32 @@ function returnStatus($s){
 }
 
 function makeImg(){
-    $file = request()->file('file');
+//    $file = request()->file('file');
+//
+//    $img = Image::make($file);
+//    $size = $img->filesize();
+//    $limit = 100000; // 100kb以上压缩
+//    if ($size > $limit) {
+//        $rate = $limit / $size * 75;
+//        $img->encode('jpg', $rate);
+//    }
+//    $path = date('Ymd') . '/' . md5(time() . rand(0, 999999)) . '.jpg';
+//    $savePath = ROOT_PATH . 'public/uploads/' . $path;
+//    if(!is_dir(ROOT_PATH . 'public/uploads/' .date('Ymd') )){
+//        mkdir(ROOT_PATH . 'public/uploads/' .date('Ymd'),0777,true);
+//    }
+//    $img->save($savePath);
+//    return '/uploads/' . $path;
 
-    $img = Image::make($file);
-    $size = $img->filesize();
-    $limit = 100000; // 100kb以上压缩
-    if ($size > $limit) {
-        $rate = $limit / $size * 75;
-        $img->encode('jpg', $rate);
+    $file = request()->file('file');
+    if($file){
+        $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
+        if($info){
+            // 输出 20160820/42a79759f284b767dfcb2a0197904287.jpg
+            $filename = '/uploads/'.$info->getSaveName();
+        }
     }
-    $path = date('Ymd') . '/' . md5(time() . rand(0, 999999)) . '.jpg';
-    $savePath = ROOT_PATH . 'public/uploads/' . $path;
-    if(!is_dir(ROOT_PATH . 'public/uploads/' .date('Ymd') )){
-        mkdir(ROOT_PATH . 'public/uploads/' .date('Ymd'),0777,true);
-    }
-    $img->save($savePath);
-    return '/uploads/' . $path;
+    return $filename;
 }
 
 
@@ -104,6 +114,27 @@ function return_data($data){
     }
     $j = [
         'status'=>200,
+        'msg'   =>$msg,
+        'data'=>$data
+    ];
+    return $j;
+}
+
+/**
+ * @param $data
+ * @return array
+ * author hongwenyang
+ * method description : 返回所有数据
+ */
+function return_data_bank($data){
+    if(empty($data)){
+        $data = array();
+        $msg = '数据为空';
+    }else{
+        $msg = '获取数据成功';
+    }
+    $j = [
+        'code'=>200,
         'msg'   =>$msg,
         'data'=>$data
     ];

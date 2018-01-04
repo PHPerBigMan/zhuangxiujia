@@ -44,38 +44,66 @@
 					</div>
 
 
-
 					<div class="layui-tab-item">
-						<span style="margin-left: 300px;color: red">* 图片展示方式时请上传3张以上图片</span>
-						<p style="margin-left: 300px;color: red">* 【施工详情】:486*373</p>
-						<p style="margin-left: 300px;color: red">* 【施工规范/施工培训】: 730*346</p>
+
 						<div class="row cl">
-							<label class="form-label col-xs-4 col-sm-2">资料图片：</label>
-							<div class="formControls col-xs-8 col-sm-9" id="rw_img">
-								<a  class='btn btn-primary radius'  onclick='add()' style="" >添加相册</a>
+							<label class="form-label col-xs-4 col-sm-2">文章图片：</label>
+							<span style="margin-left: 106.5px;color: red">* 图片展示方式时请上传3张以上图片</span>
+							<p style="margin-left: 300px;color: red">* 【施工详情】:486*373</p>
+							<p style="margin-left: 300px;color: red">* 【施工规范/施工培训】: 730*346</p>
+							<div class="layui-upload">
+								<button type="button" class="layui-btn" id="lunbo" style="margin-left: 120px">上传图片</button>
+								<div style="width: 1080px;margin: 10px 120px">
+									<blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+										预览图：
+										<div class="layui-upload-list" id="demo2">
+											{if condition="($data['zl_pic'] == '') "}
 
-								{eq name="data.zl_pic" value=""}
-								<div>
-									<input type="file" name="zl_pic[]" style='margin-top: 15px'>
+											{else /}
+											{volist name="$data['zl_pic']" id="img"}
+											<img src="{$img}" alt="" class="product_lunbo" id="{$i}" name="lunbo[]">
+											<i class="layui-icon layui-unselect layui-tab-close img-cur {$i}" onclick="delLun({$i})">ဆ</i>
+											{/volist}
+
+											{/if}
+										</div>
+										<input type="hidden" id="lun" name="lunbo" value="{$data['lunbojson']}">
+										<input type="hidden" name="id" value="{$data['id']}">
+										<input type="hidden" id="lunbocount" value="{$data['lunbocount']}">
+									</blockquote>
 								</div>
-								{else/}
-								{foreach name="$data.zl_pic" item="v1"}
-								<img src="{$v1}" alt="" style="width: 145px;height: 110px">
-								{/foreach}
-								{/eq}
 							</div>
-
 						</div>
-
 					</div>
+					<!--<div class="layui-tab-item">-->
+						<!--<span style="margin-left: 300px;color: red">* 图片展示方式时请上传3张以上图片</span>-->
+						<!--<p style="margin-left: 300px;color: red">* 【施工详情】:486*373</p>-->
+						<!--<p style="margin-left: 300px;color: red">* 【施工规范/施工培训】: 730*346</p>-->
+						<!--<div class="row cl">-->
+							<!--<label class="form-label col-xs-4 col-sm-2">资料图片：</label>-->
+							<!--<div class="formControls col-xs-8 col-sm-9" id="rw_img">-->
+								<!--<a  class='btn btn-primary radius'  onclick='add()' style="" >添加相册</a>-->
+
+								<!--{eq name="data.zl_pic" value=""}-->
+								<!--<div>-->
+									<!--<input type="file" name="zl_pic[]" style='margin-top: 15px'>-->
+								<!--</div>-->
+								<!--{else/}-->
+								<!--{foreach name="$data.zl_pic" item="v1"}-->
+								<!--<img src="{$v1}" alt="" style="width: 145px;height: 110px">-->
+								<!--{/foreach}-->
+								<!--{/eq}-->
+							<!--</div>-->
+
+						<!--</div>-->
+
+					<!--</div>-->
 
 
 					<div class="layui-tab-item">
 						<div class="row cl">
 							<label class="form-label col-xs-4 col-sm-2">资料详情：</label>
-							<script id="editor" type="text/plain"  name="content" class="zl_fwb">
-								{$data.content}
-							</script>
+							<script id="editor" type="text/plain"  name="content" class="zl_fwb">{$data.content}</script>
 						</div>
 					</div>
 				</div>
@@ -97,21 +125,82 @@
 <script type="text/javascript" src="/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
 <script type="text/javascript" src="/lib/jquery.validation/1.14.0/validate-methods.js"></script>
 <script type="text/javascript" src="/lib/jquery.validation/1.14.0/messages_zh.js"></script>
-<script type="text/javascript" src="/lib/webuploader/0.1.5/webuploader.min.js"></script>
 <script type="text/javascript" src="/lib/ueditor/1.4.3/ueditor.config.js"></script>
 <script type="text/javascript" src="/lib/ueditor/1.4.3/ueditor.all.min.js"> </script>
 <script type="text/javascript" src="/lib/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script>
-<script type="text/javascript" src="/lib/img.js"></script>
-<script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/core.js"></script>
+<script type="text/javascript" src="/layui/layui.all.js"></script>
 <script type="text/javascript">
+
+    var html ;
+    var id = $('#lunbocount').val();
+    layui.use('upload', function(){
+        var $ = layui.jquery
+            ,upload = layui.upload;
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#suolve'
+            ,url: 'saveImg'
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#demo1').attr('src', result); //图片链接（base64）
+
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败');
+                }
+                //上传成功
+
+                $('#suo').val(res);
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+
+        //多图片上传
+        upload.render({
+            elem: '#lunbo'
+            ,url: '/admin/Charging/saveImg'
+            ,multiple: true
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+
+                });
+            }
+            ,done: function(res){
+                var lun = $('#lun').val();
+                //上传完毕
+//                lun = lun+','+res;
+                id++;
+                $('#demo2').append('<img src="'+ res +'"  class="product_lunbo" id="'+id+'"><i class="layui-icon layui-unselect layui-tab-close img-cur '+id+'" onclick="delLun('+id+')">ဆ</i>')
+                if(lun == ""){
+                    lun = res;
+                }else{
+                    lun = lun+','+res;
+                }
+                $('#lun').val(lun);
+            }
+        });
+    });
+
+
     var ue = UE.getEditor('editor');
     var ue = UE.getEditor('pic');
     function add() {
         var img= "<div><input type='file' name='zl_pic[]' style='margin-top: 15px'></div>";
         $('#rw_img').append(img)
     }
-
-
 
     layui.use("form", function () {
         var form = layui.form();
@@ -210,6 +299,29 @@
 
 
     });
+
+    /**
+     *
+     * 删除轮播预览图
+     * @param id
+     */
+    var temp;
+    function delLun(id) {
+        var lun = $('#lun').val();
+        var arr = lun.split(',');
+        $.each(arr,function(index,item) {
+            // index是索引值（即下标）   item是每次遍历得到的值；
+            if (item == $('#'+id).attr('src')) {
+                arr.splice(index, 1);
+            }
+        });
+        temp = arr.join(',');
+        //  将处理对的数据赋给 对应的标签
+        $('#lun').val(temp);
+        console.log(temp);
+        $("#"+id).remove();
+        $("."+id).remove();
+    }
 
 
 </script>

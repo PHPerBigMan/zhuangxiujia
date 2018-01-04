@@ -37,7 +37,7 @@
 				<ul>
 					<li><a data-href="{:url('User/index')}" data-title="用户列表" href="javascript:void(0)">用户列表</a></li>
 					<li><a data-href="{:url('User/anli_list')}" data-title="用户案例" href="javascript:void(0)">用户案例</a></li>
-					<li><a data-href="{:url('User/cat')}" data-title="案例分类" href="javascript:void(0)">案例分类</a></li>
+					<!--<li><a data-href="{:url('User/cat')}" data-title="案例分类" href="javascript:void(0)">案例分类</a></li>-->
 			</ul>
 		</dd>
 	</dl>
@@ -46,7 +46,7 @@
 			<dd>
 				<ul>
 					<li><a data-href="{:url('Renwu/index')}" data-title="任务管理" href="javascript:void(0)">任务列表</a></li>
-					<li><a data-href="{:url('Renwu/cat')}" data-title="任务属性" href="javascript:void(0)">任务属性</a></li>
+					<li><a data-href="{:url('Renwu/cat')}" data-title="任务分类" href="javascript:void(0)">任务分类</a></li>
 			</ul>
 		</dd>
 	</dl>
@@ -59,22 +59,22 @@
 		</dd>
 	</dl>
 		<dl id="menu-admin">
-			<dt><i class="Hui-iconfont">&#xe616;</i> 审核管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+			<dt><i class="Hui-iconfont">&#xe616;</i> 订单管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
 			<dd>
 				<ul>
-					<li><a data-href="{:url('Order/index')}" data-title="订单列表" href="javascript:void(0)">任务审核
+					<li><a data-href="{:url('Order/index')}" data-title="订单列表" href="javascript:void(0)">订单列表
 					</a></li>
 			</ul>
 		</dd>
 	</dl>
-		<dl id="menu-tongji">
-			<dt><i class="Hui-iconfont">&#xe61a;</i> 装修信息管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
-			<dd>
-				<ul>
-					<li><a data-href="{:url('Room/index')}" data-title="装修信息列表" href="javascript:void(0)">装修信息列表</a></li>
-				</ul>
-			</dd>
-		</dl>
+		<!--<dl id="menu-tongji">-->
+			<!--<dt><i class="Hui-iconfont">&#xe61a;</i> 装修信息管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>-->
+			<!--<dd>-->
+				<!--<ul>-->
+					<!--<li><a data-href="{:url('Room/index')}" data-title="装修信息列表" href="javascript:void(0)">装修信息列表</a></li>-->
+				<!--</ul>-->
+			<!--</dd>-->
+		<!--</dl>-->
 		<dl id="menu-system">
 			<dt><i class="Hui-iconfont">&#xe620;</i> 商品管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
 			<dd>
@@ -112,23 +112,31 @@
 			<!--</dd>-->
 		<!--</dl>-->
 		<dl id="menu-system">
-			<dt><i class="Hui-iconfont">&#xe603;</i> 资料<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+			<dt><i class="Hui-iconfont">&#xe603;</i> 文章管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
 			<dd>
 				<ul>
-
-					<li><a data-href="{:url('Faxian/index')}" data-title="资料分类" href="javascript:void(0)">资料分类</a></li>
+					<li><a data-href="{:url('Faxian/Zlist')}" data-title="资料列表" href="javascript:void(0)">文章列表</a></li>
+					<li><a data-href="{:url('Faxian/index')}" data-title="资料分类" href="javascript:void(0)">文章分类</a></li>
 				</ul>
 			</dd>
 		</dl>
 		<dl id="menu-system-free">
-			<dt><i class="Hui-iconfont">&#xe624;</i> 免费申请<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+			<dt><i class="Hui-iconfont">&#xe624;</i> 我要装修<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
 			<dd>
 				<ul>
 					<!--<li><a data-href="{:url('Apply/Icat')}" data-title="首页申请类型" href="javascript:void(0)">首页申请类型</a></li>-->
 					<!--<li><a data-href="{:url('Apply/Mcat')}" data-title="我要装修 申请类型" href="javascript:void(0)">我要装修 申请类型</a></li>-->
 					<!--<li><a data-href="{:url('Apply/Icat_list')}" data-title="免费申请列表" href="javascript:void(0)">免费申请列表</a></li>-->
-					<li><a data-href="{:url('Apply/Mcat_list')}" data-title="我要装修申请列表" href="javascript:void(0)">我要装修申请列表</a></li>
+					<li><a data-href="{:url('Apply/Mcat_list')}" data-title="申请列表" href="javascript:void(0)">申请列表</a></li>
 					<!--<li><a data-href="{:url('Apply/degree')}" data-title="免费申请次数" href="javascript:void(0)">免费申请次数</a></li>-->
+				</ul>
+			</dd>
+		</dl>
+		<dl id="menu-system-free">
+			<dt><i class="Hui-iconfont">&#xe624;</i> 轮播图管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+			<dd>
+				<ul>
+					<li><a data-href="{:url('Intro/AppBanner')}" data-title="轮播图管理" href="javascript:void(0)">轮播图管理</a></li>
 				</ul>
 			</dd>
 		</dl>

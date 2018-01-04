@@ -185,8 +185,19 @@ class UserRw extends Model{
             $data[$k]['rw_ding'] = $v['rw_ding'];
             // 任务封面
             $data[$k]['rw_cover'] = $v['rw_cover'];
+            // 任务状态
+            if(in_array($v['order_status'],[0,7])){
+                $data[$k]['status_msg'] = "投标中";
+            }else if(in_array($v['order_status'],[8])){
+                $data[$k]['status_msg'] = "已中标";
+            }else if(in_array($v['order_status'],[9])){
+                $data[$k]['status_msg'] = "未中标";
+            }else if(in_array($v['order_status'],[4])){
+                $data[$k]['status_msg'] = "已完成";
+            }else if(in_array($v['order_status'],[5])){
+                $data[$k]['status_msg'] = "确认中";
+            }
         }
-
         return $data;
     }
 

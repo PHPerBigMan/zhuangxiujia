@@ -13,6 +13,11 @@ class Login extends Controller
        return view();
     }
 
+    public function app()
+    {
+        return view();
+    }
+
     /**
      * 后台管理员登录
      */
@@ -33,7 +38,12 @@ class Login extends Controller
            } else{
                $code = 200;
                $msg  = "登录成功";
-               session('admin',$admin_check['id']);
+
+               if(input('type') == 1){
+                   session('admin',$admin_check['id']);
+               }else{
+                   session('app_admin',$admin_check['id']);
+               }
            }
         }
 
@@ -53,6 +63,7 @@ class Login extends Controller
     public function logout()
     {
         session('admin',null);
+        session('app_admin',null);
         $msg = "退出成功";
         return json($msg);
     }

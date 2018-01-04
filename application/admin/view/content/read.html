@@ -1,0 +1,80 @@
+{include file="layout/head"}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 右侧悬浮框 <span class="c-gray en">&gt;</span> 编辑 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<!--<div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"> <a href="{:url('banner/addupdate')}"class="btn btn-primary radius" data-title="添加图片" ><i class="Hui-iconfont">&#xe600;</i> 添加图片</a></span>-->
+
+    <div class="page-container">
+        <form id="about">
+            <div class="layui-form-item">
+                <label class="layui-form-label">标题</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" placeholder="" class="layui-input" value="{$data.title}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">联系方式</label>
+                <div class="layui-input-block">
+                    <input type="text" name="phone" placeholder="请输入联系方式" class="layui-input" value="{$data.phone}">
+                </div>
+            </div>
+            <div class="layui-upload">
+                <label>上传二维码:</label>
+                <button type="button" class="layui-btn content-btn" id="test1">上传图片</button>
+                <div class="layui-upload-list" style="margin-left: 20px">
+                    <img class="layui-upload-img product_lunbo content-img" id="demo1" src="{$data.qrcode}">
+                    <input type="hidden" name="qrcode" value="{$data.qrcode}" id="qrcode">
+                </div>
+            </div>
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <input type="hidden" name="id" value="{$data.id}">
+                <p  class="btn btn-primary radius" id="submit"><i class="Hui-iconfont">&#xe632;</i> 保存</p>
+            </div>
+        </form>
+
+</body>
+
+<script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="/layui/layui.all.js"></script>
+
+<script>
+    layui.use('upload', function(){
+        var $ = layui.jquery
+            ,upload = layui.upload;
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#test1'
+            ,url: '/admin/content/saveImg'
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#demo1').attr('src', result); //图片链接（base64）
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败');
+                }
+                //上传成功
+                $('#qrcode').val(res);
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+
+    });
+    
+    $('#submit').click(function () {
+        $.post('/admin/content/save',$('#about').serialize(),function (obj) {
+            layer.msg(obj.msg);
+        })
+    });
+</script>
+</html>

@@ -1,22 +1,233 @@
 <?php
 namespace app\index\controller;
 
+use app\model\MoneyList;
 use app\model\UserRw;
 use app\model\Renwu;
 use EasyWeChat\Foundation\Application;
 use EasyWeChat\Payment\Order;
 use think\Db;
+use think\Exception;
 
 class Wechat
 {
-    // 用于业主 支付佣金
+    protected function options(){ //选项设置
+        return [
+            // 前面的appid什么的也得保留哦
+            'app_id' => 'wx5d1c29da542f85de', //你的APPID
+            'secret'  => 'a83afcea6f2146990b82ce67231911e5',     // AppSecret
+            'payment' => [
+                'merchant_id'        => '1493980822',
+                'notify_url'         => 'http://zxj.hwy.sunday.so/index/Wechat/paySuccess',
+                // 微信商户号中的 key
+                'key'                => 'D0A3272AA1A26C14D418859B60C80B5C'
+            ],
+        ];
+    }
+
+    /**
+     * @return \think\response\Json
+     * author hongwenyang
+     * method description : 投标前判断是否满足投标条件
+     */
+    public function checkIsBid(){
+        $post = input();
+        // 查看用户是否可以投标
+        $isBid = UserRw::where(['user_id'=>$post['user_id'],'rw_id'=>$post['id']])->find();
+
+        if($isBid){
+            return json(['code'=>404,'msg'=>'已投标']);
+        }else{
+            return json(['code'=>200,'msg'=>'可投标']);
+        }
+    }
+
+    //
     public function OwnerPay(){
         $orderData = input();
         $options = config('options');
         $app = new Application($options);
         $payment = $app->payment;
-        $out_trade_no  = 'wx'.$orderData['orderId'].rand(1000,9999);
-        $taskId     = UserRw::where('orderId',$orderData['orderId'])->value('rw_id');
+
+        if($orderData['payType'] == 1){
+            // 对已生成的订单进行付费
+            $taskId     = UserRw::where('orderId',$orderData['orderId'])->value('rw_id');
+            $user_id = UserRw::where('orderId',$orderData['orderId'])->value('user_id');
+            $out_trade_no  = 'wx'.$orderData['orderId'].rand(1000,9999).'-'.$orderData['payType'].'-'.$user_id.'-'.$taskId;
+        }else{
+            // 投标先付费再生成订单
+            $taskId = $orderData['id'];
+            $user_id = $orderData['user_id'];
+            $out_trade_no  = 'wx'.time().rand(1000,9999).'-'.$orderData['payType'].'-'.$user_id.'-'.$taskId;
+
+
+        }
+        $detail     = Renwu::where('id',$taskId)->value('rw_title');
+        Db::name('log')->insert([
+            'msg'=>'获取数据',
+            'data'=>json_encode($orderData)
+        ]);
+        $attributes = [
+            'trade_type'       => 'APP', // JSAPI，NATIVE，APP...
+            'body'             => '支付押金',
+            'detail'           => $detail,
+            'out_trade_no'     => $out_trade_no,
+            'total_fee'        => $orderData['rw_yj']*100, // 单位：分
+            'attach'           => $orderData['payType'].'-'.$user_id.'-'.$taskId  //
+        ];
+
+        $order = new Order($attributes);
+        $result = $payment->prepare($order);
+
+        if ($result->return_code == 'SUCCESS' && $result->result_code == 'SUCCESS'){
+            if($orderData['payType'] == 1){
+                $out_trade_no = explode('-',$out_trade_no);
+                UserRw::where('orderId',$orderData['orderId'])->update([
+                    'out_trade_no'=>$out_trade_no[0]
+                ]);
+            }
+            $prepayId = $result->prepay_id;
+            $config = $payment->configForAppPayment($prepayId);
+
+            return json($this->return_data($config));
+        }
+    }
+
+    public function return_data($data){
+        if(empty($data)){
+            $data = array();
+            $msg = '数据为空';
+        }else{
+            $msg = '获取数据成功';
+        }
+        $j = [
+            'status'=>200,
+            'msg'   =>$msg,
+            'data'=>$data
+        ];
+        return $j;
+    }
+
+    /**
+     * 支付成功回调
+     */
+    public function paySuccess(){
+        $options = config('options');
+        $app = new Application($options);
+        $response = $app->payment->handleNotify(function($notify, $successful){
+            Db::name('log')->insert([
+                'msg'=>'投标接单',
+                'data'=>$notify
+            ]);
+
+            // 使用通知里的 "微信支付订单号" 或者 "商户订单号" 去自己的数据库找到订单
+            $attach = explode('-',$notify->out_trade_no);
+            $order = UserRw::where('out_trade_no',$attach[0])->find();
+            if($attach[1] == 1){
+                if (count($order) == 0) { // 如果订单不存在  装修
+                    die('Order not exist.'); // 告诉微信，我已经处理完了，订单没找到，别再通知我了
+                }
+            }else{
+                if (count($order) != 0) { // 如果订单存在  投标
+                    die('Order not exist.'); // 告诉微信，我已经处理完了，订单没找到，别再通知我了
+                }
+            }
+//            Db::name('log')->insert([
+//                'msg'=>'支付是否成功',
+//                'data'=>$successful
+//            ]);
+//            Db::name('log')->insert([
+//                'msg'=>'支付是否成功1',
+//                'data'=>json_encode($attach)
+//            ]);
+            // 用户是否支付成功
+            if ($successful) {
+                try{
+//                    Db::name('log')->insert([
+//                        'msg'=>'支付成功',
+//                        'data'=> $attach[1]
+//                    ]);
+                    if($attach[1] == 1){
+                        // 对已有的订单进行修改
+                        // 不是已经支付状态则修改为已经支付状态
+
+                        Db::name('log')->insert([
+                            'msg'=>'进来了1--任务id',
+                            'data'=> $attach[3]
+                        ]);
+                        $update['pay_time'] = date("Y-m-d H:i:s",time());
+
+                        // 查找订单对应的任务类型
+                        $type = Renwu::where('id',$attach[3])->value('type');
+                        if($type == 1){
+                            // 装修任务
+                            $update['order_status'] = 1;
+                        }else{
+                            // 设计任务
+                            $update['order_status'] = 8;
+                        }
+                        UserRw::where('out_trade_no',$attach[0])->update($update);
+                    }else{
+
+                        // payType == 2 的时候表示是投标的服务商进行付款  只有在付完款之后才能创建新的订单
+                        Db::name('log')->insert([
+                            'msg'=>'进来了',
+                            'data'=> 12
+                        ]);
+                        // 创建投标新订单
+                        $create['id'] = $attach[3];
+                        $create['user_id']  = $attach[2];
+                        $create['out_trade_no'] = $attach[0];
+                        UserRw::add($create);
+                    }
+
+                    // 支付成功 增加支出列表
+                    MoneyList::WxPayAddMoneyList($attach,$notify->total_fee);
+                }catch (\Exception $e){
+                    Db::name('log')->insert([
+                        'msg'=>'回调错误3',
+                        'data'=>json_encode($attach)
+                    ]);
+                }
+
+                // 保存订单
+            }
+
+            return true; // 返回处理完成
+        });
+    }
+
+
+    public function demo(){
+        $data = explode('-',"wx15143566568093-2-23-18");
+
+        $create['id'] = $data[3];
+        $create['user_id']  = $data[2];
+        $create['out_trade_no'] = $data[0];
+        UserRw::add($create);
+    }
+
+    /**
+     * @return \think\response\Json
+     * author hongwenyang
+     * method description : 用于支付测试
+     */
+    public function OwnerPayDemo(){
+        $orderData = input();
+        $options = config('options');
+        $app = new Application($options);
+        $payment = $app->payment;
+        if($orderData['payType'] == 1){
+            // 对已生成的订单进行付费
+            $taskId     = UserRw::where('orderId',$orderData['orderId'])->value('rw_id');
+            $out_trade_no  = 'wx'.$orderData['orderId'].rand(1000,9999);
+            $user_id = UserRw::where('orderId',$orderData['orderId'])->value('user_id');
+        }else{
+            // 投标先付费再生成订单
+            $taskId = $orderData['id'];
+            $out_trade_no  = 'wx'.time().rand(1000,9999);
+            $user_id = $orderData['user_id'];
+        }
         $detail     = Renwu::where('id',$taskId)->value('rw_title');
 
         $attributes = [
@@ -25,7 +236,12 @@ class Wechat
             'detail'           => $detail,
             'out_trade_no'     => $out_trade_no,
             'total_fee'        => $orderData['rw_yj']*100, // 单位：分
+            'attach'           => $orderData['payType'].'-'.$user_id.'-'.$taskId  //
         ];
+//        $createString = $this->createLinkstring($attributes) . "&key=D0A3272AA1A26C14D418859B60C80B5C";
+        // 生成签名
+//        $sign = strtoupper(MD5($createString));
+
         $order = new Order($attributes);
         $result = $payment->prepare($order);
 
@@ -35,37 +251,8 @@ class Wechat
             ]);
             $prepayId = $result->prepay_id;
             $config = $payment->configForAppPayment($prepayId);
+
+            return json($this->return_data($config));
         }
-    }
-
-
-    /**
-     * 支付成功回调
-     */
-    public function paySuccess(){
-        $options = config('options');
-        $app = new Application($options);
-        $response = $app->payment->handleNotify(function($notify, $successful){
-            // 使用通知里的 "微信支付订单号" 或者 "商户订单号" 去自己的数据库找到订单
-            $order = UserRw::where('out_trade_no',$notify->out_trade_no)->find();
-            if (count($order) == 0) { // 如果订单不存在
-                return 'Order not exist.'; // 告诉微信，我已经处理完了，订单没找到，别再通知我了
-            }
-            // 如果订单存在
-            // 检查订单是否已经更新过支付状态
-            if ($order['pay_time']) { // 假设订单字段“支付时间”不为空代表已经支付
-                return true; // 已经支付成功了就不再更新了
-            }
-            // 用户是否支付成功
-            if ($successful) {
-                // 不是已经支付状态则修改为已经支付状态
-                $order['pay_time'] = date("Y-m-d H:i:s",time()); // 更新支付时间为当前时间
-                $order['order_status'] = 1; //支付成功,
-            } else { // 用户支付失败
-                $order['order_status'] = 0; //待付款
-            }
-            UserRw::where('out_trade_no',$notify->out_trade_no)->update($order); // 保存订单
-            return true; // 返回处理完成
-        });
     }
 }

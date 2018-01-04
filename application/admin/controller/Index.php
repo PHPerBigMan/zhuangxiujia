@@ -13,7 +13,18 @@ class Index extends Base
             'title'     =>"后台首页",
             'admin_name'=>$admin_name
         ];
-        return view("index/a",$j);
+        return view("index/web",$j);
+    }
+
+    public function app()
+    {
+        $admin_name = Db::name('admin')->where('id',session('admin'))->value('admin_name');
+
+        $j = [
+            'title'     =>"后台首页",
+            'admin_name'=>$admin_name
+        ];
+        return view("index/app",$j);
     }
 
 
