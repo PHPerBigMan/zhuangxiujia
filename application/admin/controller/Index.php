@@ -7,7 +7,7 @@ class Index extends Base
 {
     public function index()
     {
-        $admin_name = Db::name('admin')->where('id',session('admin'))->value('admin_name');
+        $admin_name = Db::name('admin')->where('id',session('app_admin'))->value('admin_name');
 
         $j = [
             'title'     =>"后台首页",
@@ -18,7 +18,7 @@ class Index extends Base
 
     public function app()
     {
-        $admin_name = Db::name('admin')->where('id',session('admin'))->value('admin_name');
+        $admin_name = Db::name('admin')->where('id',session('app_admin'))->value('admin_name');
 
         $j = [
             'title'     =>"后台首页",

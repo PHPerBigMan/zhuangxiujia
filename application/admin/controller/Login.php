@@ -39,9 +39,7 @@ class Login extends Controller
                $code = 200;
                $msg  = "登录成功";
 
-               if(input('type') == 1){
-                   session('admin',$admin_check['id']);
-               }else{
+               if(input('type') != 1){
                    session('app_admin',$admin_check['id']);
                }
            }

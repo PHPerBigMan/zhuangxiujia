@@ -199,7 +199,7 @@ function login_out() {
     $.post("{:url('login/logout')}",function (data) {
 		layer.msg(data);
         setTimeout(function () {
-            window.location.href= "{:url('login/index')}"
+            window.location.href= "{:url('login/app')}"
         }, 1000)
     })
 }
