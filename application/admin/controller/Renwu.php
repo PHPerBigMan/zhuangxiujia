@@ -175,9 +175,11 @@ class Renwu extends Base
 
     public function add(){
         $id         = input('id');
-        $data = input();
+        $data                    = input();
         $rw_province             = Db::name('HatProvince')->where(['provinceID'=>input('rw_province')])->value('province');
-        $data['rw_area']         = $data['city'];
+        $data['rw_area']         = $data['rw_city'];
+        // 时间转为毫秒
+//        $data['pay_limit_time'] = $data['pay_limit_time'] * 1000;
         unset($data['rw_city']  );
         if (!is_numeric($data['rw_yj'])|| !is_numeric($data['rw_ding']) || !is_numeric($data['pay_limit_time']) )
         {
@@ -226,8 +228,9 @@ class Renwu extends Base
                 unset($data['apply_id']);
             }
 
-            unset($data['user_phone']);
         }
+        unset($data['user_phone']);
+//        dump($data);die;
         if(empty($id)){
 
             $data['rw_status'] = 2;
@@ -247,6 +250,9 @@ class Renwu extends Base
             }
         }else{
 
+            if(is_numeric($data['rw_area'])){
+                $data['rw_area'] = Db::name('hat_city')->where('cityID',$data['rw_area'])->value('city');
+            }
             $status = Db::name('Renwu')->where(['id'=>$id])->value('rw_status');
 
             if($status != 2){
@@ -497,7 +503,8 @@ class Renwu extends Base
                 foreach($id as $k=>$v){
                     Db::name('Cat')->where(['id'=>$v])->delete();
                 }
-
+                $msg['code'] = 200;
+                $msg['msg']  = "删除成功";
             }else{
                 $msg['code'] = 403;
                 $msg['msg']  = "该属性下有任务,删除失败";
@@ -530,6 +537,7 @@ class Renwu extends Base
             $f = 1;
         }
         $data = Db::name('Cat')->where(['level'=>1])->select();
+
         $j = [
             'title'=>'添加属性',
             'data'=>$data,
@@ -546,5 +554,11 @@ class Renwu extends Base
         $data = input('post.');
 
         return Cat::saveCat($data);
+    }
+
+    public function time(){
+        $data = "a";
+        $a = explode(' ',$data);
+        dump($a);
     }
 }

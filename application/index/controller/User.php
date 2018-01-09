@@ -2,6 +2,7 @@
 namespace app\index\controller;
 
 use app\model\Decorate;
+use app\model\MoneyList;
 use app\model\UserRw;
 use think\Db;
 use JPush\Client as JPush;
@@ -61,6 +62,22 @@ class User
         return json($this->return_data(Decorate::getOneData($post)));
     }
 
+    /**
+     * @return \think\response\Json
+     * author hongwenyang
+     * method description : 提现申请
+     */
+
+    public function Withdrawals(){
+        $post = input();
+        // 添加数据到列表
+        $s = MoneyList::add($post);
+        // 减少用户的余额
+
+        \app\model\User::where('id',$post['user_id'])->setDec('user_money',$post['money']);
+
+        return returnStatus($s);
+    }
     /**
      * @return \think\response\Json
      * author hongwenyang
@@ -303,21 +320,17 @@ class User
                 $o_status = 6;
                 break;
         }
-
-        // 取消订单 任务释放
-        $TaskId = UserRw::where('orderId',$orderId)->value('rw_id');
-        \app\model\Renwu::where('id',$TaskId)->update([
-            'order_status'=>2
-        ]);
-
-        if($type == 1){
-            //取消任务
-            $s = Db::name('UserRw')->where(['orderId'=>$orderId])->update(['order_status'=>$o_status]);
-        }else{
-
-            //完成任务
-            $s = Db::name('UserRw')->where(['orderId'=>$orderId])->update(['order_status'=>$o_status]);
+        if($o_status == 6){
+            // 取消订单 任务释放
+            $TaskId = UserRw::where('orderId',$orderId)->value('rw_id');
+            \app\model\Renwu::where('id',$TaskId)->update([
+                'status'=>2
+            ]);
         }
+
+        $s = Db::name('UserRw')->where(['orderId'=>$orderId])->update(['order_status'=>$o_status]);
+
+
         if($s){
             $msg['code'] = 200;
             $msg['msg']  = "操作成功";

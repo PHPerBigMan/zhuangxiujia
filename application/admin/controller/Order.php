@@ -1,6 +1,7 @@
 <?php
 namespace app\admin\controller;
 
+use app\admin\model\Percentage;
 use app\common\model\BookLose;
 use app\model\UserRw;
 use think\Db;
@@ -32,7 +33,7 @@ class Order extends Base
             $data[$k]['order_status'] = $msg;
 
             $id                 = $v['id'];
-            $data[$k]['caozuo'] = "<a href=\"/admin/Order/read?id=$id\"><i class=\"Hui-iconfont\">&#xe6df;</i></a>";
+            $data[$k]['caozuo'] = "<a href=\"/admin/Order/read?id=$id\">详情</a>";
         }
 
         return json(['data'=>$data]);
@@ -58,6 +59,7 @@ class Order extends Base
         $data['rw_yj']          = $money['rw_yj'];
         $data['user_name']      = Db::name('User')->where(['id'=>$data['user_id']])->value('user_name');
 
+
         if($data['order_type'] == 2){
             // 获取所有投标的用户id
             $user_id = UserRw::where('rw_id',$data['rw_id'])->column('user_id');
@@ -65,14 +67,24 @@ class Order extends Base
             // 查找 投标用户对应的用户信息
             if(!empty($user_id)){
                 $userData = \app\model\User::whereIn('id',$user_id)->column('user_name');
+
                 if(!empty($userData)){
                     $userData = implode(',',$userData);
+                    if(empty($userData)){
+                        $userData = implode(',',\app\model\User::whereIn('id',$user_id)->column('user_phone'));
+                    }
                 }
             }
 
+            // 查找中标用户的id
+            $GetTaskUserId = UserRw::whereIn('order_status',[1,2,3,4,5,6,8,10])->where('rw_id',$data['rw_id'])->value('user_id');
             // 查找中标用户信息
-            $GetTaskUser = \app\model\User::where('id',$data['user_id'])->value('user_name');
+            $GetTaskUser = \app\model\User::where('id',$GetTaskUserId)->value('user_name');
 
+            if($GetTaskUser == null){
+                $GetTaskUser = \app\model\User::where('id',$GetTaskUserId)->value('user_phone');
+            }
+//            dump($GetTaskUserId);die;
         }
 
         $title= "订单详情";
@@ -103,8 +115,11 @@ class Order extends Base
 
             //退换定金的操作  微信退款+记录于数据库中
 
-            //将佣金充值进用户账户
-            Db::name("User")->where(['id'=>Db::name('UserRw')->where(['id'=>$id])->value('user_id')])->setInc('user_money',input('rw_yj'));
+            //将佣金充值进用户账户 需要重新计算佣金
+            $percent = Percentage::where('id',1)->value('percentage');
+
+            $TaskUserGetMoney = input('rw_yj') * (1-$percent);
+            Db::name("User")->where(['id'=>Db::name('UserRw')->where(['id'=>$id])->value('user_id')])->setInc('user_money',$TaskUserGetMoney);
 
             // 将任务的状态改为已完成
             $TaskId= UserRw::where('id',$id)->value('rw_id');

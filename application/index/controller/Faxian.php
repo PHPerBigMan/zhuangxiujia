@@ -27,16 +27,11 @@ class Faxian
 
     public function read(){
         $id     = input('id');
-        $data   = Db::name('Zl')->where(['zl_cat'=>$id])->field('id zl_id,zl_title,zl_pic,zl_type,created_at')->select();
+        $data   = Db::name('Zl')->where(['zl_cat'=>$id])->field('id zl_id,zl_title,zl_pic,zl_type,created_at,zl_content')->select();
         foreach($data as $k=>$v){
-            if($v['zl_type'] == 0){
-                $zl_pic = json_decode($v['zl_pic'],true);
-                $data[$k]['zl_pic'] = $zl_pic[0];
-            }else{
-                $zl_pic = json_decode($v['zl_pic'],true);
-                $data[$k]['zl_pic'] = array_slice($zl_pic,0,4);
-            }
-
+            $zl_pic = json_decode($v['zl_pic'],true);
+            $data[$k]['zl_pic'] = $zl_pic[0];
+            $data[$k]['content'] = mb_substr($v['zl_content'],0,20);
         }
 //        echo "<pre>";
 //        var_dump($data);die;

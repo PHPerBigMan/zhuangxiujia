@@ -34,7 +34,8 @@
 								<input type="text" class="input-text" value="" placeholder="" id="" name="scat_name">
 							{else/}
 								{foreach name="sec" item="v1"}
-										<input type="text" class="input-text" value="{$v1.cat_name}" placeholder="" id="" name="scat_name" style="margin-top: 8px">
+										<input type="text" class="input-text" value="{$v1.cat_name}" placeholder="" id="" name="scat_name[]" style="margin-top: 8px">
+							<input type="hidden" name="sec_id[]" value="{$v1.id}">
 								{/foreach}
 							{/eq}
 

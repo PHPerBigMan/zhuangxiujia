@@ -10,6 +10,10 @@
 // +----------------------------------------------------------------------
 
 return [
+    'JPush' =>[
+        'AppKey'=>"7199c61d94a3475cf74582a8",
+        'Secret'=>"7711af29e9f1dbc4816fdd3b"
+    ],
     'options'               =>  [
         'app_id' => 'wx5d1c29da542f85de', //你的APPID
         'secret'  => 'a83afcea6f2146990b82ce67231911e5',     // AppSecret

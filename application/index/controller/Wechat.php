@@ -165,6 +165,22 @@ class Wechat
                         }else{
                             // 设计任务
                             $update['order_status'] = 8;
+
+                            // 设计师中标后,将未中标且已支付定金 的数据返回到对应的用户账号中  并且将订单修改为未中标
+//                            $TaskId = UserRw::where('out_trade_no',$attach[0])->value('rw_id');
+
+                            $AllUserId = UserRw::where(['rw_id'=>$attach[3]])->where('out_trade_no','!=',$attach[0])->column('user_id');
+                            if(!empty($AllUserId)){
+                                // 开始退换定金
+                                \app\model\User::whereIn('id',$AllUserId)->setDec('user_money',Renwu::where('id',$attach[3])->value('rw_ding'));
+
+                                // 获取未中标的订单id
+                                $NoGetOrderId = UserRw::where(['rw_id'=>$attach[3]])->where('out_trade_no','!=',$attach[0])->column('id');
+
+                                // 将这些订单修改为未中标
+                                UserRw::wehreIn('id',$NoGetOrderId)->update(['order_status'=>9]);
+                            }
+
                         }
                         UserRw::where('out_trade_no',$attach[0])->update($update);
                     }else{

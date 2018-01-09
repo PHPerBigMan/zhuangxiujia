@@ -59,6 +59,29 @@
             })
         })
     }
+
+    function pass(id,called) {
+	    var title ;
+	    var change;
+		if(called == 0){
+		    // 审核通过
+			title = "是否审核不通过";
+			change = 2;
+		}else{
+		    // 审核不通过
+			title = "是否修改为审核中";
+			change = 0;
+		}
+
+        layer.confirm(title,{
+            btn:['是','否']
+        },function () {
+            $.post('/admin/apply/changeCalled',{id:id,called:change},function (obj) {
+                layer.msg('修改成功');
+                location.reload();
+            })
+        })
+    }
 </script> 
 </body>
 </html>

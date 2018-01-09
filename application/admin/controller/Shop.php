@@ -174,7 +174,7 @@ class Shop extends Base
      */
 
     public function cat_ajax(){
-        $data = Db::name('mall_cat')->select();
+        $data = Db::name('mall_cat')->order('level','asc')->select();
         foreach($data as $k=>$v){
             $id = $v['id'];
             $data[$k]['caozuo'] = "<a onclick=\"edit('分类编辑','cat_edit?id=$id',480,480)\" title=\"编辑\"><i class=\"Hui-iconfont\" >&#xe6df;</i></a> | <a style=\"text-decoration:none\" class=\"ml-5\" onClick=\"del(this,$id)\" href=\"javascript:;\" title=\"删除\"><i class=\"Hui-iconfont\">&#xe6e2;</i></a>";

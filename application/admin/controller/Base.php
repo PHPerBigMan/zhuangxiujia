@@ -19,19 +19,20 @@ class Base extends Controller
                 'Shop','Faxian','ProductHouse','WebAnli','Charging','UserQuestion','Brand','Total'
                 ,'Banner','About','Apply','Intro','Video','Content','Construction'
             ];
-            if(in_array($controller,$array)){
-                if( !session('app_admin')){
-                    if (! session('admin')) {
-                        $this->redirect('login/index');
-                    }
-                }
+//            if(in_array($controller,$array)){
+//                if( !session('app_admin')){
+//                    if (! session('admin')) {
+//                        $this->redirect('login/index');
+//                    }
+//                }
+//
+//            }else{
+//
+//            }
 
-            }else{
-                if (! session('app_admin')) {
-                    $this->redirect('login/app');
-                }
+            if (! session('app_admin')) {
+                $this->redirect('login/app');
             }
-
 
 //            //当前路径
 //            $url = '/'.\think\Request::instance()->module().'/'.\think\Request::instance()->controller().'/'.\think\Request::instance()->action();

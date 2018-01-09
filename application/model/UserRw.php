@@ -6,6 +6,7 @@
  * Time: 18:58
  */
 namespace app\model;
+use app\admin\model\Percentage;
 use think\Model;
 
 class UserRw extends Model{
@@ -238,5 +239,34 @@ class UserRw extends Model{
         }
 
         return $returnData;
+    }
+
+    /**
+     * @param $post
+     * @return \think\response\Json
+     * author hongwenyang
+     * method description : 确认设计稿
+     */
+    public static function Confirmation($post){
+        // 修改订单的状态
+        $s = UserRw::where('orderId',$post)->update(['order_status'=>4]);
+        // 退换用户的定金和佣金到个人账户
+        $TaskInfo = Renwu::where('id',UserRw::where('orderId',$post)->value('rw_id'))->find();
+
+        //开始退换账户
+        User::where('id',UserRw::where('orderId',$post)->value('user_id'))->setInc('user_money',$TaskInfo['rw_ding']);
+
+        // 重新计算佣金  乘以抽成部分
+        $percent = Percentage::where('id',1)->value('percentage');
+
+        $TaskUserGetMoney = $TaskInfo['rw_yj'] * (1-$percent);
+
+        User::where('id',UserRw::where('orderId',$post)->value('user_id'))->setInc('user_money',$TaskUserGetMoney);
+
+        // 修改任务的状态为已完成
+        Renwu::where('id',$TaskInfo['id'])->update(['status'=>2]);
+        if($s){
+            return returnStatus($s);
+        }
     }
 }

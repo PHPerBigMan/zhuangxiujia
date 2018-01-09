@@ -1,0 +1,47 @@
+{include file="layout/head"}
+<body>
+<div class="page-container">
+    <table class="table table-border table-bordered table-bg table-hover table-sort" id="message">
+        <thead>
+        <tr class="text-c">
+            <th width="40">ID</th>
+            <th>比例</th>
+            <th width="60">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr class="text-c va-m">
+            <td>{$data.id}</td>
+            <td>
+              {$data.percentage}
+            </td>
+
+            <td class="text-l" style="text-align: center">
+                <a class="service">修改</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    {include file="layout/foot"}
+</div>
+<script type="text/javascript" src="/lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="/static/h-ui/js/H-ui.min.js"></script>
+<script type="text/javascript" src="/static/h-ui.admin/js/H-ui.admin.js"></script>
+
+<script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+<script>
+   $('.service').click(function () {
+       layer.prompt({title: '输入比例值（小数）', formType: 3}, function(percentage, index){
+           layer.close(index);
+           $.post('percentageSave',{percentage:percentage},function (obj) {
+               layer.msg('修改成功');
+               setTimeout(function () {
+                   location.reload();
+               },1000)
+           })
+       });
+   })
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{include file="layout/head"}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 用户协议 <span class="c-gray en">&gt;</span> 用户协议 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<!--<div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"> <a href="{:url('banner/addupdate')}"class="btn btn-primary radius" data-title="添加图片" ><i class="Hui-iconfont">&#xe600;</i> 添加图片</a></span>-->
+
+    <div class="page-container">
+        <div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l"> </span>
+
+            <div class="mt-20">
+                <table id="table_id_example" class="display table table-border table-bordered table-bg table-hover table-sort">
+                    <tr>
+                        <td>ID</td>
+                        <td>内容</td>
+                        <td>操作</td>
+                    </tr>
+                    <tr>
+                        <td>{$data.id}</td>
+                        <td>{$data.agreement}</td>
+                        <td>
+                            <a title='编辑' href="{:url('agreement/Update',['id'=>$data.id])}"><i class='Hui-iconfont' >&#xe6df;</i></a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+        {include file="layout/foot"}
+</body>
+<script>
+
+</script>
+</html>

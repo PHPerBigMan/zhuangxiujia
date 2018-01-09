@@ -44,6 +44,8 @@ class Anli extends Base
 //        dump($re);
 //        die;
         if ($re['is_pass']==1) {
+            // 先随机撤下一个经典的案例
+            Db::name('UserAnli')->where('jidian',1)->limit(1)->update(['jidian'=>0]);
             $s = Db::name('UserAnli')->where(['id' => $id])->update([
                 'jidian' => $jidian
             ]);
@@ -72,12 +74,33 @@ class Anli extends Base
      */
 
     public function read(){
-        $id = input('id');
-        $data = Db::name('UserAnli')->where(['id'=>$id])->find();
-        $data['pic']       = json_decode($data['pic'],true);
-        $data['user_name'] = Db::name('User')->where(['id'=>$data['user_id']])->value('user_name');
+        $id                 = input('id');
+        if($id == 0){
+            $data['pic']            = array();
+            $data['user_name']      = "";
+            $data['phone']          = "";
+            $data['houseTypes']     = "";
+            $data['acreageTypes']   = "";
+            $data['decorativeStyles']   = "";
+            $data['priceRanges']        = "";
+            $data['title']          = "";
+            $data['is_pass']        = 0;
+            $data['pass_content']   = "";
+            $data['content']        = "";
+            $data['id']             = $id;
+            $data['case_type']      = 1;
+            $data['cover']      = "";
+        }else{
+            $data               = Db::name('UserAnli')->where(['id'=>$id])->find();
+            $data['pic']        = json_decode($data['pic'],true);
+            $data['user_name']  = \app\model\User::where(['id'=>$data['user_id']])->value('user_name');
+            $data['phone']      = \app\model\User::where('id',$data['user_id'])->value('user_phone');
 
-
+            if(!empty($data['cover'])){
+                $cover = json_decode($data['cover'],true);
+                $data['cover'] = $cover[0];
+            }
+        }
         //分类
         $cat = Db::name('AnliCat')->where(['level'=>1])->select();
         foreach($cat as $k=>$v){
@@ -120,28 +143,26 @@ class Anli extends Base
 
     public function add(){
         $id = input('id');
-        $data['title']          = input('title');
-        $data['user_name']      = input('user_name');
-        $data['is_pass']        = input('is_pass');
-        $data['pass_content']   = input('pass_content');
-        $data['houseTypes']     = input('houseTypes');
-        $data['acreageTypes']   = input('acreageTypes');
-        $data['decorativeStyles']   = input('decorativeStyles');
-        $data['priceRanges']        = input('priceRanges');
-        $data['create_time']        = time();
+        $data = input();
 
-        if(empty($id)){
+        $data['create_time']        = time();
+        if(!empty($data['phone'])){
+            // 查找用户
+            $data['user_id'] = \app\model\User::where('user_phone',$data['phone'])->value('id');
+        }
+        unset($data['user_name']);
+        unset($data['phone']);
+
+
+        $cover= array();
+        $cover[0] = $data['cover'];
+        $data['cover'] = json_encode($cover);
+
+
+        if(!$id){
             $s = Db::name('UserAnli')->insert($data);
         }else{
-            $s = Db::name('UserAnli')->where(['id'=>$id])->update([
-                'title'             =>$data['title'],
-                'is_pass'           =>$data['is_pass'],
-                'pass_content'      =>$data['pass_content'],
-                'houseTypes'        =>$data['houseTypes'],
-                'acreageTypes'      =>$data['acreageTypes'],
-                'decorativeStyles'  =>$data['decorativeStyles'],
-                'priceRanges'       =>$data['priceRanges'],
-            ]);
+            $s = Db::name('UserAnli')->where(['id'=>$id])->update($data);
         }
 
         if($s){

@@ -34,6 +34,7 @@ class Cat extends Model{
                 $data['cat_img']   = $data['cat_img_save'];
             }
         }
+
         if(!$f){
             $data['create_time'] = time();
             $s = Cat::create($data);
@@ -41,13 +42,25 @@ class Cat extends Model{
                 $code = 200;
             }
         }else{
+            if(!empty($data['scat_name'])) {
+                // 保存二级分类
+                foreach ($data['scat_name'] as $k => $v) {
+                    Cat::where('id', $data['sec_id'][$k])->update([
+                        'cat_name' => $v
+                    ]);
+                }
+            }
             $data['create_time'] = time();
             unset($data['f']);
             unset($data['type']);
             unset($data['fcat_name']);
             unset($data['scat_name']);
             unset($data['cat_img_save']);
+            unset($data['level']);
+            unset($data['sec_id']);
+            unset($data['p_id']);
             $s = Cat::where(['id'=>$data['id']])->update($data);
+
             if($s){
                 $code = 200;
             }

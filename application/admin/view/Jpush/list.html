@@ -1,0 +1,67 @@
+{include file="layout/head"}
+<body>
+<div class="page-container">
+    <div class="cl pd-5 bg-1 bk-gray mt-20">  <p  class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 发送消息</p></span></div>
+
+    <table class="table table-border table-bordered table-bg table-hover table-sort" id="message">
+        <thead>
+        <tr class="text-c">
+            <th width="40">ID</th>
+            <th>发送对象</th>
+            <th>发送内容</th>
+            <th>发送时间</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {volist name="data" id="item"}
+        <tr class="text-c va-m">
+            <td>{$item.id}</td>
+            <td>
+                {if condition="$item.user_id eq 0"}
+                    全体用户
+                {else/}
+
+                {/if}
+            </td>
+            <td class="text-l">
+                {$item.message}
+            </td>
+            <td class="text-l">
+                {$item.create_time}
+            </td>
+            </tr>
+        {/volist}
+        </tbody>
+    </table>
+    {include file="layout/foot"}
+</div>
+<script type="text/javascript" src="/lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="/static/h-ui/js/H-ui.min.js"></script>
+<script type="text/javascript" src="/static/h-ui.admin/js/H-ui.admin.js"></script>
+
+<script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+<script>
+    $('.btn-primary').click(function () {
+        layer.open({
+            type: 2,
+            area: ["660px","440px"],
+            fix: false, //不固定
+            maxmin: true,
+            shade:0.4,
+            title: "发送系统消息",
+            content: "send",
+            end:function () {
+                location.reload();
+            }
+        });
+
+//        layer.msg("开发中~~");
+    })
+    $('#message').DataTable({
+        "paging": true,
+        "ordering":false,
+    });
+</script>
+</body>
+</html>

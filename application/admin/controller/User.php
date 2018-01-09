@@ -83,14 +83,19 @@ class User extends Base
      */
 
     public function anli_ajax(){
-        $data = Db::name('UserAnli')->field('id,user_id,title,jidian,is_pass,pic,create_time')->order('id','desc')->select();
+        $data = Db::name('UserAnli')->order('id','desc')->select();
         foreach($data as $k=>$v){
             $data[$k]['create_time'] = date('Y-m-d H:i:s',$v['create_time']);
             $data[$k]['user']        = Db::name('User')->where(['id'=>$v['user_id']])->value('user_name');
             $data[$k]['is_pass']     = $v['is_pass'] == 0 ? "<span class=\"label label-defaunt radius\">审核未通过</span>" :"<span class=\"label label-success radius\">审核已通过</span>";
             $data[$k]['jidian']      = $v['jidian'] == 0 ?"<span class=\"label label-defaunt radius\">暂未推荐为经典案例</span>" :"<span class=\"label label-success radius\">已推荐为经典案例</span>";
             $pic                     = json_decode($v['pic'],true);
-            $data[$k]['pic']         = "<img src='$pic[0]' style='width: 45px;height: 45px'>";
+            if(!empty($v['cover'])){
+                $cover = json_decode($v['cover'],true);
+                $data[$k]['pic']         = "<img src='$cover[0]' style='width: 45px;height: 45px'>";
+            }else{
+                $data[$k]['pic']         = "<img src='$pic[0]' style='width: 45px;height: 45px'>";
+            }
             $id                      = $v['id'];
             $data[$k]['caozuo']      = "<a style=\"text-decoration:none\" onClick=\"anli_shenhe(this,$id)\" href=\"javascript:;\" title=\"审核\">审核</a> | <a style=\"text-decoration:none\" onclick=\"anli_tuijian(this,$id)\">推荐</a>
  | <a href=\"/admin/Anli/read?id=$id\"><i class=\"Hui-iconfont\">&#xe6df;</i></a>";

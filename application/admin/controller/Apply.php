@@ -3,6 +3,7 @@
 namespace app\admin\controller;
 
 use app\admin\model\Demand;
+use app\model\Decorate;
 use think\Controller;
 use think\Db;
 use think\Request;
@@ -152,15 +153,18 @@ class Apply extends Base
 
             switch ($v['called']){
                 case 0:
-                    $data[$k]['called'] = "未发布";
+                    $data[$k]['called'] = "审核中";
+                    break;
+                case 1:
+                    $data[$k]['called'] = "已发布";
                     break;
                 default:
-                    $data[$k]['called'] = "已发布";
+                    $data[$k]['called'] = "未通过";
             }
             if($type == 2){
                 $data[$k]['user_name'] = Db::name('user')->where(['id'=>$v['user_id']])->value('user_name');
             }
-            $data[$k]['caozuo']      = "<a href='/admin/apply/read?id=".$v['id']."'><i class='Hui-iconfont'>&#xe6df;</i></a>";
+            $data[$k]['caozuo']      = "<a href='/admin/apply/read?id=".$v['id']."'>详情</a> | <a onclick='pass(".$v['id'].",".$v['called'].")'>审核</a>";
         }
 //        dump($data);die;
         return json(['data'=>$data]);
@@ -234,5 +238,18 @@ class Apply extends Base
         }
         $title = "详情";
         return view('apply/read',compact('data','title'));
+    }
+
+
+    public function changeCalled(){
+        $post = input();
+
+        $s= Decorate::where('id',$post['id'])->update([
+            'called'=>$post['called']
+        ]);
+
+        if($s){
+            return 200;
+        }
     }
 }

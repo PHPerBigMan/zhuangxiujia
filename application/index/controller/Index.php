@@ -2,6 +2,7 @@
 namespace app\index\controller;
 
 use app\admin\model\Cat;
+use app\model\Agreement;
 use app\model\OrderBid;
 use app\model\OrderManuscript;
 use app\model\RenwuTask;
@@ -271,13 +272,26 @@ class Index
         }else{
             $data['task'] = 0;
         }
+
+        // 判断设计师是否上传设计稿
+        $data['isPost'] = 0;
+
+        // 获取所有该任务下的订单id
+        $AllOrderId = UserRw::where('rw_id',$id['id'])->column('orderId');
+        if(!empty($AllOrderId)){
+            $IsPostManuscript = OrderManuscript::whereIn('orderId',$AllOrderId)->find();
+
+            if(!empty($IsPostManuscript)){
+                $data['isPost'] = 1;
+            }
+        }
         return json($this->return_data($data));
     }
 
     public function Confirmation(){
         $post = input('orderId');
         $data = UserRw::Confirmation($post);
-        return json($data);
+        return $data;
     }
     /**
      * @return \think\response\Json
@@ -336,6 +350,9 @@ class Index
         $version = Db::name('Config')->field('version,download')->find();
         $version['version'] = (int)$version['version'];
 
+
+        // 用户协议
+        $data['agreement'] = Agreement::value('agreement');
         if(empty($data)){
             $data = array();
             $msg = '数据为空';

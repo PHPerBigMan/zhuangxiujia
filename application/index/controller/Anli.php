@@ -1,6 +1,7 @@
 <?php
 namespace app\index\controller;
 
+use app\admin\model\Cat;
 use think\Db;
 
 class Anli
@@ -31,19 +32,22 @@ class Anli
         }
 
         if($type == 1){
-            $data = Db::name('UserAnli')->where(['jidian'=>1])->whereIn('case_type',$case_type)->field('id,pic,title')->select();
+            $data = Db::name('UserAnli')->where(['jidian'=>1])->whereIn('case_type',$case_type)->field('id,pic,title,decorativeStyles,houseTypes,acreageTypes')->select();
 
         }else if($type == 2){
-            $data = Db::name('UserAnli')->field('id,pic,title')->whereIn('case_type',$case_type)->order('create_time desc')->select();
+            $data = Db::name('UserAnli')->field('id,pic,title,decorativeStyles,houseTypes,acreageTypes')->whereIn('case_type',$case_type)->order('create_time desc')->select();
         }else if($type == 3){
-            $sql = "SELECT anli_id,count(anli_id) as num FROM zjx_anli_read WHERE IN case_type = ".$case_type."group by anli_id order by num DESC ";
+            $sql = "SELECT anli_id,count(anli_id) as num FROM zjx_anli_read group by anli_id order by num DESC ";
             $anli_id = Db::query($sql);
 
             foreach ($anli_id as $k=>$v) {
-                $data[$k] = Db::name('UserAnli')->field('id,pic,title')->where(['id'=>$v['anli_id']])->find();
+                $data[$k] = Db::name('UserAnli')->whereIn('case_type',$case_type)->field('id,pic,title,decorativeStyles,houseTypes,acreageTypes')->where(['id'=>$v['anli_id']])->find();
             }
+
         }
         $data = $this->img($data);
+
+        $data = $this->Type($data);
         $j = $this->return_data($data);
         return json($j);
     }
@@ -82,7 +86,7 @@ class Anli
 
     /**
      * @return \think\response\Json
-     * 案例详情
+     * 案例详情  (好像没用)
      */
 
     public function read(){
@@ -96,6 +100,7 @@ class Anli
         Db::name('AnliRead')->insert($insert);
 
         $j = $this->return_data($data);
+
         return json($j);
     }
 
@@ -110,7 +115,12 @@ class Anli
         $data = Db::name('UserAnli')->where(['id'=>$id])->field('id,title,pass_content content,create_time')->find();
         $data['create_time'] = date('Y-m-d H:i:s',$data['create_time']);
 
-//        var_dump($data);die;
+        //增加一次查看详情的记录
+        $insert['user_id'] = 1;
+        $insert['anli_id'] = $id;
+        $insert['create_time'] = time();
+        Db::name('AnliRead')->insert($insert);
+
         $j = $this->return_data($data);
         return json($j);
     }
@@ -144,6 +154,15 @@ class Anli
         return $data;
     }
 
+    public function Type($data){
+        foreach($data as $k=>$v){
+            // TODO::先定死
+            $data[$k]['quarters'] = "盛世豪庭";
+            $data[$k]['style'] = Cat::where('id',$v['decorativeStyles'])->value('cat_name');
+            $data[$k]['house'] = Cat::where('id',$v['houseTypes'])->value('cat_name');
+            $data[$k]['acreage'] = Cat::where('id',$v['acreageTypes'])->value('cat_name');
+        }
 
-
+        return $data;
+    }
 }

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>发送消息</title>
+    <link rel="stylesheet" type="text/css" href="/static/h-ui/css/H-ui.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/h-ui.admin/css/H-ui.admin.css" />
+    <link rel="stylesheet" type="text/css" href="/lib/Hui-iconfont/1.0.8/iconfont.css" />
+    <link rel="stylesheet" type="text/css" href="/static/h-ui.admin/skin/default/skin.css" id="skin" />
+    <link rel="stylesheet" type="text/css" href="/static/h-ui.admin/css/style.css" />
+    <link href="/lib/layui/css/layui.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div class="">
+    <form class="Huiform " method="post" action="" target="_self" id="message">
+          <div class="send-message-1">
+              <label for="">发送消息对象:</label>
+              <span class="select-box" style="width:150px">
+                <select class="select" name="brandclass" size="1">
+                    <option value="0" selected>全体用户</option>
+                    <!--<option value="1">单独</option>-->
+                </select>
+              </span>
+          </div>
+        <div class="send-message-1">
+            <label for="">发送内容:</label>
+            <textarea name="message" cols="" rows="" class="textarea"  placeholder="输入发送内容...."></textarea>
+        </div>
+        <p class="layui-btn layui-btn-primary send-btn">发送</p>
+    </form>
+</div>
+<script type="text/javascript" src="/lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="/lib/layer/2.4/layer.js"></script>
+<script>
+    $('.send-btn').click(function () {
+        $.post('sendMessage',$('#message').serialize(),function (obj) {
+            if(obj == 200){
+                layer.msg('消息发送成功');
+            }else{
+                layer.msg('消息发送异常');
+            }
+        })
+    })
+</script>
+</body>
+</html>
