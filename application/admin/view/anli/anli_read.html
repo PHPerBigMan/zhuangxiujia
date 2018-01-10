@@ -5,7 +5,6 @@
 		<div class="layui-tab">
 			<ul class="layui-tab-title">
 				<li class="layui-this">案例基本信息</li>
-				<li>案例分类</li>
 			</ul>
 			<div class="layui-tab-content">
 				<div class="layui-tab-item layui-show">
@@ -52,7 +51,7 @@
 						</div>
 					</div>
 					<div class="row cl">
-						<label class="form-label col-xs-4 col-sm-2">案例类型：</label>
+						<label class="form-label col-xs-4 col-sm-2">案例封面：</label>
 						<div class="layui-upload">
 							<div class="formControls col-xs-8 col-sm-9">
 								<button type="button" class="layui-btn" id="test1">案例封面</button>
@@ -64,7 +63,33 @@
 							</div>
 						</div>
 					</div>
+					<div class="row cl">
+						<label class="form-label col-xs-4 col-sm-2">楼盘：</label>
+						<div class="formControls col-xs-8 col-sm-9">
+							<input type="text" class="input-text" value="{$data.priceRanges}" placeholder="" id="priceRanges" name="priceRanges" >
+						</div>
+					</div>
 
+					<div class="row cl">
+						<label class="form-label col-xs-4 col-sm-2">风格：</label>
+						<div class="formControls col-xs-8 col-sm-9">
+							<input type="text" class="input-text" value="{$data.decorativeStyles}" placeholder="" id="decorativeStyles" name="decorativeStyles">
+						</div>
+					</div>
+
+					<div class="row cl">
+						<label class="form-label col-xs-4 col-sm-2">户型：</label>
+						<div class="formControls col-xs-8 col-sm-9">
+							<input type="text" class="input-text" value="{$data.houseTypes}" placeholder="" id="houseTypes" name="houseTypes">
+						</div>
+					</div>
+
+					<div class="row cl">
+						<label class="form-label col-xs-4 col-sm-2">面积：</label>
+						<div class="formControls col-xs-8 col-sm-9">
+							<input type="text" class="input-text" value="{$data.acreageTypes}" placeholder="" id="acreageTypes" name="acreageTypes" >
+						</div>
+					</div>
 					<div class="row cl">
 
 						<label class="form-label col-xs-4 col-sm-2">案例详情：</label>
@@ -84,31 +109,8 @@
 						</div>
 					</div>
 				</div>
-				<div class="layui-tab-item">
-					<div class="row cl" style="margin-bottom: 20px">
-						<label  class="form-label col-xs-4 col-sm-2">选择案例分类</label>
-						<br>
-						{foreach name = 'cat' item='v1'}
-						<span class="form-label col-xs-4 col-sm-2">{$v1.cat_name}:
-							<div class="layui-input-inline">
-								<select name="{$v1.name}">
-									<option value="">请选择</option>
-									{foreach name="v1.sec" item="v2"}
-										<option value="{$v2.id}" <?php if($v2['select']==1){echo "selected";}?>>{$v2.cat_name}</option>
-									{/foreach}
-								</select>
-							</div>
-						</span>
-						{/foreach}
-					</div>
-				</div>
 			</div>
 		</div>
-
-
-
-
-
 
 
 		<div class="row cl">
@@ -136,6 +138,21 @@
     var ue = UE.getEditor('pic');
 
 	function add(){
+	    if($("#priceRanges").val().length == ""){
+	        layer.msg("请填写楼盘"); return false;
+		}
+
+		if($('#decorativeStyles').val().length == ""){
+            layer.msg("请填写风格"); return false;
+		}
+
+		if($('#houseTypes').val().length == ""){
+            layer.msg("请填写户型"); return false;
+		}
+
+		if($("#acreageTypes").val().length == ""){
+            layer.msg("请填写面积"); return false;
+		}
 		$.post("{:url('Anli/add')}",$('#anli').serialize(),function(data){
 			if(data.code == 200){
 				layer.msg("操作成功",{icon:1,time:2000});
@@ -184,6 +201,7 @@
         });
 
     });
+
 </script>
 </body>
 </html>

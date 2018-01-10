@@ -2,6 +2,7 @@
 namespace app\index\controller;
 
 use app\admin\model\Cat;
+use app\admin\model\Log;
 use app\model\Agreement;
 use app\model\OrderBid;
 use app\model\OrderManuscript;
@@ -63,8 +64,6 @@ class Index
     public function sec_rw(){
         $id         = input('id');
         $area       = input('area');
-
-
         $type = 1;
         // 判断任务类型 是否为装修前期
         $cat_id_pid     = Cat::where('id',$id)->value('p_id');
@@ -75,15 +74,17 @@ class Index
         }
 
         if(!empty($area)){
-            $data   = Db::name('Renwu')->where(['rw_cat'=>$id,'type'=>$type])->where("rw_status = 2")->where("is_show = 1")->where("rw_area","like","%$area%")->field('rw_title,start_time,id,rw_yj,rw_cover img,type')->select();
+            $data   = Db::name('Renwu')->where(['rw_cat'=>$id,'type'=>$type])->where("rw_status = 2")->where("is_show = 1")->where("rw_area","like","%$area%")->field('rw_title,start_time,id,rw_yj,rw_cover img,type,rw_status,status,abstract')->select();
         }else{
-            $data   = Db::name('Renwu')->where(['rw_cat'=>$id,'type'=>$type])->where("rw_status = 2")->where("is_show = 1")->field('rw_title,start_time,id,rw_yj,rw_cover img,type')->select();
+            $data   = Db::name('Renwu')->where(['rw_cat'=>$id,'type'=>$type])->where("rw_status = 2")->where("is_show = 1")->field('rw_title,start_time,id,rw_yj,rw_cover img,type,rw_status,status,abstract')->select();
         }
 
         foreach($data as $k=>$v){
             $data[$k]['start_time'] = date('Y/m/d');
-            $data[$k]['task']   = count(UserRw::where('rw_id',$v['id'])->select());
+//            $data[$k]['task']   = count(UserRw::where('rw_id',$v['id'])->select());
         }
+
+        $data = Renwu::IndexTask($data);
         $j = $this->return_data($data);
 
         return json($j);
@@ -121,14 +122,14 @@ class Index
         // TODO:: 这里还有问题
         if(!empty($area)){
 
-            $renovation = Renwu::where(['is_show'=>1,'rw_status'=>2,'type'=>1,'rw_hot'=>1])->where('rw_area','like',"%$area%")->field('id,rw_title,rw_yj,start_time,rw_cover img,type')->select();
+            $renovation = Renwu::where(['is_show'=>1,'type'=>1,'rw_hot'=>1])->where('rw_area','like',"%$area%")->field('id,rw_title,rw_yj,start_time,rw_cover img,type,abstract,rw_status,status')->select();
 
-            $design = Renwu::where(['is_show'=>1,'rw_status'=>2,'type'=>2,'rw_hot'=>1])->where('rw_area','like',"%$area%")->field('id,rw_title,rw_yj,start_time,rw_cover img,type')->select();
+            $design = Renwu::where(['is_show'=>1,'type'=>2,'rw_hot'=>1])->where('rw_area','like',"%$area%")->field('id,rw_title,rw_yj,start_time,rw_cover img,type,abstract,rw_status,status')->select();
         }else{
 
-            $renovation = Renwu::where(['is_show'=>1,'rw_status'=>2,'type'=>1,'rw_hot'=>1])->field('id,rw_title,rw_yj,start_time,rw_cover img,type')->select();
+            $renovation = Renwu::where(['is_show'=>1,'type'=>1,'rw_hot'=>1])->field('id,rw_title,rw_yj,start_time,rw_cover img,type,abstract,rw_status,status')->select();
 
-            $design = Renwu::where(['is_show'=>1,'rw_status'=>2,'type'=>2,'rw_hot'=>1])->field('id,rw_title,rw_yj,start_time,rw_cover img,type')->select();
+            $design = Renwu::where(['is_show'=>1,'type'=>2,'rw_hot'=>1])->field('id,rw_title,rw_yj,start_time,rw_cover img,type,abstract,rw_status,status')->select();
 
         }
 

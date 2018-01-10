@@ -81,11 +81,13 @@ class Renwu
 //            $sql = "SELECT id,rw_yj,rw_cover img,start_time,rw_title FROM zjx_renwu WHERE rw_status = 2 OR rw_title like '%$key%' OR rw_yj like '%$key%' OR rw_main like '%$key%'";
             if(!empty($area)){
                 $data = Db::name('Renwu')->where(['rw_status'=>2,'is_show'=>1])->where('rw_title','like',"%$key%")->where('rw_area','like',"%$area%")
-                    ->field('id,rw_yj,rw_cover img,start_time,rw_title')->select();
+                    ->field('id,rw_yj,rw_cover img,start_time,rw_title,rw_status,status,abstract,type')->select();
             }else{
-                $data = Db::name('Renwu')->where(['rw_status'=>2,'is_show'=>1])->where('rw_title','like',"%$key%")->field('id,rw_yj,rw_cover img,start_time,rw_title')->select();
+                $data = Db::name('Renwu')->where(['rw_status'=>2,'is_show'=>1])->where('rw_title','like',"%$key%")->field('id,rw_yj,rw_cover img,start_time,rw_title,rw_status,status,abstract,type')->select();
 
             }
+
+            $data = \app\model\Renwu::IndexTask($data);
 
             $j = $this->return_data($data);
         }

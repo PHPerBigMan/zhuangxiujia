@@ -11,6 +11,7 @@ class Agreement extends Base
 
         $data = \app\model\Agreement::find();
 
+        $data->agreement = mb_substr($data->agreement,0,40);
         return view('agreement/index',compact('title','data'));
     }
 

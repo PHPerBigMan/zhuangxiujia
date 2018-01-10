@@ -43,19 +43,53 @@ class UserRw extends Model{
             // 查询该任务已被投标的次数
             $bidCount = UserRw::where('rw_id',$data['id'])->count();
 
+            // 查询任务是否已经结束
+            $type = Renwu::where('id',$data['id'])->value('type');
+
+            if($type == 1){
+                // 装修任务
+                $status =Renwu::where('id',$data['id'])->value('status');
+            }else{
+                // 设计任务
+                $status = Renwu::where('id',$data['id'])->value('rw_status');
+
+            }
             if($bidCount >= 3){
                 // 该任务投标次数已满
                 return json(['code'=>404,'msg'=>"该任务投标次数已达上限"]);
             }else{
-                $s = UserRw::insert([
-                    'user_id'=>$data['user_id'],
-                    'rw_id'=>$data['id'],
-                    'orderId'=>date('Ymd').time(),
-                    'order_type'=>2,
-                    'order_status'=>7,
-                    'create_time'=>time()
-                ]);
-                return returnStatus($s);
+                if($type == 1){
+                    if($status == 1){
+                        // 已经完成
+                        return json(['code'=>404,'msg'=>"该任务已完成"]);
+                    }else{
+                        $s = UserRw::insert([
+                            'user_id'=>$data['user_id'],
+                            'rw_id'=>$data['id'],
+                            'orderId'=>date('Ymd').time(),
+                            'order_type'=>2,
+                            'order_status'=>7,
+                            'create_time'=>time()
+                        ]);
+                        return returnStatus($s);
+                    }
+                }else{
+                    if($status == 2){
+                        // 已经完成
+                        return json(['code'=>404,'msg'=>"该任务已完成"]);
+                    }else{
+                        $s = UserRw::insert([
+                            'user_id'=>$data['user_id'],
+                            'rw_id'=>$data['id'],
+                            'orderId'=>date('Ymd').time(),
+                            'order_type'=>2,
+                            'order_status'=>7,
+                            'create_time'=>time()
+                        ]);
+                        return returnStatus($s);
+                    }
+                }
+
             }
 
         }else{

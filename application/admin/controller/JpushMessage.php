@@ -1,6 +1,7 @@
 <?php
 namespace app\admin\controller;
 use app\admin\model\JpushMessage as J;
+use app\admin\model\Notice;
 use JPush;
 class JpushMessage extends Base
 {
@@ -37,6 +38,20 @@ class JpushMessage extends Base
         }else{
             // 全体消息
             $code = \app\admin\model\JpushMessage::sendAllMessage($config,$post['message']);
+
+            $User = \app\model\User::column('id');
+
+            if(!empty($User)){
+                foreach ($User as $v){
+                    Notice::create([
+                        'user_id'       =>$v,
+                        'title'         =>"【系统消息】",
+                        'content'       =>$post['message'],
+                        'detail'        =>$post['message'],
+                        'create_time'   =>time()
+                    ]);
+                }
+            }
             $user_id = 0;
         }
 

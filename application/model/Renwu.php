@@ -56,9 +56,15 @@ class Renwu extends Model{
      */
 
     public  static function IndexTask($data){
+
         if(!empty($data)){
             foreach ($data as $k=>$v){
-                $v['task'] = \app\model\UserRw::where('rw_id',$v['id'])->count();
+                $data[$k]['task'] = \app\model\UserRw::where('rw_id',$v['id'])->count();
+
+                if($v['type'] == 1){
+                    // 设计任务
+                    $v['status'] = $v['rw_status'] == 1 ? 1 : $v['rw_status'] == 2 ? 1 : 2;
+                }
             }
         }
         return $data;

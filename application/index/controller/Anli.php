@@ -32,16 +32,16 @@ class Anli
         }
 
         if($type == 1){
-            $data = Db::name('UserAnli')->where(['jidian'=>1])->whereIn('case_type',$case_type)->field('id,pic,title,decorativeStyles,houseTypes,acreageTypes')->select();
+            $data = Db::name('UserAnli')->where(['jidian'=>1])->whereIn('case_type',$case_type)->field('id,pic,title,decorativeStyles,priceRanges,houseTypes,acreageTypes')->select();
 
         }else if($type == 2){
-            $data = Db::name('UserAnli')->field('id,pic,title,decorativeStyles,houseTypes,acreageTypes')->whereIn('case_type',$case_type)->order('create_time desc')->select();
+            $data = Db::name('UserAnli')->field('id,pic,title,decorativeStyles,houseTypes,acreageTypes,priceRanges')->whereIn('case_type',$case_type)->order('create_time desc')->select();
         }else if($type == 3){
             $sql = "SELECT anli_id,count(anli_id) as num FROM zjx_anli_read group by anli_id order by num DESC ";
             $anli_id = Db::query($sql);
 
             foreach ($anli_id as $k=>$v) {
-                $data[$k] = Db::name('UserAnli')->whereIn('case_type',$case_type)->field('id,pic,title,decorativeStyles,houseTypes,acreageTypes')->where(['id'=>$v['anli_id']])->find();
+                $data[$k] = Db::name('UserAnli')->whereIn('case_type',$case_type)->field('id,pic,title,decorativeStyles,priceRanges,houseTypes,acreageTypes')->where(['id'=>$v['anli_id']])->find();
             }
 
         }
@@ -155,12 +155,13 @@ class Anli
     }
 
     public function Type($data){
+
         foreach($data as $k=>$v){
-            // TODO::先定死
-            $data[$k]['quarters'] = "盛世豪庭";
-            $data[$k]['style'] = Cat::where('id',$v['decorativeStyles'])->value('cat_name');
-            $data[$k]['house'] = Cat::where('id',$v['houseTypes'])->value('cat_name');
-            $data[$k]['acreage'] = Cat::where('id',$v['acreageTypes'])->value('cat_name');
+
+            $data[$k]['quarters']   = !isset($v['priceRanges']) ? "" : $v['priceRanges'];
+            $data[$k]['style']      = !isset($v['decorativeStyles']) ? "" : $v['priceRanges'];
+            $data[$k]['house']      = !isset($v['houseTypes']) ? "" : $v['priceRanges'];
+            $data[$k]['acreage']    = !isset($v['acreageTypes']) ? "" : $v['priceRanges'];
         }
 
         return $data;

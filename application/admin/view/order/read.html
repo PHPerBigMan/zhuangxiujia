@@ -81,6 +81,20 @@
 			</div>
 		</div>
 
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">参与任务用户手机号</label>
+			<div class="layui-input-block" style="padding-top: 10px">
+				{if condition="$data.phone neq '' "}
+					{volist name= "$data.phone" id="item"}
+						{$item}
+						<br>
+					{/volist}
+				{/if}
+			</div>
+		</div>
+
+
 		{if condition="$userData neq ''"}
 			<div class="layui-form-item">
 				<label class="layui-form-label">投标用户</label>

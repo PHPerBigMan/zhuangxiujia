@@ -127,6 +127,8 @@ class Anli extends Base
             }
             $cat[$k]['name'] = $name;
         }
+
+//        dump($data);die;
         $j = [
             'title'=>"用户案例详情",
             'data'=>$data,
@@ -157,7 +159,6 @@ class Anli extends Base
         $cover= array();
         $cover[0] = $data['cover'];
         $data['cover'] = json_encode($cover);
-
 
         if(!$id){
             $s = Db::name('UserAnli')->insert($data);

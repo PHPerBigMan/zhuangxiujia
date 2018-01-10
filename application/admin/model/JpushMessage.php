@@ -6,6 +6,7 @@
  * Time: 18:58
  */
 namespace app\admin\model;
+use app\model\User;
 use JPush\Client;
 use think\Model;
 
@@ -27,6 +28,7 @@ class JpushMessage extends Model{
                 ->addAllAudience()
                 ->setNotificationAlert($mssage)
                 ->send();
+
             if($s['http_code'] == 200){
                 // 发送成功
                 return 200;

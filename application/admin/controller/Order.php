@@ -60,9 +60,9 @@ class Order extends Base
         $data['user_name']      = Db::name('User')->where(['id'=>$data['user_id']])->value('user_name');
 
 
+        $user_id = UserRw::where('rw_id',$data['rw_id'])->column('user_id');
         if($data['order_type'] == 2){
             // 获取所有投标的用户id
-            $user_id = UserRw::where('rw_id',$data['rw_id'])->column('user_id');
 
             // 查找 投标用户对应的用户信息
             if(!empty($user_id)){
@@ -84,7 +84,11 @@ class Order extends Base
             if($GetTaskUser == null){
                 $GetTaskUser = \app\model\User::where('id',$GetTaskUserId)->value('user_phone');
             }
-//            dump($GetTaskUserId);die;
+
+        }
+        $data['phone'] = array();
+        if(!empty($user_id)){
+            $data['phone'] = \app\model\User::whereIn('id',$user_id)->column('user_phone');
         }
 
         $title= "订单详情";

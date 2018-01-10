@@ -123,6 +123,7 @@ class User
         $data = UserRw::alias('ur')->join('renwu t','t.id = ur.rw_id')
             ->where(['ur.user_id'=>$post['user_id'],'t.type'=>2])
             ->whereIn('ur.order_status',$status)
+            ->order('id','desc')
            ->select();
 
         $data = UserRw::ReturnOrderList($data);
@@ -348,7 +349,8 @@ class User
      */
     public function my_anli(){
         $id = input('user_id');
-        $data = Db::name('UserAnli')->where(['user_id'=>$id])->field('id,pic,title')->select();
+        $data = Db::name('UserAnli')->where(['user_id'=>$id])->field('id,pic,title,priceRanges as quarters,decorativeStyles as style,
+        houseTypes as house,acreageTypes as acreage')->select();
 
         foreach($data as $k=>$v){
             if(!empty($v['pic'])){
@@ -572,6 +574,16 @@ class User
         // 案例多图
         $data['pic']  = json_encode($user_pic);
 
+        $data['priceRanges']        = $data['quarters'];
+        $data['decorativeStyles']   = $data['style'];
+        $data['houseTypes']         = $data['house'];
+        $data['acreageTypes']       = $data['acreage'];
+
+        unset( $data['quarters']);
+        unset( $data['style']);
+        unset( $data['house']);
+        unset( $data['acreage']);
+
         $s = Db::name('UserAnli')->insert($data);
 
         if($s){
@@ -609,7 +621,6 @@ class User
 
 
     public function ji_tui(){
-
 
         $app_key = "7199c61d94a3475cf74582a8";
         $master_secret = "7711af29e9f1dbc4816fdd3b";
@@ -671,26 +682,23 @@ class User
 
     public function del(){
         $id = input('param.id/d');
-        $s  = Db::name('zx')->where("id=$id")->delete();
+        $s  = Db::name('user_anli')->where("id",$id)->delete();
 
-//        dump($id);
-//        die;
+        if($s){
+         $code = 200;
+         $msg = '案例删除成功';
 
-//        if($s){
-//         $code = 200;
-//         $msg = '案例删除成功';
-//
-//        }else{
-//            $code = 404;
-//           $msg = '案例删除失败';
-//        }
-//        $j = [
-//            'code'=>$code,
-//            'msg'=>$msg
-//        ];
-//
-//        return json($j);
-        echo  "<script>alert('案例删除成功');history.go(-1)</script>";
+        }else{
+            $code = 404;
+           $msg = '案例删除失败';
+        }
+        $j = [
+            'code'=>$code,
+            'msg'=>$msg
+        ];
+
+        return json($j);
+
 
     }
 }
