@@ -38,11 +38,14 @@ class Decorate extends Model{
                 $returnData[$k]['measure']      = $v['room_mj'];
                 $returnData[$k]['created_at']   = $v['created_at'];
                 $returnData[$k]['id']           = $v['id'];
-                $status = Renwu::where('apply_id',$v['id'])->find();
-                if(!$status){
+                if($v['called'] == 0){
                     $returnData[$k]['status_msg'] = "审核中";
-                }else{
+                }else if($v['called'] == 1){
                     $returnData[$k]['status_msg'] = "已发布";
+                }else if($v['called'] == 2){
+                    $returnData[$k]['status_msg'] = "审核未通过";
+                }else{
+                    $returnData[$k]['status_msg'] = "审核已通过";
                 }
                 $img = array();
                 if(!empty($v['imgs'])){
@@ -75,12 +78,16 @@ class Decorate extends Model{
             $returnData['money']           = $data['room_ys'];
             $returnData['remark']           = $data['remark'];
             $returnData['time']           = $data['room_time'];
-            $status = Renwu::where('apply_id',$data['id'])->find();
-            if(!$status){
+            if($data['called'] == 0){
                 $returnData['status_msg'] = "审核中";
-            }else{
+            }else if($data['called'] == 1){
                 $returnData['status_msg'] = "已发布";
+            }else if($data['called'] == 2){
+                $returnData['status_msg'] = "审核未通过";
+            }else{
+                $returnData['status_msg'] = "审核已通过";
             }
+
             $returnData['img'] = array();
             if(!empty($data['imgs'])){
                 $returnData['img'] = json_decode($data['imgs'],true);

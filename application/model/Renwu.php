@@ -27,9 +27,9 @@ class Renwu extends Model{
     }
 
 
-    public function getTaskAttr($value){
-        return count($value);
-    }
+//    public function getTaskAttr($value){
+//        return count($value);
+//    }
     protected function scopeCount($query,$id){
         $query->where('id',$id)->count();
     }
@@ -62,8 +62,17 @@ class Renwu extends Model{
                 $data[$k]['task'] = \app\model\UserRw::where('rw_id',$v['id'])->count();
 
                 if($v['type'] == 1){
-                    // 设计任务
-                    $v['status'] = $v['rw_status'] == 1 ? 1 : $v['rw_status'] == 2 ? 1 : 2;
+                    // 装修任务
+//                    $data[$k]['status'] =  $v['rw_status'] == 1 ? 2 : $v['rw_status'] == 2 ? 1 : 1;
+
+                    switch ($v['rw_status']){
+                        case 1:
+                            $data[$k]['status'] = 2;
+                            break;
+                        default:
+                            $data[$k]['status'] = 1;
+                            break;
+                    }
                 }
             }
         }
@@ -81,17 +90,32 @@ class Renwu extends Model{
             $img                     = $v['rw_cover'];
             $data[$k]['rw_cover']    = "<img src='$img' style='width: 100px;height: 100px;'>";
             $data[$k]['rw_cat']      = Cat::where(['id'=>$v['rw_cat']])->value('cat_name');
-            switch ($v['rw_status']){
-                case 0:
-                    $status = "<span class=\"label label-defaunt radius\">未支付佣金</span>";
-                    break;
-                case 1:
-                    $status = "<span class=\"label label-success radius\">已支付佣金</span>";
-                    break;
-                case 2:
-                    $status = "<span class=\"label label-defaunt radius\">未被接单</span>";
-                    break;
+            if($v['type'] == 1){
+                switch ($v['rw_status']){
+                    case 0:
+                        $status = "<span class=\"label label-defaunt radius\">未支付佣金</span>";
+                        break;
+                    case 1:
+                        $status = "<span class=\"label label-success radius\">已支付佣金</span>";
+                        break;
+                    case 2:
+                        $status = "<span class=\"label label-defaunt radius\">未被接单</span>";
+                        break;
+                }
+            }else{
+                switch ($v['status']){
+                    case 0:
+                        $status = "<span class=\"label label-defaunt radius\">投标中</span>";
+                        break;
+                    case 1:
+                        $status = "<span class=\"label label-success radius\">进行中</span>";
+                        break;
+                    case 2:
+                        $status = "<span class=\"label label-success radius\">已完成</span>";
+                        break;
+                }
             }
+
             $data[$k]['rw_status'] = $status;
 
             switch ($v['is_show']){
@@ -112,10 +136,19 @@ class Renwu extends Model{
 
             $data[$k]['rw_hot'] = $v['rw_hot'] == 0 ? "<span class=\"label label-defaunt radius\">非热门任务</span>" : "<span class=\"label label-success radius\">热门任务</span>";
 
-            $bidUser = UserRw::with('user')->where('rw_id',$v['id'])->whereIn('order_status',[0,1,2,3,4,6,8,10])->find();
+            if($v['type'] == 1){
+                $bidUser = UserRw::with('user')->where('rw_id',$v['id'])->whereIn('order_status',[0,1,2,3,4,6,8,7,10])->find();
+                $data[$k]['bidUser'] = empty($bidUser) ? "" : $bidUser['user']['user_name'];
+            }else{
+                $bidUser = UserRw::where('rw_id',$v['id'])->whereIn('order_status',[0,1,2,3,4,6,8,7,10])->column('user_id');
 
+                $data[$k]['bidUser'] = empty($bidUser) ? "" : User::whereIn('id',$bidUser)->column('user_name');
 
-            $data[$k]['bidUser'] = empty($bidUser) ? "" : $bidUser['user']['user_name'];
+                if(!empty($data[$k]['bidUser'])){
+
+                    $data[$k]['bidUser'] = implode("<br>",$data[$k]['bidUser']);
+                }
+            }
 
             $p_id = Cat::where('id',$v['rw_cat'])->value('p_id');
 
@@ -123,6 +156,7 @@ class Renwu extends Model{
             $data[$k]['p_name'] = Cat::where('id',$p_id)->value('cat_name');
         }
 
+//        dump($data);die;
         return $data;
     }
 }

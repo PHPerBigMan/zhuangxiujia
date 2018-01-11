@@ -74,9 +74,16 @@ class Index
         }
 
         if(!empty($area)){
-            $data   = Db::name('Renwu')->where(['rw_cat'=>$id,'type'=>$type])->where("rw_status = 2")->where("is_show = 1")->where("rw_area","like","%$area%")->field('rw_title,start_time,id,rw_yj,rw_cover img,type,rw_status,status,abstract')->select();
+            $data   = Db::name('Renwu')->where(['rw_cat'=>$id,'type'=>$type])->where("is_show = 1")
+                ->where("rw_area","like","%$area%")
+                ->field('rw_title,start_time,id,rw_yj,rw_cover img,type,rw_status,status,abstract')
+                ->order('id','desc')
+                ->select();
         }else{
-            $data   = Db::name('Renwu')->where(['rw_cat'=>$id,'type'=>$type])->where("rw_status = 2")->where("is_show = 1")->field('rw_title,start_time,id,rw_yj,rw_cover img,type,rw_status,status,abstract')->select();
+            $data   = Db::name('Renwu')->where(['rw_cat'=>$id,'type'=>$type])->where("is_show = 1")
+                ->field('rw_title,start_time,id,rw_yj,rw_cover img,type,rw_status,status,abstract')
+                ->order('id','desc')
+                ->select();
         }
 
         foreach($data as $k=>$v){
@@ -85,6 +92,7 @@ class Index
         }
 
         $data = Renwu::IndexTask($data);
+
         $j = $this->return_data($data);
 
         return json($j);
@@ -122,14 +130,25 @@ class Index
         // TODO:: 这里还有问题
         if(!empty($area)){
 
-            $renovation = Renwu::where(['is_show'=>1,'type'=>1,'rw_hot'=>1])->where('rw_area','like',"%$area%")->field('id,rw_title,rw_yj,start_time,rw_cover img,type,abstract,rw_status,status')->select();
+            $renovation = Renwu::where(['is_show'=>1,'type'=>1,'rw_hot'=>1])
+                ->where('rw_area','like',"%$area%")
+                ->field('id,rw_title,rw_yj,start_time,rw_cover img,type,abstract,rw_status,status')
+                ->order('id','desc')
+                ->select();
 
-            $design = Renwu::where(['is_show'=>1,'type'=>2,'rw_hot'=>1])->where('rw_area','like',"%$area%")->field('id,rw_title,rw_yj,start_time,rw_cover img,type,abstract,rw_status,status')->select();
+            $design = Renwu::where(['is_show'=>1,'type'=>2,'rw_hot'=>1])->where('rw_area','like',"%$area%")
+                ->field('id,rw_title,rw_yj,start_time,rw_cover img,type,abstract,rw_status,status')
+                ->order('id','desc')
+                ->select();
         }else{
 
-            $renovation = Renwu::where(['is_show'=>1,'type'=>1,'rw_hot'=>1])->field('id,rw_title,rw_yj,start_time,rw_cover img,type,abstract,rw_status,status')->select();
+            $renovation = Renwu::where(['is_show'=>1,'type'=>1,'rw_hot'=>1])
+                ->field('id,rw_title,rw_yj,start_time,rw_cover img,type,abstract,rw_status,status')
+                ->order('id','desc')->select();
 
-            $design = Renwu::where(['is_show'=>1,'type'=>2,'rw_hot'=>1])->field('id,rw_title,rw_yj,start_time,rw_cover img,type,abstract,rw_status,status')->select();
+            $design = Renwu::where(['is_show'=>1,'type'=>2,'rw_hot'=>1])
+                ->field('id,rw_title,rw_yj,start_time,rw_cover img,type,abstract,rw_status,status')
+                ->order('id','desc')->select();
 
         }
 
@@ -137,7 +156,9 @@ class Index
 
         $renovation =  Renwu::IndexTask($renovation);
 
+
         $j = Task($renovation,$design);
+
 
         return json($j);
     }
@@ -216,10 +237,14 @@ class Index
                 $orderStatus = [7];
             }else{
                 // 中标
-                $orderStatus = [1,8];
+                $orderStatus = [1,8,10];
+                if($data['order_status'] == 10){
+                    // 当订单状态为 确认中时 显示所有投标用户
+                    $orderStatus = [1,8,7,10];
+                }
             }
             // 查找对应任务的 投标或中标用户
-            $user_id = UserRw::where('rw_id',$data['rw_id'])->column('user_id');
+            $user_id = UserRw::where('rw_id',$data['rw_id'])->whereIn('order_status',$orderStatus)->column('user_id');
 
             // 获取用户信息
             $userInfo = \app\model\User::whereIn('id',$user_id)->field('user_pic,id,user_name')->select();
@@ -233,7 +258,7 @@ class Index
             $data['create_time'] = $Task['create_time'];
             $data['rw_main'] = $Task['rw_main'];
         }
-        $data['task'] = count($data['task']);
+        $data['task'] = UserRw::where('rw_id',$Task['id'])->count();
 
         return json($this->return_data($data));
     }
@@ -258,7 +283,7 @@ class Index
         }
 
         if(!empty($data['design'])){
-            $data['task'] = count($data['design']);
+            $data['task'] = UserRw::where(['rw_id'=>$data['id']])->whereIn('order_status',[8,10,4,1,7])->count();
             foreach ($data['design'] as $k=>$v){
                 $data['user'][$k]['orderId'] = $v['orderId'];
                 $data['orderId'] = $v['orderId'];

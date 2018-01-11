@@ -65,12 +65,12 @@
 	    var change;
 		if(called == 0){
 		    // 审核通过
-			title = "是否审核不通过";
-			change = 2;
+			title = "是否审核通过";
+			change = 3;
 		}else{
 		    // 审核不通过
-			title = "是否修改为审核中";
-			change = 0;
+			title = "是否修改为不通过";
+			change = 2;
 		}
 
         layer.confirm(title,{

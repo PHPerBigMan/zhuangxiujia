@@ -6,6 +6,7 @@ use app\admin\model\Demand;
 use app\admin\model\Log;
 use app\common\model\BookCategory;
 use app\common\model\BookLose;
+use app\model\Decorate;
 use app\model\UserRw;
 use function EasyWeChat\Payment\get_client_ip;
 use think\Db;
@@ -154,6 +155,8 @@ class Renwu extends Base
         }else{
             $phone ="";
         }
+        $data['pay_limit_time'] = $data['pay_limit_time'] / 1000;
+        $data['bid_time'] = $data['bid_time'] / 1000;
 //        dump($TaskUserId);die;
         $j = [
             'title'=>"任务详情",
@@ -179,7 +182,7 @@ class Renwu extends Base
         $rw_province             = Db::name('HatProvince')->where(['provinceID'=>input('rw_province')])->value('province');
         $data['rw_area']         = $data['rw_city'];
         // 时间转为毫秒
-//        $data['pay_limit_time'] = $data['pay_limit_time'] * 1000;
+        $data['pay_limit_time'] = $data['pay_limit_time'] * 1000;
         unset($data['rw_city']  );
         if (!is_numeric($data['rw_yj'])|| !is_numeric($data['rw_ding']) || !is_numeric($data['pay_limit_time']) )
         {
@@ -216,18 +219,20 @@ class Renwu extends Base
         $data['create_time'] = strtotime($data['create_time']);
         $data['start_time'] = strtotime($data['start_time']);
 
+
         if($data['rw_cat'] == 4){
             // 根据手机号查询
-            $data['apply_id'] = Demand::where(['phone'=>$data['user_phone'],'called'=>0])->value('id');
+            $data['apply_id'] = Demand::where(['phone'=>$data['user_phone']])->whereIn('called',[0,3])->value('id');
             if(!empty($data['apply_id'])){
                 // 查询用户的id
-                $data['user_id'] = Demand::where(['phone'=>$data['user_phone'],'called'=>0])->value('user_id');
-                // 改变申请状态
+                $data['user_id'] = Demand::where(['phone'=>$data['user_phone']])->whereIn('called',[0,3])->value('user_id');
+                // 改变申请状态  将审核通过的和审核中的订单 都改为已发布
                 Demand::where('id',$data['apply_id'])->update(['called'=>1]);
             }else{
                 unset($data['apply_id']);
             }
 
+            $data['bid_time'] = $data['bid_time']*1000;
         }
         unset($data['user_phone']);
 //        dump($data);die;
@@ -249,6 +254,8 @@ class Renwu extends Base
 },500)</script>";
             }
         }else{
+
+            $data['user_id'] = Decorate::where('id',\app\model\Renwu::where('id',$id)->value('apply_id'))->value('user_id');
 
             if(is_numeric($data['rw_area'])){
                 $data['rw_area'] = Db::name('hat_city')->where('cityID',$data['rw_area'])->value('city');
@@ -289,8 +296,6 @@ class Renwu extends Base
 
         $pass = "<span class=\"label label-defaunt radius\" $font>未审核</span>";
         $data['rw_pass'] = $pass;
-
-
         $data['rw_img']         = array();
         $data['rw_title']       = "";
         $data['rw_yj']          = "";
@@ -298,6 +303,7 @@ class Renwu extends Base
         $data['rw_cat']         = "";
         $data['rw_main']        = "";
         $data['rw_province']    = "";
+        $data['abstract']    = "";
         $data['rw_area']        = "";
         $data['rw_cover']       = "";
         $data['create_time']    = date('Y-m-d',time());
@@ -306,6 +312,7 @@ class Renwu extends Base
         $data['id']  = "";
         $data['lunbojson']  = "";
         $data['lunbocount']  = 0;
+        $data['bid_time']  = 0;
         $province = Db::name('HatProvince')->select();
 
         $city = Db::name('HatCity')->where(['father'=>Db::name('HatCity')->where(['city'=>$data['rw_area']])->value('father')])->select();

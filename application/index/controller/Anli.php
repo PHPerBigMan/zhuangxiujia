@@ -159,9 +159,9 @@ class Anli
         foreach($data as $k=>$v){
 
             $data[$k]['quarters']   = !isset($v['priceRanges']) ? "" : $v['priceRanges'];
-            $data[$k]['style']      = !isset($v['decorativeStyles']) ? "" : $v['priceRanges'];
-            $data[$k]['house']      = !isset($v['houseTypes']) ? "" : $v['priceRanges'];
-            $data[$k]['acreage']    = !isset($v['acreageTypes']) ? "" : $v['priceRanges'];
+            $data[$k]['style']      = !isset($v['decorativeStyles']) ? "" : $v['decorativeStyles'];
+            $data[$k]['house']      = !isset($v['houseTypes']) ? "" : $v['houseTypes'];
+            $data[$k]['acreage']    = !isset($v['acreageTypes']) ? "" : $v['acreageTypes'];
         }
 
         return $data;

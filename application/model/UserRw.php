@@ -7,6 +7,7 @@
  */
 namespace app\model;
 use app\admin\model\Percentage;
+use think\Db;
 use think\Model;
 
 class UserRw extends Model{
@@ -48,16 +49,20 @@ class UserRw extends Model{
 
             if($type == 1){
                 // 装修任务
-                $status =Renwu::where('id',$data['id'])->value('status');
+                $status =Renwu::where('id',$data['id'])->value('rw_status');
             }else{
                 // 设计任务
-                $status = Renwu::where('id',$data['id'])->value('rw_status');
+                $status = Renwu::where('id',$data['id'])->value('status');
 
             }
             if($bidCount >= 3){
                 // 该任务投标次数已满
                 return json(['code'=>404,'msg'=>"该任务投标次数已达上限"]);
             }else{
+                Db::name('log')->insert([
+                    'msg'=>'创建新订单',
+                    'data'=> json_encode($data)
+                ]);
                 if($type == 1){
                     if($status == 1){
                         // 已经完成
@@ -84,7 +89,8 @@ class UserRw extends Model{
                             'orderId'=>date('Ymd').time(),
                             'order_type'=>2,
                             'order_status'=>7,
-                            'create_time'=>time()
+                            'create_time'=>time(),
+                            'out_trade_no'=>$data['out_trade_no']
                         ]);
                         return returnStatus($s);
                     }
@@ -207,6 +213,7 @@ class UserRw extends Model{
      */
     public static  function ReturnOrderList($Getdata){
         $data = array();
+
         foreach($Getdata as $k=>$v){
             // 接单日期
             $data[$k]['create_time'] = $v['create_time'];
@@ -233,6 +240,7 @@ class UserRw extends Model{
                 $data[$k]['status_msg'] = "确认中";
             }
         }
+//        dump($data);die;
         return $data;
     }
 

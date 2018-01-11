@@ -158,8 +158,11 @@ class Apply extends Base
                 case 1:
                     $data[$k]['called'] = "已发布";
                     break;
-                default:
+                case 2:
                     $data[$k]['called'] = "未通过";
+                    break;
+                default:
+                    $data[$k]['called'] = "已通过";
             }
             if($type == 2){
                 $data[$k]['user_name'] = Db::name('user')->where(['id'=>$v['user_id']])->value('user_name');

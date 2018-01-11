@@ -15,17 +15,24 @@ class MoneyList extends Model{
         return $this->hasOne(UserRw::class,'orderId','order_id');
     }
     public static function add($data){
-        $s = MoneyList::insert([
-            'user_id'=>$data['user_id'],
-            'money'=>$data['money'],
-            'type'=>3,
-            'status'=>1,
-            'create_time'=>time()
-        ]);
+        // 先查询是否金额大于余额
+        $hasMoney = User::where('id',$data['user_id'])->value('user_money');
+        if($hasMoney > $data['money']){
+            $s = MoneyList::insert([
+                'user_id'=>$data['user_id'],
+                'money'=>$data['money'],
+                'type'=>3,
+                'status'=>1,
+                'create_time'=>time()
+            ]);
 
-        if($s){
-            $code = 200;
+            if($s){
+                $code = 200;
+            }
+        }else{
+            $code = 0;
         }
+
 
         return $code;
     }

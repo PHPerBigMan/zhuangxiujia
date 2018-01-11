@@ -74,7 +74,9 @@ class User
         $s = MoneyList::add($post);
         // 减少用户的余额
 
-        \app\model\User::where('id',$post['user_id'])->setDec('user_money',$post['money']);
+        if($s == 200){
+            \app\model\User::where('id',$post['user_id'])->setDec('user_money',$post['money']);
+        }
 
         return returnStatus($s);
     }
@@ -120,12 +122,12 @@ class User
                 $status = [4];
                 break;
         }
+
         $data = UserRw::alias('ur')->join('renwu t','t.id = ur.rw_id')
             ->where(['ur.user_id'=>$post['user_id'],'t.type'=>2])
             ->whereIn('ur.order_status',$status)
-            ->order('id','desc')
+            ->order('ur.id','desc')
            ->select();
-
         $data = UserRw::ReturnOrderList($data);
         return json($this->return_data($data));
     }
@@ -700,5 +702,17 @@ class User
         return json($j);
 
 
+    }
+
+    /**
+     * @return \think\response\Json
+     * author hongwenyang
+     * method description : 获取设计师简历
+     */
+    public function Resume(){
+        $data = \app\model\User::findOrFail(input('user_id'));
+
+
+        return json($this->return_data($data));
     }
 }

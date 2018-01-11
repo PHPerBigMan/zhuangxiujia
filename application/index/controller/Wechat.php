@@ -49,24 +49,27 @@ class Wechat
         $app = new Application($options);
         $payment = $app->payment;
 
-        if($orderData['payType'] == 1){
-            // 对已生成的订单进行付费
-            $taskId     = UserRw::where('orderId',$orderData['orderId'])->value('rw_id');
-            $user_id = UserRw::where('orderId',$orderData['orderId'])->value('user_id');
-            $out_trade_no  = 'wx'.$orderData['orderId'].rand(1000,9999).'-'.$orderData['payType'].'-'.$user_id.'-'.$taskId;
-        }else{
-            // 投标先付费再生成订单
-            $taskId = $orderData['id'];
-            $user_id = $orderData['user_id'];
-            $out_trade_no  = 'wx'.time().rand(1000,9999).'-'.$orderData['payType'].'-'.$user_id.'-'.$taskId;
-
-
-        }
-        $detail     = Renwu::where('id',$taskId)->value('rw_title');
         Db::name('log')->insert([
             'msg'=>'获取数据',
             'data'=>json_encode($orderData)
         ]);
+
+        if($orderData['payType'] == 1){
+            // 对已生成的订单进行付费
+            $taskId     = UserRw::where('orderId',$orderData['orderId'])->value('rw_id');
+            $user_id    = UserRw::where('orderId',$orderData['orderId'])->value('user_id');
+
+            $out_trade_no  = 'wx'.$orderData['orderId'].'-'.$orderData['payType'].'-'.$user_id.'-'.$taskId;
+        }else{
+            // 投标先付费再生成订单
+            $taskId = $orderData['id'];
+            $user_id = $orderData['user_id'];
+            $out_trade_no  = 'wx'.time().'-'.$orderData['payType'].'-'.$user_id.'-'.$taskId;
+
+
+        }
+        $detail     = Renwu::where('id',$taskId)->value('rw_title');
+
         $attributes = [
             'trade_type'       => 'APP', // JSAPI，NATIVE，APP...
             'body'             => '支付押金',
@@ -76,9 +79,10 @@ class Wechat
             'attach'           => $orderData['payType'].'-'.$user_id.'-'.$taskId  //
         ];
 
+
         $order = new Order($attributes);
         $result = $payment->prepare($order);
-
+//        dd($result);die;
         if ($result->return_code == 'SUCCESS' && $result->result_code == 'SUCCESS'){
             if($orderData['payType'] == 1){
                 $out_trade_no = explode('-',$out_trade_no);
@@ -136,10 +140,10 @@ class Wechat
 //                'msg'=>'支付是否成功',
 //                'data'=>$successful
 //            ]);
-//            Db::name('log')->insert([
-//                'msg'=>'支付是否成功1',
-//                'data'=>json_encode($attach)
-//            ]);
+            Db::name('log')->insert([
+                'msg'=>'支付是否成功1',
+                'data'=>json_encode($attach)
+            ]);
             // 用户是否支付成功
             if ($successful) {
                 try{
@@ -161,7 +165,10 @@ class Wechat
                         $type = Renwu::where('id',$attach[3])->value('type');
                         if($type == 1){
                             // 装修任务
-                            $update['order_status'] = 1;
+                            $old = UserRw::where('out_trade_no',$attach[0])->value('order_status');
+                            if($old == 0){
+                                $update['order_status'] = 1;
+                            }
                         }else{
                             // 设计任务
                             $update['order_status'] = 8;
@@ -169,19 +176,27 @@ class Wechat
                             // 设计师中标后,将未中标且已支付定金 的数据返回到对应的用户账号中  并且将订单修改为未中标
 //                            $TaskId = UserRw::where('out_trade_no',$attach[0])->value('rw_id');
 
-                            $AllUserId = UserRw::where(['rw_id'=>$attach[3]])->where('out_trade_no','!=',$attach[0])->column('user_id');
+                            $AllUserId = UserRw::where(['rw_id'=>$attach[3]])->where('out_trade_no','neq',$attach[0])->column('user_id');
+
+
+                            Db::name('log')->insert([
+                                'msg'=>'进来了2--任务修改',
+                                'data'=> $AllUserId
+                            ]);
+
                             if(!empty($AllUserId)){
                                 // 开始退换定金
                                 \app\model\User::whereIn('id',$AllUserId)->setDec('user_money',Renwu::where('id',$attach[3])->value('rw_ding'));
 
                                 // 获取未中标的订单id
-                                $NoGetOrderId = UserRw::where(['rw_id'=>$attach[3]])->where('out_trade_no','!=',$attach[0])->column('id');
+                                $NoGetOrderId = UserRw::where(['rw_id'=>$attach[3]])->where('out_trade_no','neq',$attach[0])->column('id');
 
                                 // 将这些订单修改为未中标
                                 UserRw::wehreIn('id',$NoGetOrderId)->update(['order_status'=>9]);
                             }
 
                         }
+
                         UserRw::where('out_trade_no',$attach[0])->update($update);
                     }else{
 
@@ -215,12 +230,13 @@ class Wechat
 
 
     public function demo(){
-        $data = explode('-',"wx15143566568093-2-23-18");
+        $AllUserId = UserRw::where(['rw_id'=>113])->where('out_trade_no','neq',"wx201801111515671912")->column('user_id');
 
-        $create['id'] = $data[3];
-        $create['user_id']  = $data[2];
-        $create['out_trade_no'] = $data[0];
-        UserRw::add($create);
+        dump($AllUserId);die;
+        Db::name('log')->insert([
+            'msg'=>'进来了2--任务修改',
+            'data'=> $AllUserId
+        ]);
     }
 
     /**
