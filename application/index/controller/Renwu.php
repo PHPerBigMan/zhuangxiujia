@@ -19,6 +19,10 @@ class Renwu
         $data['rw_img']         = json_decode($data['rw_img'],true);
         $data['start_time']     = strtotime($data['start_time']);
 
+        if($data['type'] == 2){
+            $data['bid_time']  = TaskReturn($data);
+        }
+
         $j = $this->return_data($data);
         return json($j);
     }
@@ -39,10 +43,15 @@ class Renwu
         $orderId = "";
         // 判断用户是否已经接过这个任务
         $isGet = UserRw::where(['user_id'=>$insert['user_id'],'rw_id'=>$id])->value('id');
+        // 查看任务的状态
+        $status = \app\model\Renwu::where('id',$id)->value('rw_status');
         if($isGet){
             $msg = "该用户已经接过此任务";
             $status = 404;
-
+        }else if($status != 2){
+            // 2的状态是未接单  如果不是的话则表示这个任务已经被接单
+            $msg = "该任务已被接单";
+            $status = 404;
         }else{
             $s = Db::name('UserRw')->insertGetId($insert);
             Db::name('Renwu')->where(['id'=>$id])->update(['rw_status'=>0]);
@@ -55,7 +64,6 @@ class Renwu
                 $status = 404;
             }
         }
-
 
         $j = [
             'msg'=>$msg,

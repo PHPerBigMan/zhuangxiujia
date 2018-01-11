@@ -59,4 +59,3 @@ function makeQrcode($url){
     return $returnName;
 }
 
-

@@ -100,7 +100,7 @@ class Index
 
     public function banner()
     {
-        $Img    = Db::name('Banner')->field('banner_url url')->where(['type'=>0])->select();
+        $Img    = Db::name('Banner')->field('banner_url url,href')->where(['type'=>0])->select();
 
         if(empty($Img)){
             $status = 200;
@@ -248,18 +248,18 @@ class Index
 
             // 获取用户信息
             $userInfo = \app\model\User::whereIn('id',$user_id)->field('user_pic,id,user_name')->select();
-//            dump($userInfo);die;
+
             $data['user'] = $userInfo;
-//            dd($userInfo);die;
             $Task = Renwu::where('id',$data['rw_id'])->find();
             $data['rw_title'] = $Task['rw_title'];
             $data['rw_yj']    = $Task['rw_yj'];
-            $data['bid_time'] = $Task['bid_time'];
+            $data['bid_time'] = TaskReturn($Task);
             $data['create_time'] = $Task['create_time'];
             $data['rw_main'] = $Task['rw_main'];
         }
         $data['task'] = UserRw::where('rw_id',$Task['id'])->count();
 
+//        dump($data);die;
         return json($this->return_data($data));
     }
 
@@ -281,6 +281,8 @@ class Index
             $data['design'] = UserRw::where(['rw_id'=>$data['id']])->whereIn('order_status',[8,10,4,1])->with(['user'=>function($query){$query->field('id,user_name,user_pic');}])->select();
 
         }
+
+        $data['bid_time'] = TaskReturn($data);
 
         if(!empty($data['design'])){
             $data['task'] = UserRw::where(['rw_id'=>$data['id']])->whereIn('order_status',[8,10,4,1,7])->count();

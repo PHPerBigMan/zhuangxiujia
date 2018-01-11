@@ -178,6 +178,7 @@ class User
                 } else {
 //                    $data[$k]['pay_limit_time']     = ($rewu['pay_limit_time']-(time()-$rewu['pay_limit_time'])) / 60;
 
+                    // TODO::支付倒计时
                     $time = $rewu['pay_limit_time'] - (time() - $v['create_time']);
 
                     $data[$k]['pay_limit_time'] = date('s',$time) * 1000;
@@ -537,11 +538,11 @@ class User
         // 案例图片
         if(request()->file('pic') !=NULL){
             $files = request()->file('pic');
-            foreach($files as $file){
+            foreach($files as $k=>$file){
                 // 移动到框架应用根目录/public/uploads/ 目录下
                 $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
                 if($info){
-                    $user_pic[] = DS.'uploads'.DS.$info->getSaveName();
+                    $user_pic[$k] = DS.'uploads'.DS.$info->getSaveName();
                 }
             }
         }
@@ -552,6 +553,10 @@ class User
             $user_img[$k] = "<img src='$save_url' style='width: 330px;height: 180px'>";
         }
 
+        Db::name('log')->insert([
+            'msg'=>'案例',
+            'data'=>json_encode($user_pic)
+        ]);
         // 案例封面
         if(request()->file('cover') !=NULL){
             $files = request()->file('cover');
@@ -571,6 +576,7 @@ class User
         $data['content'] = "<p>".$data['content']."</p>";
         $user_img = implode('',$user_img);
         $data['pass_content'] = $data['content'].$user_img;
+//        dump($data);die;
 
 
         // 案例多图

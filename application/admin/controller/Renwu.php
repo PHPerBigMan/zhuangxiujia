@@ -36,14 +36,23 @@ class Renwu extends Base
 
         $cat = Cat::where('level','1')->select();
 
-        $j = [
-            'title'     => "任务列表",
-            'count'     =>$count,
-            'cat'       =>$cat,
-            'keyword'   =>$keyword
-        ];
+        $whereIn = Cat::where('level',2)->column('id');
+        if(!empty(input('keyword'))){
+            $whereIn = Cat::where('p_id',input('keyword'))->column('id');
+        }
 
-        return view("Renwu/index", $j);
+        $data = \app\model\Renwu::order("id desc")->whereIn('rw_cat',$whereIn)->order('create_time','desc')->select();
+
+        if(!empty($data)){
+            foreach ($data as $v){
+                $v->catName = Cat::where('id',$v->rw_cat)->value('cat_name');
+            }
+        }
+        $data = \app\model\Renwu::getBackAll($data);
+//
+        $title = "任务列表";
+
+        return view("Renwu/index", compact('count','cat','keyword','data','title'));
     }
 
     /**
@@ -356,7 +365,7 @@ class Renwu extends Base
         $id = input('id');
         $is_pass = Db::name('Renwu')->where(['id'=>$id])->value('is_show') == 1 ? 0 : 1;
 
-        $s = Db::name('Renwu')->where(['id'=>$id])->update(['is_show'=>$is_pass]);
+        $s = Db::name('Renwu')->where(['id'=>$id])->update(['is_show'=>$is_pass,'create_time'=>time()]);
         if($s){
             $code = 200;
         }else{

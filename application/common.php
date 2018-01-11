@@ -141,3 +141,25 @@ function return_data_bank($data){
     return $j;
 }
 
+/**
+ * @param $Bid
+ * @return false|int 处理投标倒计时
+ */
+function TaskReturn($Bid){
+    $bid_time  = $Bid['bid_time']- (time() - strtotime($Bid['create_time']));
+
+    // TODO:: 投标倒计时
+    $bid_time = date('i',$bid_time) * 10000;
+//    dump($bid_time);die;
+    if($bid_time <= 0){
+        $bid_time = 0;
+        // 修改任务的状态 暂时改为已完成
+        \app\model\Renwu::where('id',$Bid['id'])->update([
+            'status'=>2
+        ]);
+    }
+
+
+    return $bid_time;
+}
+
