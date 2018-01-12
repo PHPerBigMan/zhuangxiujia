@@ -34,10 +34,14 @@ class Wechat
         $post = input();
         // 查看用户是否可以投标
         $isBid = UserRw::where(['user_id'=>$post['user_id'],'rw_id'=>$post['id']])->find();
-
+        // 查看任务是否已结束
+        $status = Renwu::where('id',$post['id'])->value('status');
         if($isBid){
             return json(['code'=>404,'msg'=>'已投标']);
         }else{
+            if(in_array($status,[1,2])){
+                return json(['code'=>404,'msg'=>'投标已结束']);
+            }
             return json(['code'=>200,'msg'=>'可投标']);
         }
     }

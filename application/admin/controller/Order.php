@@ -3,6 +3,7 @@ namespace app\admin\controller;
 
 use app\admin\model\Percentage;
 use app\common\model\BookLose;
+use app\model\MoneyList;
 use app\model\UserRw;
 use think\Db;
 
@@ -125,6 +126,15 @@ class Order extends Base
             $TaskUserGetMoney = input('rw_yj') * (1-$percent);
             Db::name("User")->where(['id'=>Db::name('UserRw')->where(['id'=>$id])->value('user_id')])->setInc('user_money',$TaskUserGetMoney);
 
+            // 将数据记录正在金额明细中
+            // 将记录存储
+            MoneyList::insert([
+                'user_id'=>UserRw::where('id',$id)->value('user_id'),
+                'money'=>$TaskUserGetMoney,
+                'type'=>0,
+                'status'=>2,
+                'create_time'=>time()
+            ]);
             // 将任务的状态改为已完成
             $TaskId= UserRw::where('id',$id)->value('rw_id');
             \app\model\Renwu::where('id',$TaskId)->update(['status'=>2,'rw_status'=>1]);

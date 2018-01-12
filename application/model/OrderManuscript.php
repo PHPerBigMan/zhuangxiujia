@@ -36,11 +36,19 @@ class OrderManuscript extends Model{
         $manuscript = json_encode($manuscript);
         // 保存数据
 
-        $s = OrderManuscript::insert([
-            'orderId'=>$data['orderId'],
-            'manuscript'=>$manuscript
-        ]);
-
+        // 查看是已经上传过设计稿
+        $isSend = OrderManuscript::where('orderId',$data['orderId'])->select();
+        if($isSend){
+            // 更新
+            $s = OrderManuscript::where('orderId',$data['orderId'])->update([
+                'manuscript'=>$manuscript
+            ]);
+        }else{
+            $s = OrderManuscript::insert([
+                'orderId'=>$data['orderId'],
+                'manuscript'=>$manuscript
+            ]);
+        }
         // 修改订单状态 待确认
         UserRw::where('orderId',$data['orderId'])->update([
             'order_status'=>10

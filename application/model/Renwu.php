@@ -13,9 +13,9 @@ class Renwu extends Model{
     protected $table = "zjx_renwu";
 
 
-    public function getStartTimeAttr($value){
-        return date('m'.'月'.'d'.'日',$value);
-    }
+//    public function getStartTimeAttr($value){
+//        return date('m'.'月'.'d'.'日',$value);
+//    }
 
     public function task(){
         return $this->hasMany(UserRw::class,'rw_id','id');

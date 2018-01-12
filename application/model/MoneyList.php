@@ -17,7 +17,7 @@ class MoneyList extends Model{
     public static function add($data){
         // 先查询是否金额大于余额
         $hasMoney = User::where('id',$data['user_id'])->value('user_money');
-        if($hasMoney > $data['money']){
+        if($hasMoney >= $data['money']){
             $s = MoneyList::insert([
                 'user_id'=>$data['user_id'],
                 'money'=>$data['money'],

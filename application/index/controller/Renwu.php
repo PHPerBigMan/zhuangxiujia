@@ -13,16 +13,15 @@ class Renwu
     public function read(){
 
         $id = input('id');
-        $data =\app\model\Renwu::where(['id'=>$id])->field('id,rw_yj,rw_title,rw_img,rw_main,rw_ding,create_time,start_time,type,bid_time')->find();
+        $data =\app\model\Renwu::where(['id'=>$id])->field('id,rw_yj,rw_title,rw_img,rw_main,rw_ding,create_time,start_time,type,bid_time,status,rw_status')->find();
 
         $data['task']           = UserRw::where('rw_id',$data['id'])->count();
         $data['rw_img']         = json_decode($data['rw_img'],true);
-        $data['start_time']     = strtotime($data['start_time']);
+        $data['start_time']     = date("m"."月"."d"."日",$data['start_time']);
 
         if($data['type'] == 2){
             $data['bid_time']  = TaskReturn($data);
         }
-
         $j = $this->return_data($data);
         return json($j);
     }

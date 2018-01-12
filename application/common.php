@@ -146,10 +146,9 @@ function return_data_bank($data){
  * @return false|int 处理投标倒计时
  */
 function TaskReturn($Bid){
-    $bid_time  = $Bid['bid_time']- (time() - strtotime($Bid['create_time']));
+    $bid_time  = ($Bid['bid_time']- (date('s',time() - strtotime($Bid['create_time'])))) *1000;
 
     // TODO:: 投标倒计时
-    $bid_time = date('i',$bid_time) * 10000;
 //    dump($bid_time);die;
     if($bid_time <= 0){
         $bid_time = 0;

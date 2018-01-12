@@ -332,8 +332,19 @@ class User
             ]);
         }
 
-        $s = Db::name('UserRw')->where(['orderId'=>$orderId])->update(['order_status'=>$o_status]);
+        if($o_status == 2){
+            // 服务商点击完成任务前先判断当前时间和任务的开工时间
+            $TaskId = UserRw::where('orderId',$orderId)->value('rw_id');
 
+            $TaskStartTime = \app\model\Renwu::where('id',$TaskId)->value('start_time');
+
+            if(time() < $TaskStartTime){
+                // 如果开工时间大于当前时间则表示尚未开工
+                return json(['code'=>404,'msg'=>'任务未开始不能确认']);
+            }
+        }
+
+        $s = Db::name('UserRw')->where(['orderId'=>$orderId])->update(['order_status'=>$o_status]);
 
         if($s){
             $msg['code'] = 200;
@@ -613,7 +624,7 @@ class User
     public function money_list(){
 //        echo time();die;
         $id = input('user_id');
-        $data = Db::name('MoneyList')->where(['user_id'=>$id])->select();
+        $data = Db::name('MoneyList')->where(['user_id'=>$id])->order('id','desc')->select();
         foreach ($data as $k=>$v){
             $data[$k]['create_time'] = date('Y-m-d',$v['create_time']);
             $order_id = $v['order_id'];
