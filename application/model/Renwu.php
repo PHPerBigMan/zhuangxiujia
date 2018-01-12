@@ -66,14 +66,24 @@ class Renwu extends Model{
 //                    $data[$k]['status'] =  $v['rw_status'] == 1 ? 2 : $v['rw_status'] == 2 ? 1 : 1;
 
                     switch ($v['rw_status']){
+                        // 进行中
+                        case 0:
+//                            $data[$k]['status'] = 0;
+                            $data[$k]['status'] = 1;
+                            break;
+                            // 已结束
                         case 1:
+//                            $data[$k]['status'] = 1;
                             $data[$k]['status'] = 2;
                             break;
+                            // 可接单（未接单）
                         default:
-                            $data[$k]['status'] = 1;
+                            $data[$k]['status'] = 3;
                             break;
                     }
                 }
+
+                $data[$k]['start_time'] = date("m-d",$v['start_time']);
             }
         }
         return $data;

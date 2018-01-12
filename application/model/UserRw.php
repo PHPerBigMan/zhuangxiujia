@@ -305,14 +305,24 @@ class UserRw extends Model{
 
         User::where('id',UserRw::where('orderId',$post)->value('user_id'))->setInc('user_money',$TaskUserGetMoney);
 
-        // 将记录存储
-        MoneyList::insert([
-            'user_id'=>UserRw::where('orderId',$post)->value('user_id'),
-            'money'=>$TaskUserGetMoney,
-            'type'=>0,
-            'status'=>2,
-            'create_time'=>time()
-        ]);
+        // 退还定金
+        User::where('id',UserRw::where('orderId',$post)->value('user_id'))->setInc('user_money',$TaskInfo['rw_ding']);
+
+        // 将记录存储(佣金)
+        $type = [
+            0=>$TaskUserGetMoney,
+            1=>$TaskInfo['rw_ding']
+        ];
+        foreach ($type as $k=>$value){
+            MoneyList::insert([
+                'user_id'=>UserRw::where('orderId',$post)->value('user_id'),
+                'money'=>$value,
+                'type'=>$k,
+                'status'=>2,
+                'create_time'=>time()
+            ]);
+        }
+
         // 修改任务的状态为已完成
         Renwu::where('id',$TaskInfo['id'])->update(['status'=>2]);
         if($s){

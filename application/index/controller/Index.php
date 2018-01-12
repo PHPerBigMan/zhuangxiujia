@@ -86,11 +86,6 @@ class Index
                 ->select();
         }
 
-        foreach($data as $k=>$v){
-            $data[$k]['start_time'] = date('Y/m/d');
-//            $data[$k]['task']   = count(UserRw::where('rw_id',$v['id'])->select());
-        }
-
         $data = Renwu::IndexTask($data);
 
         $j = $this->return_data($data);

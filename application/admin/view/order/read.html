@@ -60,7 +60,7 @@
 				<label class="layui-form-label">审核是否通过</label>
 				<div class="layui-input-block">
 					<input type="radio" name="order_status_pass" value="4" title="是" <?php if($data['order_status'] == 4){echo "checked=checked";}?>>
-					<input type="radio" name="order_status_pass" value="0" title="否" <?php if($data['order_status'] == 0){echo "checked=checked";}?>>
+					<input type="radio" name="order_status_pass" value="3" title="否" <?php if($data['order_status'] == 0){echo "checked=checked";}?>>
 					<input type="radio" name="order_status_pass" value="2" title="暂未审核" <?php if($data['order_status'] ==2 ){echo "checked=checked";}?>>
 				</div>
 			</div>
@@ -159,7 +159,7 @@
 		var value = $('input[name="order_status_pass"]:checked').val();
 		var order_remrark = $('#order_remark').val();
 		
-		if(value == 0){
+		if(value == 3){
 		    if(order_remrark == ""){
 		        layer.msg("请填写 审核不通过的原因");
 			}else{
@@ -175,7 +175,7 @@
                 })
             }
 		}else if(value == 4){
-		    layer.confirm("审核通过后 定金将退还至用户账户!",['是','否'],function () {
+		    layer.confirm("审核通过后 定金和佣金将发放至用户账户!",['是','否'],function () {
                 $.post("{:url('Order/order_edit')}",$('#form').serialize(),function (code) {
                     if(code == 200){
                         layer.msg("订单修改成功",{icon:1,time:1000});

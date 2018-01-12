@@ -102,35 +102,6 @@ class Renwu extends Base
     public function read(){
         $id = input('id');
         $data = Db::name('Renwu')->where(['id'=>$id])->find();
-
-//        var_dump($data);die;
-        $font = "style=\"font-size:14px\"";
-        switch ($data['rw_status']){
-            case 0:
-                $status = "<span class=\"label label-defaunt radius\" $font>未支付佣金</span>";
-                break;
-            case 1:
-                $status = "<span class=\"label label-success radius\" $font>已支付佣金</span>";
-                break;
-            case 2:
-                $status = "<span class=\"label label-defaunt radius\" $font>未被接单</span>";
-                break;
-        }
-        $data['rw_status'] = $status;
-
-        switch ($data['rw_pass']){
-                case 0:
-                    $pass = "<span class=\"label label-defaunt radius\" $font>未审核</span>";
-                    break;
-                case 1:
-                    $pass = "<span class=\"label label-defaunt radius\" $font>审核未通过</span>";
-                    break;
-                case 2:
-                    $pass = "<span class=\"label label-success radius\" $font>审核已通过</span>";
-                    break;
-            }
-
-        $data['rw_pass'] = $pass;
         $data['rw_img']  = json_decode($data['rw_img'],true);
 
         if(empty($data['rw_img'])) {

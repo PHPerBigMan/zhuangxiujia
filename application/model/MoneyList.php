@@ -6,6 +6,7 @@
  * Time: 18:58
  */
 namespace app\model;
+use think\Db;
 use think\Model;
 
 class MoneyList extends Model{
@@ -27,6 +28,11 @@ class MoneyList extends Model{
             ]);
 
             if($s){
+                // 将数据加入提现申请数据表中
+                Db::name('tixian')->insert([
+                    'user_id'=>$data['user_id'],
+                    'money'=>$data['money']
+                ]);
                 $code = 200;
             }
         }else{

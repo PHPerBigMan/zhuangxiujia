@@ -50,7 +50,7 @@
 
 	/*审核*/
 	function shenghe(obj,id) {
-		layer.confirm("确认您的操作吗？",function () {
+		layer.confirm("确认通过审核的操作吗？",function () {
 			$.post("{:url('Tixian/shenghe')}",{id:id},function (code) {
 				if(code == 200){
 					layer.msg('操作成功',{icon:1,time:1000});
@@ -58,7 +58,7 @@
 						location.reload()
 					},1000);
 				}else{
-				    layer.msg('您没有权限')
+				    layer.msg('操作未成功')
 				}
 			})
 		});

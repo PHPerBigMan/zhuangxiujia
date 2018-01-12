@@ -324,9 +324,9 @@ class User
                 $o_status = 6;
                 break;
         }
+        $TaskId = UserRw::where('orderId',$orderId)->value('rw_id');
         if($o_status == 6){
             // 取消订单 任务释放
-            $TaskId = UserRw::where('orderId',$orderId)->value('rw_id');
             \app\model\Renwu::where('id',$TaskId)->update([
                 'status'=>2
             ]);
@@ -334,7 +334,6 @@ class User
 
         if($o_status == 2){
             // 服务商点击完成任务前先判断当前时间和任务的开工时间
-            $TaskId = UserRw::where('orderId',$orderId)->value('rw_id');
 
             $TaskStartTime = \app\model\Renwu::where('id',$TaskId)->value('start_time');
 
@@ -344,6 +343,23 @@ class User
             }
         }
 
+        $TaskType = \app\model\Renwu::where('id',$TaskId)->find();
+        if($o_status == 5){
+            // 判断任务的类型
+            if($TaskType['type'] == 1){
+                // 装修任务
+                $column = "rw_status";
+                $status = 2;
+            }else{
+                // 设计任务
+                $column = "status";
+                $status = 0;
+            }
+            // 取消订单释放任务
+            \app\model\Renwu::where('id',$TaskId)->update([
+                "$column"=>"$status"
+            ]);
+        }
         $s = Db::name('UserRw')->where(['orderId'=>$orderId])->update(['order_status'=>$o_status]);
 
         if($s){

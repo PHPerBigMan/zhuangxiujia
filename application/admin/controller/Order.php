@@ -107,12 +107,14 @@ class Order extends Base
         $id = input('id');
         $order_remark = input('order_remark');
         $order_status = input('order_status_pass');
-
+        $TaskId= UserRw::where('id',$id)->value('rw_id');
         if($order_status == 0){
+            // 任务不通过
             $s = Db::name('UserRw')->where(['id'=>$id])->update([
                 'order_remark'=>$order_remark,
                 'order_status'=>$order_status
             ]);
+            $TaskPass = 1;
         }else if($order_status == 4){
             $s = Db::name('UserRw')->where(['id'=>$id])->update([
                 'order_status'=>$order_status
@@ -123,27 +125,45 @@ class Order extends Base
             //将佣金充值进用户账户 需要重新计算佣金
             $percent = Percentage::where('id',1)->value('percentage');
 
-            $TaskUserGetMoney = input('rw_yj') * (1-$percent);
+            $TaskUserGetMoney = round(input('rw_yj') * (1-$percent),2);
+            // 佣金
             Db::name("User")->where(['id'=>Db::name('UserRw')->where(['id'=>$id])->value('user_id')])->setInc('user_money',$TaskUserGetMoney);
+            //定金
+            Db::name("User")->where(['id'=>Db::name('UserRw')->where(['id'=>$id])->value('user_id')])->setInc('user_money',input('rw_ding'));
 
+            // 将定金返还至账户
             // 将数据记录正在金额明细中
             // 将记录存储
-            MoneyList::insert([
-                'user_id'=>UserRw::where('id',$id)->value('user_id'),
-                'money'=>$TaskUserGetMoney,
-                'type'=>0,
-                'status'=>2,
-                'create_time'=>time()
-            ]);
+            $type = [
+                0=>$TaskUserGetMoney,
+                1=>input('rw_ding')
+            ];
+            foreach ($type as $k=>$value){
+                MoneyList::insert([
+                    'user_id'=>Db::name('UserRw')->where(['id'=>$id])->value('user_id'),
+                    'money'=>$value,
+                    'type'=>$k,
+                    'status'=>2,
+                    'create_time'=>time()
+                ]);
+            }
             // 将任务的状态改为已完成
-            $TaskId= UserRw::where('id',$id)->value('rw_id');
+
             \app\model\Renwu::where('id',$TaskId)->update(['status'=>2,'rw_status'=>1]);
+
+            // 任务通过
+            $TaskPass = 2;
         }else{
             $s = Db::name('UserRw')->where(['id'=>$id])->update([
                 'order_status'=>$order_status
             ]);
+            $TaskPass = 0;
         }
 
+        // 修改任务的状态
+        \app\model\Renwu::where('id',$TaskId)->update([
+            'rw_pass'=>$TaskPass
+        ]);
         if($s){
             $code = 200;
         }else{
@@ -167,10 +187,10 @@ class Order extends Base
                 $msg = "<span class=\"label label-success radius\" $font>进行中</span>";
                 break;
             case 2:
-                $msg = "<span class=\"label label-success radius\" $font>进行中</span>";
+                $msg = "<span class=\"label label-success radius\" $font>进行中(需审核)</span>";
                 break;
             case 3:
-                $msg = "<span class=\"label label-success radius\" $font>进行中</span>";
+                $msg = "<span class=\"label label-success radius\" $font>进行中(审核未通过)</span>";
                 break;
             case 4:
                 $msg = "<span class=\"label label-success radius\" $font>已完成</span>";

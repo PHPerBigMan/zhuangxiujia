@@ -18,10 +18,16 @@ class Withdrawals extends Model{
 
         foreach($data as $k=>$v){
             $font = "style=\"font-size:14px\"";
-            $data[$k]['user_name']      = User::where(['id'=>$v['user_id']])->value('user_name');
+            $user = User::where(['id'=>$v['user_id']])->find();
+            $data[$k]['user_name']      =  $user['user_name'];
+            if(empty($data[$k]['user_name'])){
+                $data[$k]['user_name']      =  $user['user_phone'];
+            }
 //            $data[$k]['create_time']    = date('Y-m-d H:i:s',$v['create_time']);
-            $data[$k]['end_time']       = date('Y-m-d H:i:s',$v['end_time']);
-
+            if(!empty($v['end_time'])){
+                $data[$k]['end_time']       = date('Y-m-d H:i:s',$v['end_time']);
+            }
+//
 
             switch($v['status']){
                 case 0:
@@ -43,6 +49,9 @@ class Withdrawals extends Model{
                 case 1:
                     $sh = "<span class=\"label label-success radius\" $font>通过</span>";
                     break;
+                case 2:
+                    $sh = "<span class=\"label label-success radius\" $font>审核中</span>";
+                    break;
             }
 
             $data[$k]['shenghe'] = $sh;
@@ -63,7 +72,6 @@ class Withdrawals extends Model{
                 $data[$k]['bankCustomer']   = "未填写";
                 $data[$k]['bankName']       = "未填写";
             }
-
         }
 
         return $data;

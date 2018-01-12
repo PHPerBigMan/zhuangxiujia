@@ -53,17 +53,40 @@
 								</select>
 							</div>
 						</div>
-
-						<div class="row cl">
-							<label class="form-label col-xs-4 col-sm-2">任务审核：</label>
-							<div class="formControls col-xs-8 col-sm-9">
-								{$data.rw_pass}
+						{if condition="$data.type eq 1"}
+							<div class="row cl">
+								<label class="form-label col-xs-4 col-sm-2">任务审核：</label>
+								<div class="formControls col-xs-8 col-sm-9">
+									{if condition="$data.rw_pass eq 0"}
+										<span class="label label-defaunt radius" $font>未审核</span>
+									{elseif condition="$data.rw_pass eq 1"}
+										<span class="label label-defaunt radius" $font>审核未通过</span>
+									{else/}
+										<span class="label label-success radius" $font>审核已通过</span>
+									{/if}
+								</div>
 							</div>
-						</div>
+						{/if}
 						<div class="row cl">
 							<label class="form-label col-xs-4 col-sm-2">任务状态：</label>
 							<div class="formControls col-xs-8 col-sm-9">
-								{$data.rw_status}
+								{if condition="$data.type eq 1"}
+									{if condition="$data.rw_status eq 0"}
+										<span class="label label-defaunt radius" $font>未支付佣金</span>
+									{elseif condition="$data.rw_status eq 1"}
+										<span class="label label-success radius" $font>已支付佣金</span>
+									{else/}
+										<span class="label label-defaunt radius" $font>未被接单</span>
+									{/if}
+								{else/}
+									{if condition="$data.status eq 0"}
+									<span class="label label-defaunt radius" $font>投标中</span>
+									{elseif condition="$data.status eq 1"}
+									<span class="label label-success radius" $font>进行中</span>
+									{else/}
+									<span class="label label-success radius" $font>已完成</span>
+									{/if}
+								{/if}
 							</div>
 						</div>
 						<div class="row cl">

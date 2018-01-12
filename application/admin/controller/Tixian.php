@@ -26,7 +26,6 @@ class Tixian extends Base
      * method description : 获取提现列表数据
      */
     public function tixian_ajax(){
-
         return json(['data'=>Withdrawals::getAll()]);
     }
 
@@ -39,9 +38,8 @@ class Tixian extends Base
     public function shenghe(){
         $id = input('id');
 
-        $shenghe  = Db::name('Tixian')->where(['id'=>$id])->value('shenghe') == 0 ? 1 : 0;
 
-        $s = Db::name('Tixian')->where(['id'=>$id])->update(['shenghe'=>$shenghe]);
+        $s = Db::name('Tixian')->where(['id'=>$id])->update(['shenghe'=>1]);
         if($s){
             $code = 200;
         }else{
@@ -57,16 +55,10 @@ class Tixian extends Base
 
     public function dakuan(){
         $id = input('id');
-        //打款
-        $money = input('money');
-
-        $status = Db::name('Tixian')->where(['id'=>$id])->value('status');
-        if($status == 1){
-            //用户已提现成功
-            $code = 100;
-        }else{
-            //打款成功后减去对应用户的账户余额
-            Db::name("User")->where(['id'=>Db::name('Tixian')->where(['id'=>$id])->value('user_id')])->setDec('user_money',$money);
+        // 修改为提现成功
+        $s = Db::name('tixian')->where('id',$id)->update(['status'=>1]);
+        if($s){
+            return 200;
         }
     }
 
