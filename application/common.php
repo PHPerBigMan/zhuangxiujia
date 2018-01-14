@@ -146,19 +146,31 @@ function return_data_bank($data){
  * @return false|int 处理投标倒计时
  */
 function TaskReturn($Bid){
-    $bid_time  = ($Bid['bid_time']- (date('s',time() - strtotime($Bid['create_time'])))) *1000;
+    $bid_time  = ($Bid['bid_time']- time() - strtotime($Bid['create_time']));
 
+    if($bid_time > 0){
+        $bid_time = (int)substr($bid_time, 0, 4);
+    }
     // TODO:: 投标倒计时
-//    dump($bid_time);die;
+
     if($bid_time <= 0){
         $bid_time = 0;
-        // 修改任务的状态 暂时改为已完成
-        \app\model\Renwu::where('id',$Bid['id'])->update([
-            'status'=>2
-        ]);
+        // 如果这个任务下还没有方案则将 任务的状态修改 改为投标中？ 任务释放
+
+        // 查找所有该任务下的订单
+        $OrderId = \app\model\UserRw::where('rw_id',$Bid['id'])->column('orderId');
+        // 查找是否存在方案
+        $OrderBid = \app\model\OrderBid::whereIn('orderId',$OrderId)->find();
+        if(empty($OrderBid)){
+            \app\model\Renwu::where('id',$Bid['id'])->update([
+                'status'=>0
+            ]);
+        }
     }
 
-
+    if($Bid['bid_time'] == ""){
+        return 0;
+    }
     return $bid_time;
 }
 

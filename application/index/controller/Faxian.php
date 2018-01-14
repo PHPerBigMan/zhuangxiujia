@@ -26,6 +26,7 @@ class Faxian
      */
 
     public function read(){
+
         $id     = input('id');
         $data   = Db::name('Zl')->where(['zl_cat'=>$id])->field('id zl_id,zl_title,zl_pic,zl_type,created_at,zl_content')->select();
         foreach($data as $k=>$v){

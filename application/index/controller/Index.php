@@ -227,12 +227,13 @@ class Index
         if(!empty($data)){
             // 获取任务的状态
             $TaskStatus = Renwu::where('id',$data['rw_id'])->value('status');
+//            dump($data['rw_id']);die;
             if($TaskStatus == 0){
                 // 投标中
                 $orderStatus = [7];
             }else{
                 // 中标
-                $orderStatus = [1,8,10];
+                $orderStatus = [1,4,8,10];
                 if($data['order_status'] == 10){
                     // 当订单状态为 确认中时 显示所有投标用户
                     $orderStatus = [1,8,7,10];

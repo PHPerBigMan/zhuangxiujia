@@ -21,6 +21,8 @@ class Renwu
 
         if($data['type'] == 2){
             $data['bid_time']  = TaskReturn($data);
+        }else{
+//            $data['bid_time'] = 0;
         }
         $j = $this->return_data($data);
         return json($j);
@@ -87,10 +89,10 @@ class Renwu
         }else{
 //            $sql = "SELECT id,rw_yj,rw_cover img,start_time,rw_title FROM zjx_renwu WHERE rw_status = 2 OR rw_title like '%$key%' OR rw_yj like '%$key%' OR rw_main like '%$key%'";
             if(!empty($area)){
-                $data = Db::name('Renwu')->where(['rw_status'=>2,'is_show'=>1])->where('rw_title','like',"%$key%")->where('rw_area','like',"%$area%")
+                $data = Db::name('Renwu')->where(['is_show'=>1])->where('rw_title','like',"%$key%")->where('rw_area','like',"%$area%")
                     ->field('id,rw_yj,rw_cover img,start_time,rw_title,rw_status,status,abstract,type')->select();
             }else{
-                $data = Db::name('Renwu')->where(['rw_status'=>2,'is_show'=>1])->where('rw_title','like',"%$key%")->field('id,rw_yj,rw_cover img,start_time,rw_title,rw_status,status,abstract,type')->select();
+                $data = Db::name('Renwu')->where(['is_show'=>1])->where('rw_title','like',"%$key%")->field('id,rw_yj,rw_cover img,start_time,rw_title,rw_status,status,abstract,type')->select();
 
             }
 

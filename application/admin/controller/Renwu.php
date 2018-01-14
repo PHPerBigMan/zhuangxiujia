@@ -281,8 +281,10 @@ class Renwu extends Base
         $data['rw_yj']          = "";
         $data['rw_ding']        = "";
         $data['rw_cat']         = "";
+        $data['status']         = 0;
         $data['rw_main']        = "";
         $data['rw_province']    = "";
+        $data['type']    = "";
         $data['abstract']    = "";
         $data['rw_area']        = "";
         $data['rw_cover']       = "";

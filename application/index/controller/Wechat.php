@@ -62,7 +62,7 @@ class Wechat
             // 对已生成的订单进行付费
             $taskId     = UserRw::where('orderId',$orderData['orderId'])->value('rw_id');
             $user_id    = UserRw::where('orderId',$orderData['orderId'])->value('user_id');
-
+//            $rand = ;
             $out_trade_no  = 'wx'.$orderData['orderId'].'-'.$orderData['payType'].'-'.$user_id.'-'.$taskId;
         }else{
             // 投标先付费再生成订单
@@ -86,7 +86,7 @@ class Wechat
 
         $order = new Order($attributes);
         $result = $payment->prepare($order);
-//        dd($result);die;
+//        dump($result);die;
         if ($result->return_code == 'SUCCESS' && $result->result_code == 'SUCCESS'){
             if($orderData['payType'] == 1){
                 $out_trade_no = explode('-',$out_trade_no);
@@ -98,6 +98,8 @@ class Wechat
             $config = $payment->configForAppPayment($prepayId);
 
             return json($this->return_data($config));
+        }else{
+            return json(['status'=>404,'msg'=>'该订单已支付']);
         }
     }
 
@@ -198,7 +200,8 @@ class Wechat
                                 // 将这些订单修改为未中标
                                 UserRw::wehreIn('id',$NoGetOrderId)->update(['order_status'=>9]);
                             }
-
+                            // 业主付完钱之后任务的状态修改为进行中
+                            Renwu::where('id',$attach[3])->update(['status'=>1]);
                         }
 
                         UserRw::where('out_trade_no',$attach[0])->update($update);

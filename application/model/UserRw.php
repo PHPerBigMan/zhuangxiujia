@@ -150,7 +150,7 @@ class UserRw extends Model{
                 } else {
 //                    $data[$k]['pay_limit_time']     = ($rewu['pay_limit_time']-(time()-$rewu['pay_limit_time'])) / 60;
 
-                    $time = ($rewu['pay_limit_time'] - (time() - $v['create_time'])) / 60;
+                    $time = ($rewu['pay_limit_time'] - (time() - $v['create_time']));
 
                     $data[$k]['pay_limit_time'] = (int)substr($time, 0, 4);
                 }
@@ -301,7 +301,7 @@ class UserRw extends Model{
         // 重新计算佣金  乘以抽成部分
         $percent = Percentage::where('id',1)->value('percentage');
 
-        $TaskUserGetMoney = $TaskInfo['rw_yj'] * (1-$percent);
+        $TaskUserGetMoney = round($TaskInfo['rw_yj'] * (1-$percent),2);
 
         User::where('id',UserRw::where('orderId',$post)->value('user_id'))->setInc('user_money',$TaskUserGetMoney);
 
@@ -324,7 +324,7 @@ class UserRw extends Model{
         }
 
         // 修改任务的状态为已完成
-        Renwu::where('id',$TaskInfo['id'])->update(['status'=>2]);
+        Renwu::where('id',$TaskInfo['id'])->update(['status'=>2,'bid_time'=>0]);
         if($s){
             return returnStatus($s);
         }

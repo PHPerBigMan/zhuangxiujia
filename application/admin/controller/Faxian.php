@@ -87,7 +87,7 @@ class Faxian extends Base
      */
 
     public function data_ajax(){
-        $data = Db::name('Zl')->select();
+        $data = Db::name('Zl')->order('id','desc')->select();
         foreach($data as $k=>$v){
 //            $data[$k]['create_time'] = date('Y-m-d H:i:s',$v['create_time']);
 
@@ -160,19 +160,22 @@ class Faxian extends Base
         if(!empty($data['lunbo'])){
             $data['zl_pic'] = json_encode(explode(',',$data['lunbo']));
         }
-
+        $data['zl_content'] = $data['content'];
         unset($data['lunbo']);
         if($data['id'] == 0){
             unset($data['id']);
             $s = Db::name('Zl')->insert($data);
         }else{
-            $s = Db::name('Zl')->where(['id'=>$data['id']])->update([
-                'zl_title'      =>$data['zl_title'],
-                'zl_cat'        =>$data['zl_cat'],
-                'zl_type'        =>$data['zl_type'],
-                'zl_pic'        =>$data['zl_pic'],
-                'content'       =>empty($data['content']) ? "" :$data['content'],
-            ]);
+//            $s = Db::name('Zl')->where(['id'=>$data['id']])->update([
+//                'zl_title'      =>$data['zl_title'],
+//                'zl_cat'        =>$data['zl_cat'],
+//                'zl_type'        =>$data['zl_type'],
+//                'zl_pic'        =>$data['zl_pic'],
+//                'content'       =>empty($data['content']) ? "" :$data['content'],
+//            ]);
+            $map['id'] = $data['id'];
+            unset($data['id']);
+            $s = Db::name('Zl')->where($map)->update($data);
         }
 
         if($s){

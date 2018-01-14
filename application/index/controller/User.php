@@ -344,7 +344,13 @@ class User
         }
 
         $TaskType = \app\model\Renwu::where('id',$TaskId)->find();
+
         if($o_status == 5){
+
+            Db::name('log')->insert([
+                'msg'=>"任务支付超时",
+                'data'=>$TaskType
+            ]);
             // 判断任务的类型
             if($TaskType['type'] == 1){
                 // 装修任务
@@ -356,9 +362,22 @@ class User
                 $status = 0;
             }
             // 取消订单释放任务
-            \app\model\Renwu::where('id',$TaskId)->update([
+            $TaskResue = \app\model\Renwu::where('id',$TaskId)->update([
                 "$column"=>"$status"
             ]);
+
+            if($TaskResue){
+                // 释放成功
+                Db::name('log')->insert([
+                    'msg'=>"释放成功",
+                    'data'=>1
+                ]);
+            }else{
+                Db::name('log')->insert([
+                    'msg'=>"释放失败",
+                    'data'=>2
+                ]);
+            }
         }
         $s = Db::name('UserRw')->where(['orderId'=>$orderId])->update(['order_status'=>$o_status]);
 
